@@ -2,7 +2,7 @@
 #'
 #' This function allows you to get the adjacency matrix from a graph object.
 #' @param pathway A graph object.
-#' @param directed Set to TRUE if you want the graph to be directed.
+#' @param liste Set to TRUE if you want the graph to be directed.
 #' @keywords adjacency matrix
 #' @export
 #' @examples
