@@ -33,7 +33,7 @@ ALGORITHM:
 
 ## Application
 
-Data: we will use KEGG Pathways data, and scores used in Daub et al. (2013), consisting in scaled *F*subscript~ST~ over 53 human populaions, for more than 17,000 genes.
+Data: we will use KEGG Pathways data, and scores used in Daub et al. (2013), consisting in scaled $F_ST$ over 53 human populaions, for more than 17,000 genes.
 
 ```
 data(keggPathways);data(zScores)
