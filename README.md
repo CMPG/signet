@@ -13,7 +13,7 @@ Search algorithm
 
 Application
 
-Data: we will use KEGG Pathways data, and scores used in Daub et al. (2013), consisting in scaled Fst over 53 human populaions, for more than 17,000 genes.
+``Data``: w`e` will use KEGG Pathways data, and scores used in Daub et al. (2013), consisting in scaled Fst over 53 human populaions, for more than 17,000 genes.
 
 ```
 data(keggPathways);data(zScores)
