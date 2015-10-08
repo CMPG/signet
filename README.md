@@ -1,13 +1,18 @@
 # `signet`: Selection Inference in Gene Networks
 
-## Introduction
-
 `signet` is a R package designed to handle the evolutionary analysis of gene networks.
 
 From a biological pathways database, and a gene scores list, one could search for high-scoring subnetworks in biological pathways.
 
 The method implemented is based on Ideker et al. (2002) heuristics, but several improvements are considered.
 
+## Installation
+
+There is no official release of the signet package at the moment. But you can install the current version using the devtools package:
+
+```
+devtools::install_github(algorythmes/signet)
+```
 
 ## Search algorithm
 
@@ -28,7 +33,7 @@ ALGORITHM:
 
 ## Application
 
-Data: we will use KEGG Pathways data, and scores used in Daub et al. (2013), consisting in scaled *F*ST over 53 human populaions, for more than 17,000 genes.
+Data: we will use KEGG Pathways data, and scores used in Daub et al. (2013), consisting in scaled *F*subscript~ST~ over 53 human populaions, for more than 17,000 genes.
 
 ```
 data(keggPathways);data(zScores)
