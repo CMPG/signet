@@ -1,4 +1,4 @@
-# signet
+# signet: Selection Inference in Gene Networks
 
 signet is a R package designed to handle the evolutionary analysis of gene networks.
 
