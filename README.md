@@ -8,26 +8,22 @@ The method implemented is based on Ideker et al. (2002) heuristics, but several 
 
 ## Installation
 
-There is no official release of the signet package at the moment. But you can install the current version using the devtools package:
+There is no official release of the signet package at the moment. But you can install the development version using the `devtools` package:
 
 ```
-devtools::install_github(algorythmes/signet)
+#install.packages('devtools')
+devtools::install_github('algorythmes/signet')
 ```
 
-## Search algorithm
+## Methodology
 
 INPUT: a graph G(V, E)
 
 OUTPUT:
 
-ALGORITHM:
-- Select a random subnetwork of kmin nodes v in V
-- FOR i = 1 to N, DO:
-  - Randomly pick a node and toggle its state
-  - Compute the subnetwork score sk
-  - IF ():
-    ELSE:
-- Return the subnetwork and its score 
+The principle is as follow:
+
+Here is an animation to look at a run of the algorithm:
 
 ![simulatedAnnealing](misc/anim_50fps.gif)
 

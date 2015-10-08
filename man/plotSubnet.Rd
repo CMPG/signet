@@ -7,9 +7,9 @@
 plotSubnet(path, liste)
 }
 \arguments{
-\item{pathway}{A graph object.}
+\item{liste}{Set to TRUE if you want the graph to be directed.}
 
-\item{directed}{Set to TRUE if you want the graph to be directed.}
+\item{pathway}{A graph object.}
 }
 \description{
 This function allows you to get the adjacency matrix from a graph object.

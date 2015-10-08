@@ -11,7 +11,7 @@ nullDistribution(pathwaysList, scores, kmin, kmax, iterations)
 
 \item{param}{a data frame with gene list and associated scores}
 
-\item{burnin}{}
+\item{burnin}{A burnin}
 }
 \description{
 Generate the temperature function used in simulated annealing.

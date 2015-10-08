@@ -51,7 +51,9 @@ searchSubnet<-function(pathway,
 
   if(missing(nullDist))
   {
-    nullDist<-nullDistribution(scores = scores, kmin = 2, kmax = length(scores$gene),iterations=2000)
+    if(length(scores$gene)<100) max<-length(scores$gene)
+    else max <- 100
+    nullDist<-nullDistribution(scores = scores, kmin = 2, kmax = max,iterations=2000)
   }
 
   ### Initialization of the graph
@@ -147,7 +149,7 @@ searchSubnet<-function(pathway,
       sampBound<-TRUE
     }
 
-    if(length(activeNet)>=kmin & length(unique(c(neighbours,boundaries)))>0)
+    if(length(activeNet)>=kmin & length(unique(c(neighbours,boundaries)))>0 & length(activeNet)<=100)
     {
       #Sample a new gene to toggle its state
       if(sampBound) newG<-as.character(sample(unique(c(neighbours,boundaries)),1))
@@ -159,6 +161,7 @@ searchSubnet<-function(pathway,
       s2<-(sumStat-nullDist[nullDist$k==length(activeNet),]$mu)/nullDist[nullDist$k==length(activeNet),]$sigma
 
       #Keep or not the toggled gene
+
       if(s2<s)#If the score is weaker than the last one, we keep the gene toggled with a probability "prob"
       {
         prob<-exp((s2-s)/temp[i])
