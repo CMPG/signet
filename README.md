@@ -8,7 +8,7 @@ The method implemented is based on Ideker et al. (2002) heuristics, but several 
 
 ## Installation
 
-There is no official release of the signet package at the moment. But you can install the development version using the `devtools` package:
+There is no official release of the signet package at the moment. But you can install the development version using the `devtools` package (Rtools must also be installed and properly configured):
 
 ```
 #install.packages('devtools')
@@ -17,11 +17,7 @@ devtools::install_github('algorythmes/signet')
 
 ## Methodology
 
-INPUT: a graph G(V, E)
-
-OUTPUT:
-
-The principle is as follow:
+The principle is as follow: 
 
 Here is an animation to look at a run of the algorithm:
 
@@ -29,7 +25,7 @@ Here is an animation to look at a run of the algorithm:
 
 ## Application
 
-Data: we will use KEGG Pathways data, and scores used in Daub et al. (2013), consisting in scaled $F_{ST}$ over 53 human populaions, for more than 17,000 genes.
+Data: we will use KEGG Pathways data, and scores used in Daub et al. (2013), consisting in scaled differentiation scores over 53 human populaions, for more than 17,000 genes.
 
 ```
 data(keggPathways);data(zScores)

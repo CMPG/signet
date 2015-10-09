@@ -15,7 +15,7 @@ searchSubnet(pathway, scores, nullDist, iterations = 2000,
 
 \item{nullDist}{A data frame with three columns : k, mu, sigma. Can be obtained thanks to nulldistribution() function}
 
-\item{iterations}{}
+\item{iterations}{Number of iterations.}
 
 \item{temperature}{The temperature function parameter.}
 
@@ -25,6 +25,9 @@ searchSubnet(pathway, scores, nullDist, iterations = 2000,
 
 \item{verbose}{If TRUE, displays text in the R console.}
 }
+\value{
+A list containing a table with genes, their state, their score; the subnetwortk score and size and the p-value
+}
 \description{
 A simulated annealing algorithm is used to research a high scoring subnetwork.
 Implements also a test id a null distribution is provided.
@@ -33,7 +36,10 @@ Implements also a test id a null distribution is provided.
 data(keggPathways)
 data(zScores)
 
-searchSubnet(keggPathways[[1]],zScores)
+example1 <- searchSubnet(keggPathways[[1]],zScores)
+
+data() #a previously generated null distribution
+example2 <- searchSubnet(keggPathways[[1]],zScores,null)
 }
 \keyword{algorithm}
 \keyword{annealing,}

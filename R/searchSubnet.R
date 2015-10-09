@@ -5,18 +5,21 @@
 #' @param pathway A graph object.
 #' @param scores a data frame with gene list and associated scores
 #' @param nullDist A data frame with three columns : k, mu, sigma. Can be obtained thanks to nulldistribution() function
-#' @param iterations
+#' @param iterations Number of iterations.
 #' @param temperature The temperature function parameter.
 #' @param kmin The minimal size of a subnetwork.
 #' @param directed If TRUE, considers the edges direction, i.e. cannot go back.
 #' @param verbose If TRUE, displays text in the R console.
 #' @keywords subnetwork, simulated annealing, heuristics, search algorithm
-#' @export
+#' @return A list containing a table with genes, their state, their score; the subnetwortk score and size and the p-value
 #' @examples
 #' data(keggPathways)
 #' data(zScores)
 #'
-#' searchSubnet(keggPathways[[1]],zScores)
+#' example1 <- searchSubnet(keggPathways[[1]],zScores)
+#'
+#' data() #a previously generated null distribution
+#' example2 <- searchSubnet(keggPathways[[1]],zScores,null)
 
 searchSubnet<-function(pathway,
                        scores,
