@@ -12,6 +12,7 @@
 #' @param verbose If TRUE, displays text in the R console.
 #' @keywords subnetwork, simulated annealing, heuristics, search algorithm
 #' @return A list containing a table with genes, their state, their score; the subnetwortk score and size and the p-value
+#' @export
 #' @examples
 #' data(keggPathways)
 #' data(zScores)

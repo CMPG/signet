@@ -12,6 +12,7 @@
 #' @param animPlot Number of iterations represented in the animation.
 #' @keywords subnetwork, simulated annealing, heuristics, search algorithm
 #' @return A HTML file and three folder in the animation subfolder in your working directory.
+#' @export
 #' @examples
 #' data(keggPathways)
 #' data(zScores)
