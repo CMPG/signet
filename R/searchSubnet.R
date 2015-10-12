@@ -46,9 +46,9 @@ searchSubnet<-function(pathway,
   if(missing(scores)) stop("Gene scores are missing !")
 
   #remove conn components of size < kmin
-  pathway<-subGraph(unlist(connComp(pathway)[!lapply(connComp(pathway),length)<kmin]),pathway)
+  pathway<-subGraph(unlist(graph::connComp(pathway)[!lapply(graph::connComp(pathway),length)<kmin]),pathway)
 
-  if(directed==FALSE) pathway<-ugraph(pathway)
+  if(directed==FALSE) pathway<-graph::ugraph(pathway)
 
   names(scores)[[1]]<-"gene";names(scores)[[2]]<-"score"
   scores<-scores[scores$gene%in%nodes(pathway),]
@@ -62,7 +62,7 @@ searchSubnet<-function(pathway,
 
   ### Initialization of the graph
 
-  newpath<-subGraph(as.character(scores[!is.na(scores$score),]$gene),pathway) #remove missing values
+  newpath<-graph::subGraph(as.character(scores[!is.na(scores$score),]$gene),pathway) #remove missing values
   adjMatrix<-getAdjacencyMatrix(pathway=newpath) #get the adjacency matrix of the graph
 
   #initialize the gene scores list (gene names, scores, and state)
@@ -135,9 +135,9 @@ searchSubnet<-function(pathway,
     while(bla!=1)
     {
       ge<-sample(activeNet,1)
-      test<-subGraph(as.character(activeNet[activeNet!=ge]),newpath)
+      test<-graph::subGraph(as.character(activeNet[activeNet!=ge]),newpath)
 
-      bla<-length(connComp(test))
+      bla<-length(graph::connComp(test))
       if(bla==1) neighbours<-c(ge)
     }
 

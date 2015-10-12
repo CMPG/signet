@@ -40,7 +40,7 @@ nullDistribution<-function(pathwaysList,
         while(length(glis)<k+5)
         {
           path<-pathwaysList[[sample(length(pathwaysList),1)]]
-          glis<-nodes(path)
+          glis<-graph::nodes(path)
         }
         gList<-scores[scores$gene %in% glis,]
       }

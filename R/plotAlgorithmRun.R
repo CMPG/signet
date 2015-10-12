@@ -30,7 +30,7 @@ plotAlgorithmRun<-function(pathway,
                            animPlot = 100)
 {
   require(animation)
-  saveHTML({
+  animation::saveHTML({
   searchSubnet(pathway,
                scores,
                nullDist,
