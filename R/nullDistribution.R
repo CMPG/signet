@@ -1,15 +1,18 @@
 #' Null distribution
 #'
 #' Generate the temperature function used in simulated annealing.
-#' @param iterations A graph object.
-#' @param param a data frame with gene list and associated scores
-#' @param burnin A burnin
+#' @param pathwaysList A graph object, or a liste of graphNEL objects.
+#' @param scores A data frame with gene list and associated scores
+#' @param kmin kmin
+#' @param kmax kmax
+#' @param iterations Number of iterations.
+#'
 #' @keywords subnetwork, simulated annealing
 #' @export
 #' @examples
 #' require(signet)
 #' #get data
-#' nullDistribution()
+#' #nullDistribution()
 
 nullDistribution<-function(pathwaysList,
                            scores,

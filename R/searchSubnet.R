@@ -1,17 +1,22 @@
 #' Search for a high scoring subnetwork
 #'
-#' A simulated annealing algorithm is used to research a high scoring subnetwork.
-#' Implements also a test id a null distribution is provided.
+#' A simulated annealing algorithm is used to research a high scoring
+#' subnetwork.Implements also a test id a null distribution is provided.
+#'
 #' @param pathway A graph object.
 #' @param scores a data frame with gene list and associated scores
-#' @param nullDist A data frame with three columns : k, mu, sigma. Can be obtained thanks to nulldistribution() function
+#' @param nullDist A data frame with three columns : k, mu, sigma.
+#' Can be obtained thanks to nulldistribution() function
 #' @param iterations Number of iterations.
 #' @param temperature The temperature function parameter.
 #' @param kmin The minimal size of a subnetwork.
 #' @param directed If TRUE, considers the edges direction, i.e. cannot go back.
 #' @param verbose If TRUE, displays text in the R console.
+#' @param animPlot If TRUE, generates a HTML file
+#'
 #' @keywords subnetwork, simulated annealing, heuristics, search algorithm
-#' @return A list containing a table with genes, their state, their score; the subnetwortk score and size and the p-value
+#' @return A list containing a table with genes, their state, their score;
+#' the subnetwortk score and size and the p-value
 #' @export
 #' @examples
 #' require(signet)
@@ -20,8 +25,8 @@
 #'
 #' example1 <- searchSubnet(keggPathways[[1]],zScores)
 #'
-#' data() #a previously generated null distribution
-#' example2 <- searchSubnet(keggPathways[[1]],zScores,null)
+#' #data() #a previously generated null distribution
+#' #example2 <- searchSubnet(keggPathways[[1]],zScores,null)
 
 searchSubnet<-function(pathway,
                        scores,
@@ -195,13 +200,13 @@ searchSubnet<-function(pathway,
       plotSubnet(newpath,workingTable[workingTable$state,]$gene)
       par(mar=c(5,5,5,5))
       plot(1:i,size,ylim=c(0,50),xlim=c(0,animPlot),
-           ylab="Subset size",xlab="Iteration",pch=16,cex=0.5)
+           ylab="Subnetwork size",xlab="Iteration",pch=16,cex=0.5)
       text(x=1,y=1,i)
       plot(1:i,temp[1:i],ylim=c(0,1),xlim=c(0,animPlot),
            ylab="Temperature",xlab="Iteration",pch=16,cex=0.5)
       text(x=0,y=0,i)
       plot(1:i,score,ylim=c(-5,5),xlim=c(0,animPlot),
-           ylab="Subset score",xlab="Iteration",pch=16,cex=0.5)
+           ylab="Subnetwork score",xlab="Iteration",pch=16,cex=0.5)
       abline(h=0,lty=2)
       text(x=0,y=-5,i)
       requireNamespace("animation",quietly=TRUE)

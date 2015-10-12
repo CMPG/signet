@@ -38,7 +38,7 @@ require(signet)
 data(keggPathways)
 data(zScores)
 
-plotAlgorithmRun(keggPathways[[1]],zScores,animPlot=10)
+#plotAlgorithmRun(keggPathways[[1]],zScores,animPlot=10)
 }
 \keyword{algorithm}
 \keyword{annealing,}

@@ -1,14 +1,16 @@
 #' Temperature function
 #'
-#' Generate the temperature function used in simulated annealing.
-#' @param iterations A graph object.
-#' @param param a data frame with gene list and associated scores
+#' A function to generate the temperature function used in simulated annealing.
+#' After a burnin period, the temperature decreases geometrically.
+#'
+#' @param iterations Number of iterations.
+#' @param param Geometric parameter
 #' @param burnin Burnin
 #' @keywords subnetwork, simulated annealing
 #' @export
 #' @examples
-#' #get data
-#' temperatureFunction()
+#' t<-temperatureFunction(iterations=1500,param=0.995,burnin=100)
+#' plot(t)
 
 temperatureFunction<-function(iterations,param,burnin)
 {

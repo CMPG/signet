@@ -12,7 +12,7 @@ Description: An R package to detect and test for selection in biological
   data, one can search for a high-scoring subnetwork and test for its
   significance against the score's null distribution.
 Depends: R (>= 3.2.1)
-Imports:
-  graph
+Imports: graph
+Suggests: animation, graphite
 License: GPL-2
 LazyData: true

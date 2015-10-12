@@ -4,12 +4,12 @@
 \alias{plotSubnet}
 \title{plotSubnet}
 \usage{
-plotSubnet(path, liste)
+plotSubnet(pathway, liste)
 }
 \arguments{
-\item{liste}{Set to TRUE if you want the graph to be directed.}
-
 \item{pathway}{A graph object.}
+
+\item{liste}{Set to TRUE if you want the graph to be directed.}
 }
 \description{
 This function allows you to get the adjacency matrix from a graph object.
@@ -17,7 +17,7 @@ This function allows you to get the adjacency matrix from a graph object.
 \examples{
 #get data
 require(signet)
-plotSubnet()
+#plotSubnet()
 }
 \keyword{adjacency}
 \keyword{matrix}

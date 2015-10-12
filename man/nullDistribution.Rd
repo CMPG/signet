@@ -7,11 +7,15 @@
 nullDistribution(pathwaysList, scores, kmin, kmax, iterations)
 }
 \arguments{
-\item{iterations}{A graph object.}
+\item{pathwaysList}{A graph object, or a liste of graphNEL objects.}
 
-\item{param}{a data frame with gene list and associated scores}
+\item{scores}{A data frame with gene list and associated scores}
 
-\item{burnin}{A burnin}
+\item{kmin}{kmin}
+
+\item{kmax}{kmax}
+
+\item{iterations}{Number of iterations.}
 }
 \description{
 Generate the temperature function used in simulated annealing.
@@ -19,7 +23,7 @@ Generate the temperature function used in simulated annealing.
 \examples{
 require(signet)
 #get data
-nullDistribution()
+#nullDistribution()
 }
 \keyword{annealing}
 \keyword{simulated}

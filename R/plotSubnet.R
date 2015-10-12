@@ -8,18 +8,18 @@
 #' @examples
 #' #get data
 #' require(signet)
-#' plotSubnet()
+#' #plotSubnet()
 
-plotSubnet<-function(path,liste)
+plotSubnet<-function(pathway,liste)
 {
   subs<-as.character(liste)
 
   col<-c(rep("red",length(subs)))
   nAttrs<-list()
   nAttrs$fillcolor <- col
-  nAttrs$height <- nAttrs$width <- rep("0.4", length(graph::nodes(path)))
-  names(nAttrs$width)<-names(nAttrs$height)<-graph::nodes(path)
+  nAttrs$height <- nAttrs$width <- rep("0.4", length(graph::nodes(pathway)))
+  names(nAttrs$width)<-names(nAttrs$height)<-graph::nodes(pathway)
   names(nAttrs$fillcolor)<-c(subs)
 
-  return(plot(path, y="neato", nodeAttrs = nAttrs))
+  return(plot(pathway, y="neato", nodeAttrs = nAttrs))
 }

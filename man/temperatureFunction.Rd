@@ -7,7 +7,7 @@
 temperatureFunction(iterations, param, burnin)
 }
 \arguments{
-\item{iterations}{A graph object.}
+\item{iterations}{Numbver of iterations.}
 
 \item{param}{a data frame with gene list and associated scores}
 
@@ -15,10 +15,11 @@ temperatureFunction(iterations, param, burnin)
 }
 \description{
 Generate the temperature function used in simulated annealing.
+Follows a geometric law, after a burnin.
 }
 \examples{
-#get data
-temperatureFunction()
+t<-temperatureFunction(iterations=1500,param=0.995,burnin=100)
+plot(t)
 }
 \keyword{annealing}
 \keyword{simulated}
