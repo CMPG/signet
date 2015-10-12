@@ -12,6 +12,7 @@
 #' @param kmin The minimal size of a subnetwork.
 #' @param directed If TRUE, considers the edges direction, i.e. cannot go back.
 #' @param verbose If TRUE, displays text in the R console.
+#' @param burnin Burnin
 #' @param animPlot If TRUE, generates a HTML file
 #'
 #' @keywords subnetwork, simulated annealing, heuristics, search algorithm
@@ -30,12 +31,13 @@
 
 searchSubnet<-function(pathway,
                        scores,
-                       nullDist,
+                       nullDist = FALSE,
                        iterations = 2000,
                        temperature = 0.995,
                        kmin = 3,
                        directed = FALSE,
                        verbose = TRUE,
+                       burnin = 2,
                        animPlot = 0)
 {
   #check for the package graph and load it
@@ -59,11 +61,9 @@ searchSubnet<-function(pathway,
   names(scores)[[1]]<-"gene";names(scores)[[2]]<-"score"
   scores<-scores[scores$gene %in% graph::nodes(pathway),]
 
-  if(missing(nullDist))
+  if(nullDist == FALSE)
   {
-    if(length(scores$gene)<100) max<-length(scores$gene)
-    else max <- 100
-    nullDist<-nullDistribution(scores = scores, kmin = 2, kmax = max,iterations=2000)
+    cat("  No null distribution provided. The mean will be maximized.\n")
   }
 
   ### Initialization of the graph
@@ -76,7 +76,7 @@ searchSubnet<-function(pathway,
   workingTable$state <- rep(FALSE,length(workingTable$score))
 
   #initialize the temperature function
-  temp<-temperatureFunction(iterations = iterations, param = temperature, burnin = 50)
+  temp<-temperatureFunction(iterations = iterations, param = temperature, burnin = burnin)
 
   #c. select the initial subset of size kmin
   boundaries<-NULL
@@ -108,7 +108,11 @@ searchSubnet<-function(pathway,
   workingTable[which(workingTable$gene%in%geneSampled),]$state <- TRUE
   workingTable[which(!workingTable$gene%in%geneSampled),]$state <- FALSE
   sumStat<-mean(workingTable[workingTable$state,]$score)
-  s<-(sumStat-nullDist[nullDist$k==kmin,]$mu)/nullDist[nullDist$k==kmin,]$sigma
+  if(nullDist == FALSE)
+  {
+    s <- sumStat
+  }
+  else  s<-(sumStat-nullDist[nullDist$k==kmin,]$mu)/nullDist[nullDist$k==kmin,]$sigma
 
   ###2. OPTIMISATION
   ######
@@ -158,7 +162,13 @@ searchSubnet<-function(pathway,
       sampBound<-TRUE
     }
 
-    if(length(activeNet)>=kmin & length(unique(c(neighbours,boundaries)))>0 & length(activeNet)<=100)
+    if(nullDist != FALSE)
+    {
+      if(length(activeNet)) stop(paste("No null distribution for subnetwork
+                                 of size > ",max(nullDist$k)))
+    }
+
+    if(length(activeNet)>=kmin & length(unique(c(neighbours,boundaries)))>0)
     {
       #Sample a new gene to toggle its state
       if(sampBound) newG<-as.character(sample(unique(c(neighbours,boundaries)),1))
@@ -167,7 +177,11 @@ searchSubnet<-function(pathway,
 
       #Compute the subnet score
       sumStat<-mean(workingTable[workingTable$state,]$score)
-      s2<-(sumStat-nullDist[nullDist$k==length(activeNet),]$mu)/nullDist[nullDist$k==length(activeNet),]$sigma
+      if(nullDist == FALSE)
+      {
+        s2 <- sumStat
+      }
+      else  s2<-(sumStat-nullDist[nullDist$k==length(activeNet),]$mu)/nullDist[nullDist$k==length(activeNet),]$sigma
 
       #Keep or not the toggled gene
 
@@ -217,9 +231,13 @@ searchSubnet<-function(pathway,
   ### Return the results (subnetwork, size, score and p-value)
   Stat<-mean(workingTable[workingTable$state,]$score)
   subnetSize<-length(workingTable[workingTable$state,]$gene)
+  if(nullDist != FALSE)
+  {
   pval<-1-pnorm(Stat,
                 mean=nullDist[nullDist$k==length(activeNet),]$mu,
                 sd=nullDist[nullDist$k==length(activeNet),]$sigma)
+  }
+  else pval <- NA
   cat(paste("\n\n  Subnetwork size:",subnetSize,
             "genes\n  Subnetwork score:",format(s,digits=4),
             "\n  p-value:",pval,"\n\n"))

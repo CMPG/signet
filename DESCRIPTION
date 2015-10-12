@@ -1,7 +1,7 @@
 Package: signet
 Type: Package
 Title: signet: Selection Inference in Gene Networks
-Version: 0.1
+Version: 0.2
 Date: 2015-10-09
 Authors@R: c(person("Alexandre", "Gouy",
   email = "alexandre.gouy@iee.unibe.ch", role = c("aut", "cre")),
@@ -13,6 +13,6 @@ Description: An R package to detect and test for selection in biological
   significance against the score's null distribution.
 Depends: R (>= 3.2.1)
 Imports: graph
-Suggests: animation, graphite
+Suggests: animation, graphite, RCytoscape
 License: GPL-2
 LazyData: true

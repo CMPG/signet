@@ -4,9 +4,9 @@
 \alias{searchSubnet}
 \title{Search for a high scoring subnetwork}
 \usage{
-searchSubnet(pathway, scores, nullDist, iterations = 2000,
+searchSubnet(pathway, scores, nullDist = FALSE, iterations = 2000,
   temperature = 0.995, kmin = 3, directed = FALSE, verbose = TRUE,
-  animPlot = 0)
+  burnin = 2, animPlot = 0)
 }
 \arguments{
 \item{pathway}{A graph object.}
@@ -25,6 +25,8 @@ Can be obtained thanks to nulldistribution() function}
 \item{directed}{If TRUE, considers the edges direction, i.e. cannot go back.}
 
 \item{verbose}{If TRUE, displays text in the R console.}
+
+\item{burnin}{Burnin}
 
 \item{animPlot}{If TRUE, generates a HTML file}
 }

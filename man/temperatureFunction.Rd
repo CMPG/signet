@@ -2,7 +2,7 @@
 % Please edit documentation in R/temperatureFunction.R
 \name{temperatureFunction}
 \alias{temperatureFunction}
-\title{Temperature function}
+\title{Generate the temperature function}
 \usage{
 temperatureFunction(iterations, param, burnin)
 }
