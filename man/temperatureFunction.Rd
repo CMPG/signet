@@ -11,7 +11,7 @@ temperatureFunction(iterations, param, burnin)
 
 \item{param}{a data frame with gene list and associated scores}
 
-\item{burnin}{}
+\item{burnin}{Burnin}
 }
 \description{
 Generate the temperature function used in simulated annealing.

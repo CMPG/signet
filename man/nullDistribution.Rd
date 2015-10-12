@@ -17,8 +17,9 @@ nullDistribution(pathwaysList, scores, kmin, kmax, iterations)
 Generate the temperature function used in simulated annealing.
 }
 \examples{
+require(signet)
 #get data
-temperatureFunction()
+nullDistribution()
 }
 \keyword{annealing}
 \keyword{simulated}

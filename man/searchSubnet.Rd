@@ -33,6 +33,7 @@ A simulated annealing algorithm is used to research a high scoring subnetwork.
 Implements also a test id a null distribution is provided.
 }
 \examples{
+require(signet)
 data(keggPathways)
 data(zScores)
 

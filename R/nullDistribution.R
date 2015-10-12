@@ -7,8 +7,9 @@
 #' @keywords subnetwork, simulated annealing
 #' @export
 #' @examples
+#' require(signet)
 #' #get data
-#' temperatureFunction()
+#' nullDistribution()
 
 nullDistribution<-function(pathwaysList,
                            scores,
@@ -16,7 +17,7 @@ nullDistribution<-function(pathwaysList,
                            kmax,
                            iterations)
 {
-  require(graph)
+  requireNamespace("graph",quietly=TRUE)
   if(missing(pathwaysList))
   {
     pathwaysList<-NULL

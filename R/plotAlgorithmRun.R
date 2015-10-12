@@ -14,6 +14,7 @@
 #' @return A HTML file and three folder in the animation subfolder in your working directory.
 #' @export
 #' @examples
+#' require(signet)
 #' data(keggPathways)
 #' data(zScores)
 #'
@@ -29,7 +30,7 @@ plotAlgorithmRun<-function(pathway,
                            verbose = TRUE,
                            animPlot = 100)
 {
-  require(animation)
+  requireNamespace("animation",quietly=TRUE)
   animation::saveHTML({
   searchSubnet(pathway,
                scores,

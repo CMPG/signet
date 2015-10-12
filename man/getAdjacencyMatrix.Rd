@@ -18,8 +18,9 @@ A n x n matrix, n is the number of nodes in the graph.
 This function generates the adjacency matrix from a \verb{graphNEL} object.
 }
 \examples{
+require(signet)
 data(keggPathways)
-adj<-getAdjacencyMatrix(keggPathways[[1]])
+#adj<-getAdjacencyMatrix(keggPathways[[1]])
 }
 \keyword{adjacency}
 \keyword{graph}

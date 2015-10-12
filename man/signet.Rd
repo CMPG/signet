@@ -7,8 +7,9 @@
 \title{Selection Inference in Gene Networks}
 
 \description{
-  Implements a method to perform inferences of selection in biological pathways. In particular it implements
-a simulated annealing approach that searchs for a high scoring subnetwork in a pathway and test for its significance.
+  Implements a method to perform inferences of selection in biological pathways.
+  In particular it implements a simulated annealing approach that searchs for a
+  high scoring subnetwork in a pathway and test for its significance.
 }
 
 
@@ -20,7 +21,8 @@ a simulated annealing approach that searchs for a high scoring subnetwork in a p
 
  data(keggPathways);data(zScores)
 
- ## (2) Generate the null distribution of the subnetworks scores for subnetworks of size kmin to kmax.
+ ## (2) Generate the null distribution of the subnetworks scores
+ ## for subnetworks of size kmin to kmax.
  ## This may be a little long, so you can use data(nullDistExample) here.
 
  nullDistribution(keggPathways,zScores,iterations = 10000)

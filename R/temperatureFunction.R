@@ -3,7 +3,7 @@
 #' Generate the temperature function used in simulated annealing.
 #' @param iterations A graph object.
 #' @param param a data frame with gene list and associated scores
-#' @param burnin
+#' @param burnin Burnin
 #' @keywords subnetwork, simulated annealing
 #' @export
 #' @examples

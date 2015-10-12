@@ -16,6 +16,7 @@ This function allows you to get the adjacency matrix from a graph object.
 }
 \examples{
 #get data
+require(signet)
 plotSubnet()
 }
 \keyword{adjacency}

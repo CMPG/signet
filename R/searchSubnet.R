@@ -14,6 +14,7 @@
 #' @return A list containing a table with genes, their state, their score; the subnetwortk score and size and the p-value
 #' @export
 #' @examples
+#' require(signet)
 #' data(keggPathways)
 #' data(zScores)
 #'
@@ -39,19 +40,19 @@ searchSubnet<-function(pathway,
   }
   else
   {
-    suppressMessages(require(graph))
+    requireNamespace("graph",quietly=TRUE)
   }
   #check for arguments
   if(missing(pathway)) stop("Pathway is missing !")
   if(missing(scores)) stop("Gene scores are missing !")
 
   #remove conn components of size < kmin
-  pathway<-subGraph(unlist(graph::connComp(pathway)[!lapply(graph::connComp(pathway),length)<kmin]),pathway)
+  pathway<-graph::subGraph(unlist(graph::connComp(pathway)[!lapply(graph::connComp(pathway),length)<kmin]),pathway)
 
   if(directed==FALSE) pathway<-graph::ugraph(pathway)
 
   names(scores)[[1]]<-"gene";names(scores)[[2]]<-"score"
-  scores<-scores[scores$gene%in%nodes(pathway),]
+  scores<-scores[scores$gene %in% graph::nodes(pathway),]
 
   if(missing(nullDist))
   {
@@ -118,7 +119,6 @@ searchSubnet<-function(pathway,
 
     ###
     activeNet<-as.character(workingTable[workingTable$state,]$gene)
-    # subG<-subGraph(activeNet,newpath)
     # boundaries<-boundary(activeNet,newpath)
     bu<-adjMatrix[activeNet,]
 
@@ -204,7 +204,8 @@ searchSubnet<-function(pathway,
            ylab="Subset score",xlab="Iteration",pch=16,cex=0.5)
       abline(h=0,lty=2)
       text(x=0,y=-5,i)
-      ani.pause()
+      requireNamespace("animation",quietly=TRUE)
+      animation::ani.pause()
     }
   }
 

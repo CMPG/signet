@@ -34,6 +34,7 @@ A HTML file and three folder in the animation subfolder in your working director
 This function will create an HTML file to visualize a run.
 }
 \examples{
+require(signet)
 data(keggPathways)
 data(zScores)
 

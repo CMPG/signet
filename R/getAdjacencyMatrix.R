@@ -6,14 +6,15 @@
 #' @keywords adjacency matrix, graph
 #' @return A n x n matrix, n is the number of nodes in the graph.
 #' @examples
+#' require(signet)
 #' data(keggPathways)
-#' adj<-getAdjacencyMatrix(keggPathways[[1]])
+#' #adj<-getAdjacencyMatrix(keggPathways[[1]])
 
 getAdjacencyMatrix<-function(pathway,
                              directed = FALSE)
 {
-  require(graph)
-  x<-edges(pathway)
+  requireNamespace("graph",quietly=TRUE)
+  x<-graph::edges(pathway)
   GList <- names(x)
   adjMatrix <- matrix(0,length(GList),length(GList),dimnames=list(GList,GList))
 
