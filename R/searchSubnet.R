@@ -7,6 +7,7 @@
 #' @param scores a data frame with gene list and associated scores
 #' @param nullDist A data frame with three columns : k, mu, sigma.
 #' Can be obtained thanks to nulldistribution() function
+#' @param replicates Number of replicates per network
 #' @param iterations Number of iterations.
 #' @param temperature The temperature function parameter.
 #' @param kmin The minimal size of a subnetwork.
@@ -32,6 +33,7 @@
 searchSubnet<-function(pathway,
                        scores,
                        nullDist = FALSE,
+                       replicates = 1,
                        iterations = 2000,
                        temperature = 0.995,
                        kmin = 3,
@@ -52,7 +54,39 @@ searchSubnet<-function(pathway,
   #check for arguments
   if(missing(pathway)) stop("Pathway is missing !")
   if(missing(scores)) stop("Gene scores are missing !")
+  if(verbose) cat("  Running simulated annealing...\n")
 
+  if(replicates>1)
+  {
+    co<-replicates
+    if(verbose) cat("  Replicating: ")
+    allReturn<-replicate(replicates,{out<-searchSubnet(pathway=pathway,
+                      scores = scores,
+                      nullDist = nullDist,
+                      replicates = -1,
+                      iterations = iterations,
+                      temperature = temperature,
+                      kmin = kmin,
+                      directed = directed,
+                      verbose = FALSE,
+                      burnin = burnin,
+                      animPlot = 0);cat("+");return(out)},
+
+                      simplify=FALSE)
+    cat("\n  ... Done !")
+    sz<-unlist(lapply(allReturn,function(x) return(x$size)))
+
+
+    condS<-which(sz > kmin) #plusieurs maxima possibles,
+    allReturn<-allReturn[condS]
+
+    vec<-unlist(lapply(allReturn,function(x) return(x$score)))
+    condV<-which(vec==max(vec))
+
+    ret<-allReturn[condV][[1]]#on prend le premier si plusieurs
+  }
+  else
+  {
   #remove conn components of size < kmin
   pathway<-graph::subGraph(unlist(graph::connComp(pathway)[!lapply(graph::connComp(pathway),length)<kmin]),pathway)
 
@@ -61,7 +95,7 @@ searchSubnet<-function(pathway,
   names(scores)[[1]]<-"gene";names(scores)[[2]]<-"score"
   scores<-scores[scores$gene %in% graph::nodes(pathway),]
 
-  if(nullDist == FALSE)
+  if(nullDist == FALSE & verbose)
   {
     cat("  No null distribution provided. The mean will be maximized.\n")
   }
@@ -120,7 +154,7 @@ searchSubnet<-function(pathway,
   for(i in 1:iterations)
   {
 
-    if(verbose == TRUE & (100*i/iterations)%%10==0)#displays the progession every 10%
+    if(verbose & (100*i/iterations)%%10==0)#displays the progession every 10%
     {
       cat('\r  Searching for a high-scoring subnetwork...',paste(10*(100*i/iterations)%/%10,"%",sep=""))
       flush.console()
@@ -162,7 +196,7 @@ searchSubnet<-function(pathway,
       sampBound<-TRUE
     }
 
-    if(nullDist != FALSE)
+    if(verbose & nullDist != FALSE)
     {
       if(length(activeNet)) stop(paste("No null distribution for subnetwork
                                  of size > ",max(nullDist$k)))
@@ -238,10 +272,15 @@ searchSubnet<-function(pathway,
                 sd=nullDist[nullDist$k==length(activeNet),]$sigma)
   }
   else pval <- NA
-  cat(paste("\n\n  Subnetwork size:",subnetSize,
-            "genes\n  Subnetwork score:",format(s,digits=4),
-            "\n  p-value:",pval,"\n\n"))
-
   ret<-list(table=workingTable,score=s,size=subnetSize,pvalue=pval)
+
+  }
+
+  if(verbose)
+  {
+    cat(paste("\n\n  Subnetwork size:",ret$size,
+              "genes\n  Subnetwork score:",format(ret$score,digits=4),
+              "\n  p-value:",ret$pvalue,"\n\n"))
+  }
   invisible((ret))
 }

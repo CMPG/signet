@@ -4,9 +4,9 @@
 \alias{searchSubnet}
 \title{Search for a high scoring subnetwork}
 \usage{
-searchSubnet(pathway, scores, nullDist = FALSE, iterations = 2000,
-  temperature = 0.995, kmin = 3, directed = FALSE, verbose = TRUE,
-  burnin = 2, animPlot = 0)
+searchSubnet(pathway, scores, nullDist = FALSE, replicates = 1,
+  iterations = 2000, temperature = 0.995, kmin = 3, directed = FALSE,
+  verbose = TRUE, burnin = 2, animPlot = 0)
 }
 \arguments{
 \item{pathway}{A graph object.}
@@ -15,6 +15,8 @@ searchSubnet(pathway, scores, nullDist = FALSE, iterations = 2000,
 
 \item{nullDist}{A data frame with three columns : k, mu, sigma.
 Can be obtained thanks to nulldistribution() function}
+
+\item{replicates}{Number of replicates per network}
 
 \item{iterations}{Number of iterations.}
 

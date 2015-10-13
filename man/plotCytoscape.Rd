@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotCytoscape.R
 \name{plotCytoscape}
 \alias{plotCytoscape}
-\title{Build adjacency matrix of a graph}
+\title{Plot the results in Cytoscape}
 \usage{
 plotCytoscape(pathway, outAlgo, layout = "jgraph-spring")
 }
@@ -17,7 +17,9 @@ plotCytoscape(pathway, outAlgo, layout = "jgraph-spring")
 A plot in Cytoscape.
 }
 \description{
-This function generates the adjacency matrix from a \verb{graphNEL} object.
+This function plots the output of the algorithm in Cytoscape.
+CytoscapeRPC plugin must be installed and launched in Cytoscape (< 3.0)
+before running this function.
 }
 \examples{
 require(signet)
