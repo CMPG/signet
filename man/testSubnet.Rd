@@ -10,6 +10,8 @@ testSubnet(outputSA, pathwaysList, scores)
 \item{outputSA}{Output of the algorithm.}
 
 \item{pathwaysList}{List of pathways to generate null distribution.}
+
+\item{scores}{Again, the scores.}
 }
 \description{
 A function to generate the temperature function used in simulated annealing.

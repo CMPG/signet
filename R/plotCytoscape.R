@@ -19,38 +19,38 @@ plotCytoscape <- function(pathway,outAlgo,layout="jgraph-spring")
   requireNamespace("RCytoscape",quietly=TRUE)
 
   # Nodes and edges attributes
-  pathway <- initNodeAttribute(graph=pathway, attribute.name='subNet',
+  pathway <- RCytoscape::initNodeAttribute(graph=pathway, attribute.name='subNet',
                                attribute.type='char',default.value='false')
-  pathway <- initNodeAttribute(graph=pathway, attribute.name='z',
+  pathway <- RCytoscape::initNodeAttribute(graph=pathway, attribute.name='z',
                                attribute.type='numeric',default.value=0)
-  pathway <- initEdgeAttribute(graph=pathway, attribute.name='edgeType',
+  pathway <- RCytoscape::initEdgeAttribute(graph=pathway, attribute.name='edgeType',
                                attribute.type='char',default.value='undefined')
-  pathway <- initEdgeAttribute(graph=pathway, attribute.name='weight',
+  pathway <- RCytoscape::initEdgeAttribute(graph=pathway, attribute.name='weight',
                                attribute.type='char',default.value='undefined')
 
   # add values corresponding to attributes (gene scores, ...)
   glist<-as.character(outAlgo$table[outAlgo$table$state,]$gene)
-  for(gene in glist) nodeData(pathway,gene,"subNet")<-"true"
+  for(gene in glist) graph::nodeData(pathway,gene,"subNet")<-"true"
   glistz<-as.character(outAlgo$table$gene)
   for(gene in glistz) nodeData(pathway,gene,"z")<-outAlgo$table[outAlgo$table$gene==gene,]$score
-  for(gene in glistz[!glistz%in%glist]) nodeData(pathway,gene,"subNet")<-"false"
+  for(gene in glistz[!glistz%in%glist]) graph::nodeData(pathway,gene,"subNet")<-"false"
 
   #create the network in Cytoscape
-  cw <- new.CytoscapeWindow(p@title, graph=pathway,overwriteWindow=TRUE)
-  displayGraph(cw)
+  cw <- RCytoscape::new.CytoscapeWindow("signet output", graph=pathway,overwriteWindow=TRUE)
+  RCytoscape::displayGraph(cw)
 
   # setNodeShapeRule(cw,"subNet",c("true","false"),c('ellipse','ellipse'))
 
   #node colored in red if part of the subnetwork
-  setNodeColorRule(cw,"subNet",c("true","false"),
+  RCytoscape::setNodeColorRule(cw,"subNet",c("true","false"),
                    c('#ff0000','#ffffff'),mode='lookup')
 
   #size of the node proportional to the gene score
-  setNodeSizeRule(cw,"z",c(0,4),c(30,60),
+  RCytoscape::setNodeSizeRule(cw,"z",c(0,4),c(30,60),
                   mode= 'interpolate')
 
-  setDefaultBackgroundColor(cw,'#ffffff') #white background
-  setDefaultEdgeColor(cw,'#bdbdbd') #grey edge
+  RCytoscape::setDefaultBackgroundColor(cw,'#ffffff') #white background
+  RCytoscape::setDefaultEdgeColor(cw,'#bdbdbd') #grey edge
 
-  layoutNetwork(cw,layout) #update the network in Cytoscape
+  RCytoscape::layoutNetwork(cw,layout) #update the network in Cytoscape
 }

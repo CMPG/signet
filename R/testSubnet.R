@@ -5,6 +5,7 @@
 #'
 #' @param outputSA Output of the algorithm.
 #' @param pathwaysList List of pathways to generate null distribution.
+#' @param scores Again, the scores.
 #'
 #' @keywords subnetwork, simulated annealing
 #' @export
@@ -15,14 +16,19 @@
 testSubnet<-function(outputSA,pathwaysList,scores)
 {
 
-  nul<-nullDistribution(pathwaysList,scores,kmin=outputSA$size,kmax=outputSA$size,
-                   iterations=10000)
+  klist<-unlist(lapply(outputSA,function(x) return(x$size)))
 
-  normScore<-(outputSA$score-nul$mu)/nul$sigma
-  pval<-pnorm(normScore)
+  nul<-nullDistribution(pathwaysList,scores,kmin=min(klist),kmax=max(klist),
+                   iterations=100)
 
-  cat("\n  p-value =",pval,"\n")
+  pvals<-lapply(outputSA,
+  function(x)
+  {
+    normScore<-(x$score-nul[which(nul$k==x$size),]$mu)/nul[which(nul$k==x$size),]$sigma
+    pval<-1-pnorm(normScore)
+    outputSA$pvalue<-pval
+    print(pval)
+  })
 
-  outputSA$pvalue<-pval
   invisible(outputSA)
 }
