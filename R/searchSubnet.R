@@ -81,206 +81,225 @@ searchSubnet<-function(pathway,
     allReturn<-allReturn[condS]
 
     vec<-unlist(lapply(allReturn,function(x) return(x$score)))
-    condV<-which(vec==max(vec))
 
-    ret<-allReturn[condV][[1]]#on prend le premier si plusieurs
-  }
-  else
-  {
-  #remove conn components of size < kmin
-  pathway<-graph::subGraph(unlist(graph::connComp(pathway)[!lapply(graph::connComp(pathway),length)<kmin]),pathway)
-
-  if(directed==FALSE) pathway<-graph::ugraph(pathway)
-
-  names(scores)[[1]]<-"gene";names(scores)[[2]]<-"score"
-  scores<-scores[scores$gene %in% graph::nodes(pathway),]
-
-  if(nullDist == FALSE & verbose)
-  {
-    cat("  No null distribution provided. The mean will be maximized.\n")
-  }
-
-  ### Initialization of the graph
-
-  newpath<-graph::subGraph(as.character(scores[!is.na(scores$score),]$gene),pathway) #remove missing values
-  adjMatrix<-getAdjacencyMatrix(pathway=newpath) #get the adjacency matrix of the graph
-
-  #initialize the gene scores list (gene names, scores, and state)
-  workingTable <- scores[!is.na(scores$score),]
-  workingTable$state <- rep(FALSE,length(workingTable$score))
-
-  #initialize the temperature function
-  temp<-temperatureFunction(iterations = iterations, param = temperature, burnin = burnin)
-
-  #c. select the initial subset of size kmin
-  boundaries<-NULL
-  geneSampled<-NULL
-  for(ii in 1:kmin)
-  {
-    bu<-0
-    gene<-NULL
-    while(sum(bu)==0)
-    {
-      if(ii == 1){ gene<-sample(colnames(adjMatrix),1)}## 1. 1 gene au hasard
-      else{ gene<-sample(boundaries,1)}
-      bu<-adjMatrix[gene,]
-    }
-    boundaries<-c(boundaries,names(bu[which(bu!=0)]))
-
-    boundaries<-boundaries[!boundaries %in% geneSampled]
-    if(ii==1)
-    {
-      geneSampled<-gene
+    if(length(vec)==0){
+      cat("\n  No high-scoring subnetwork found\n\n")
+      ret <- NULL
     }
     else
     {
-      if(length(boundaries)>0) geneSampled<-c(geneSampled,gene)
+      condV<-which(vec==max(vec))
+      ret<-allReturn[condV][[1]]#on prend le premier si plusieurs
     }
   }
-
-  #toggle state in final list
-  workingTable[which(workingTable$gene%in%geneSampled),]$state <- TRUE
-  workingTable[which(!workingTable$gene%in%geneSampled),]$state <- FALSE
-  sumStat<-mean(workingTable[workingTable$state,]$score)
-  if(nullDist == FALSE)
+  else
   {
-    s <- sumStat
+  #remove conn components of size < threshold
+  threshold<-10
+  X<-unlist(graph::connComp(pathway)[!lapply(graph::connComp(pathway),length)<threshold])
+  if(is.null(X))
+  {
+    cat("\r  No connected component of size greater than 10 ")
+    ret<-NULL
   }
-  else  s<-(sumStat-nullDist[nullDist$k==kmin,]$mu)/nullDist[nullDist$k==kmin,]$sigma
-
-  ###2. OPTIMISATION
-  ######
-
-  for(i in 1:iterations)
+  else
   {
+    pathway<-graph::subGraph(X,pathway)
 
-    if(verbose & (100*i/iterations)%%10==0)#displays the progession every 10%
+    if(directed==FALSE) pathway<-graph::ugraph(pathway)
+
+    names(scores)[[1]]<-"gene";names(scores)[[2]]<-"score"
+    scores<-scores[scores$gene %in% graph::nodes(pathway),]
+
+    if(nullDist == FALSE & verbose)
     {
-      cat('\r  Searching for a high-scoring subnetwork...',paste(10*(100*i/iterations)%/%10,"%",sep=""))
-      flush.console()
+      cat("  No null distribution provided. The mean will be maximized.\n")
     }
 
-    ###
-    activeNet<-as.character(workingTable[workingTable$state,]$gene)
-    # boundaries<-boundary(activeNet,newpath)
-    bu<-adjMatrix[activeNet,]
+    ### Initialization of the graph
 
-    if(length(dim(bu))>0)
+    newpath<-graph::subGraph(as.character(scores[!is.na(scores$score),]$gene),pathway) #remove missing values
+    adjMatrix<-getAdjacencyMatrix(pathway=newpath) #get the adjacency matrix of the graph
+
+    #initialize the gene scores list (gene names, scores, and state)
+    workingTable <- scores[!is.na(scores$score),]
+    workingTable$state <- rep(FALSE,length(workingTable$score))
+
+    #initialize the temperature function
+    temp<-temperatureFunction(iterations = iterations, param = temperature, burnin = burnin)
+
+    #c. select the initial subset of size kmin
+    boundaries<-NULL
+    geneSampled<-NULL
+    for(ii in 1:kmin)
     {
-      boundaries<-bu[apply(bu,1,sum)>0,]
-      boundaries<-colnames(boundaries[,apply(boundaries,2,sum)>0])
-      #remove boundaries already active
-      boundaries<-boundaries[!boundaries %in% workingTable[workingTable$state,]$gene]
-    }
-    else boundaries<-NULL
-
-    bla<-0
-    while(bla!=1)
-    {
-      ge<-sample(activeNet,1)
-      test<-graph::subGraph(as.character(activeNet[activeNet!=ge]),newpath)
-
-      bla<-length(graph::connComp(test))
-      if(bla==1) neighbours<-c(ge)
-    }
-
-    pro<-1
-    if(length(activeNet)>2)
-    {
-      pro<-length(boundaries)/(length(boundaries)+length(activeNet))
-    }
-
-    sampBound<-FALSE
-    if(pro>runif(1))
-    {
-      sampBound<-TRUE
-    }
-
-    if(verbose & nullDist != FALSE)
-    {
-      if(length(activeNet)) stop(paste("No null distribution for subnetwork
-                                 of size > ",max(nullDist$k)))
-    }
-
-    if(length(activeNet)>=kmin & length(unique(c(neighbours,boundaries)))>0)
-    {
-      #Sample a new gene to toggle its state
-      if(sampBound) newG<-as.character(sample(unique(c(neighbours,boundaries)),1))
-      else newG<-neighbours
-      workingTable[which(workingTable$gene==newG),]$state <- !workingTable[which(workingTable$gene==newG),]$state
-
-      #Compute the subnet score
-      sumStat<-mean(workingTable[workingTable$state,]$score)
-      if(nullDist == FALSE)
+      bu<-0
+      gene<-NULL
+      while(sum(bu)==0)
       {
-        s2 <- sumStat
+        if(ii == 1){ gene<-sample(colnames(adjMatrix),1)}## 1. 1 gene au hasard
+        else{ gene<-sample(boundaries,1)}
+        bu<-adjMatrix[gene,]
       }
-      else  s2<-(sumStat-nullDist[nullDist$k==length(activeNet),]$mu)/nullDist[nullDist$k==length(activeNet),]$sigma
+      boundaries<-c(boundaries,names(bu[which(bu!=0)]))
 
-      #Keep or not the toggled gene
-
-      if(s2<s)#If the score is weaker than the last one, we keep the gene toggled with a probability "prob"
+      boundaries<-boundaries[!boundaries %in% geneSampled]
+      if(ii==1)
       {
-        prob<-exp((s2-s)/temp[i])
-        if(prob>runif(1))
+        geneSampled<-gene
+      }
+      else
+      {
+        if(length(boundaries)>0) geneSampled<-c(geneSampled,gene)
+      }
+    }
+
+    #toggle state in final list
+    workingTable[which(workingTable$gene%in%geneSampled),]$state <- TRUE
+    workingTable[which(!workingTable$gene%in%geneSampled),]$state <- FALSE
+    sumStat<-mean(workingTable[workingTable$state,]$score)
+    if(nullDist == FALSE)
+    {
+      s <- sumStat
+    }
+    else  s<-(sumStat-nullDist[nullDist$k==kmin,]$mu)/nullDist[nullDist$k==kmin,]$sigma
+
+    ###2. OPTIMISATION
+    ######
+
+    for(i in 1:iterations)
+    {
+
+      if(verbose & (100*i/iterations)%%10==0)#displays the progession every 10%
+      {
+        cat('\r  Searching for a high-scoring subnetwork...',paste(10*(100*i/iterations)%/%10,"%",sep=""))
+        flush.console()
+      }
+
+      ###
+      activeNet<-as.character(workingTable[workingTable$state,]$gene)
+      # boundaries<-boundary(activeNet,newpath)
+      bu<-adjMatrix[activeNet,]
+
+      if(length(dim(bu))>0)
+      {
+        boundaries<-bu[apply(bu,1,sum)>0,]
+        boundaries<-colnames(boundaries[,apply(boundaries,2,sum)>0])
+        #remove boundaries already active
+        boundaries<-boundaries[!boundaries %in% workingTable[workingTable$state,]$gene]
+      }
+      else boundaries<-NULL
+
+      bla<-0
+      while(bla!=1)
+      {
+        ge<-sample(activeNet,1)
+        test<-graph::subGraph(as.character(activeNet[activeNet!=ge]),newpath)
+
+        bla<-length(graph::connComp(test))
+        if(bla==1) neighbours<-c(ge)
+      }
+
+      pro<-1
+      if(length(activeNet)>2)
+      {
+        pro<-length(boundaries)/(length(boundaries)+length(activeNet))
+      }
+
+      sampBound<-FALSE
+      if(pro>runif(1))
+      {
+        sampBound<-TRUE
+      }
+
+      if(verbose & nullDist != FALSE)
+      {
+        if(length(activeNet)) stop(paste("No null distribution for subnetwork
+                                   of size > ",max(nullDist$k)))
+      }
+
+      if(length(activeNet)>=kmin & length(unique(c(neighbours,boundaries)))>0)
+      {
+        #Sample a new gene to toggle its state
+        if(sampBound) newG<-as.character(sample(unique(c(neighbours,boundaries)),1))
+        else newG<-neighbours
+        workingTable[which(workingTable$gene==newG),]$state <- !workingTable[which(workingTable$gene==newG),]$state
+
+        #Compute the subnet score
+        sumStat<-mean(workingTable[workingTable$state,]$score)
+        if(nullDist == FALSE)
+        {
+          s2 <- sumStat
+        }
+        else  s2<-(sumStat-nullDist[nullDist$k==length(activeNet),]$mu)/nullDist[nullDist$k==length(activeNet),]$sigma
+
+        #Keep or not the toggled gene
+
+        if(s2<s)#If the score is weaker than the last one, we keep the gene toggled with a probability "prob"
+        {
+          prob<-exp((s2-s)/temp[i])
+          if(prob>runif(1))
+          {
+            s<-s2
+          }
+          else
+          {
+            workingTable[which(workingTable$gene==newG),]$state<-!workingTable[which(workingTable$gene==newG),]$state
+          }
+        }
+        else if(s2>s)#If the score is greater than the last one, we keep the gene toggled
         {
           s<-s2
         }
-        else
-        {
-          workingTable[which(workingTable$gene==newG),]$state<-!workingTable[which(workingTable$gene==newG),]$state
-        }
       }
-      else if(s2>s)#If the score is greater than the last one, we keep the gene toggled
+
+      if(animPlot>0 & i<animPlot)
       {
-        s<-s2
+        if(i==1)size<-NULL
+        size<-c(size,length(workingTable[workingTable$state,]$gene))
+        if(i==1)score<-NULL
+        score<-c(score,s)
+
+        par(mfrow=c(2,2))
+        plotSubnet(newpath,workingTable[workingTable$state,]$gene)
+        par(mar=c(5,5,5,5))
+        plot(1:i,size,ylim=c(0,50),xlim=c(0,animPlot),
+             ylab="Subnetwork size",xlab="Iteration",pch=16,cex=0.5)
+        text(x=1,y=1,i)
+        plot(1:i,temp[1:i],ylim=c(0,1),xlim=c(0,animPlot),
+             ylab="Temperature",xlab="Iteration",pch=16,cex=0.5)
+        text(x=0,y=0,i)
+        plot(1:i,score,ylim=c(-5,5),xlim=c(0,animPlot),
+             ylab="Subnetwork score",xlab="Iteration",pch=16,cex=0.5)
+        abline(h=0,lty=2)
+        text(x=0,y=-5,i)
+        requireNamespace("animation",quietly=TRUE)
+        animation::ani.pause()
       }
     }
 
-    if(animPlot>0 & i<animPlot)
+    ### Return the results (subnetwork, size, score and p-value)
+    Stat<-mean(workingTable[workingTable$state,]$score)
+    subnetSize<-length(workingTable[workingTable$state,]$gene)
+    if(nullDist != FALSE)
     {
-      if(i==1)size<-NULL
-      size<-c(size,length(workingTable[workingTable$state,]$gene))
-      if(i==1)score<-NULL
-      score<-c(score,s)
+    pval<-1-pnorm(Stat,
+                  mean=nullDist[nullDist$k==length(activeNet),]$mu,
+                  sd=nullDist[nullDist$k==length(activeNet),]$sigma)
+    }
+    else pval <- NA
+    ret<-list(table=workingTable,score=s,size=subnetSize,pvalue=pval)
 
-      par(mfrow=c(2,2))
-      plotSubnet(newpath,workingTable[workingTable$state,]$gene)
-      par(mar=c(5,5,5,5))
-      plot(1:i,size,ylim=c(0,50),xlim=c(0,animPlot),
-           ylab="Subnetwork size",xlab="Iteration",pch=16,cex=0.5)
-      text(x=1,y=1,i)
-      plot(1:i,temp[1:i],ylim=c(0,1),xlim=c(0,animPlot),
-           ylab="Temperature",xlab="Iteration",pch=16,cex=0.5)
-      text(x=0,y=0,i)
-      plot(1:i,score,ylim=c(-5,5),xlim=c(0,animPlot),
-           ylab="Subnetwork score",xlab="Iteration",pch=16,cex=0.5)
-      abline(h=0,lty=2)
-      text(x=0,y=-5,i)
-      requireNamespace("animation",quietly=TRUE)
-      animation::ani.pause()
     }
   }
 
-  ### Return the results (subnetwork, size, score and p-value)
-  Stat<-mean(workingTable[workingTable$state,]$score)
-  subnetSize<-length(workingTable[workingTable$state,]$gene)
-  if(nullDist != FALSE)
-  {
-  pval<-1-pnorm(Stat,
-                mean=nullDist[nullDist$k==length(activeNet),]$mu,
-                sd=nullDist[nullDist$k==length(activeNet),]$sigma)
-  }
-  else pval <- NA
-  ret<-list(table=workingTable,score=s,size=subnetSize,pvalue=pval)
-
-  }
-
-  if(verbose)
+  if(verbose & !is.null(ret))
   {
     cat(paste("\n\n  Subnetwork size:",ret$size,
               "genes\n  Subnetwork score:",format(ret$score,digits=4),
               "\n  p-value:",ret$pvalue,"\n\n"))
   }
-  invisible((ret))
+
+  invisible(ret)
+
 }
