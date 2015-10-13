@@ -134,13 +134,17 @@ searchSubnet<-function(pathway,
     for(ii in 1:kmin)
     {
       bu<-0
+      countW<-0
       gene<-NULL
       while(sum(bu)==0)
       {
         if(ii == 1){ gene<-sample(colnames(adjMatrix),1)}## 1. 1 gene au hasard
         else{ gene<-sample(boundaries,1)}
         bu<-adjMatrix[gene,]
+        countW<-countW+1
+        if(countW==100){ret<-NULL;break()}
       }
+      if(countW==100){break()}
       boundaries<-c(boundaries,names(bu[which(bu!=0)]))
 
       boundaries<-boundaries[!boundaries %in% geneSampled]
@@ -153,6 +157,8 @@ searchSubnet<-function(pathway,
         if(length(boundaries)>0) geneSampled<-c(geneSampled,gene)
       }
     }
+
+    if(countW<100){
 
     #toggle state in final list
     workingTable[which(workingTable$gene%in%geneSampled),]$state <- TRUE
@@ -292,7 +298,7 @@ searchSubnet<-function(pathway,
 
     }
   }
-
+  }
   if(verbose & !is.null(ret))
   {
     cat(paste("\n\n  Subnetwork size:",ret$size,
