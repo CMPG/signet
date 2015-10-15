@@ -5,8 +5,7 @@ Version: 0.2
 Date: 2015-10-09
 Authors@R: c(person("Alexandre", "Gouy",
   email = "alexandre.gouy@iee.unibe.ch", role = c("aut", "cre")),
-  person("Laurent", "Excoffier",
-  role = c("aut")))
+  person("Laurent", "Excoffier",role = c("aut")))
 Description: An R package to detect and test for selection in biological
   pathways. From a gene list with associated scores, and biological pathways
   data, one can search for a high-scoring subnetwork and test for its
