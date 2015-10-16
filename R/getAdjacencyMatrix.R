@@ -1,4 +1,4 @@
-#' Build adjacency matrix of a graph
+#' Build the adjacency matrix of a graph
 #'
 #' This function generates the adjacency matrix from a \verb{graphNEL} object.
 #' @param pathway A \verb{graphNEL} object.
