@@ -6,6 +6,7 @@
 #' @param kmin kmin
 #' @param kmax kmax
 #' @param iterations Number of iterations.
+#' @param distribution If TRUE, returns the whole simulated data. Else, returns the mean and sd.
 #'
 #' @keywords subnetwork, simulated annealing
 #' @export
@@ -18,7 +19,8 @@ nullDistribution<-function(pathwaysList,
                            scores,
                            kmin,
                            kmax,
-                           iterations)
+                           iterations,
+                           distribution=FALSE)
 {
   requireNamespace("graph",quietly=TRUE)
   if(missing(pathwaysList))
@@ -26,8 +28,10 @@ nullDistribution<-function(pathwaysList,
     pathwaysList<-NULL
     gList<-scores
   }
-  cat("  Generating null distribution...\n")
+ colnames(scores)<-c("gene","score")
 
+  cat("  Generating null distribution...\n")
+  distrib<-NULL
   nullD<-NULL
   for(k in kmin:kmax)
   {
@@ -48,13 +52,17 @@ nullDistribution<-function(pathwaysList,
         }
         gList<-scores[scores$gene %in% glis,]
       }
-      ba<-rbind(ba,c(mean(gList[sample(length(gList$gene),k),]$score),na.rm=TRUE))
+      ba<-rbind(ba,c(mean(gList[sample(length(gList$gene),k,replace=TRUE),]$score,na.rm=TRUE)))
     }
+
     nullD<-rbind(nullD,c(k,mean(ba,na.rm=TRUE),sd(ba,na.rm=TRUE)))
+    distrib<-c(distrib,ba)
   }
   cat("\n  Done !\n\n")
   nullD<-as.data.frame(nullD)
   colnames(nullD)<-c("k","mu","sigma")
+
+  if(distribution) nullD<-list(parameters=nullD,distributions=distrib)
   # print(nullD)
   return(nullD)
 }

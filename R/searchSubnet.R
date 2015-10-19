@@ -3,23 +3,28 @@
 #' A simulated annealing algorithm is used to research a high scoring
 #' subnetwork.Implements also a test id a null distribution is provided.
 #'
-#' @param pathway A graph object.
-#' @param scores a data frame with gene list and associated scores
+#' @param pathway A gene network, or a list of networks,
+#'  in the \verb{graphNEL} format.
+#' @param scores A data frame with two columns: gene identifiers list
+#'  and associated scores.
 #' @param nullDist A data frame with three columns : k, mu, sigma.
-#' Can be obtained thanks to nulldistribution() function
-#' @param replicates Number of replicates per network
+#' Can be obtained thanks to the \verb{nulldistribution()} function.
+#' @param replicates Number of replicates per network.
 #' @param iterations Number of iterations.
 #' @param temperature The temperature function parameter.
 #' @param kmin The minimal size of a subnetwork.
-#' @param directed If TRUE, considers the edges direction, i.e. cannot go back.
-#' @param verbose If TRUE, displays text in the R console.
-#' @param burnin Burnin
-#' @param animPlot If TRUE, generates a HTML file
+#' @param directed If \verb{TRUE}, considers the edges direction, i.e. cannot go back.
+#' @param verbose If \verb{TRUE}, displays text in the R console.
+#' @param burnin Number of iterations before the temperature begins to decrease.
+#' @param animPlot For development purposes.
 #'
 #' @keywords subnetwork, simulated annealing, heuristics, search algorithm
+#'
 #' @return A list containing a table with genes, their state, their score;
 #' the subnetwortk score and size and the p-value
+#'
 #' @export
+#'
 #' @examples
 #' require(signet)
 #' data(keggPathways)
@@ -39,7 +44,7 @@ searchSubnet<-function(pathway,
                        kmin = 3,
                        directed = FALSE,
                        verbose = TRUE,
-                       burnin = 2,
+                       burnin = 100,
                        animPlot = 0)
 {
   #check for the package graph and load it
@@ -218,9 +223,9 @@ searchSubnet<-function(pathway,
         sampBound<-TRUE
       }
 
-      if(verbose & nullDist != FALSE)
+      if(nullDist & verbose  != FALSE)
       {
-        if(length(activeNet)) stop(paste("No null distribution for subnetwork
+        if(length(activeNet)>=max(nullDist$k)) stop(paste("No null distribution for subnetwork
                                    of size > ",max(nullDist$k)))
       }
 

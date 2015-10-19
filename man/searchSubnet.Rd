@@ -6,17 +6,19 @@
 \usage{
 searchSubnet(pathway, scores, nullDist = FALSE, replicates = 1,
   iterations = 2000, temperature = 0.995, kmin = 3, directed = FALSE,
-  verbose = TRUE, burnin = 2, animPlot = 0)
+  verbose = TRUE, burnin = 100, animPlot = 0)
 }
 \arguments{
-\item{pathway}{A graph object.}
+\item{pathway}{A gene network, or a list of networks,
+in the \verb{graphNEL} format.}
 
-\item{scores}{a data frame with gene list and associated scores}
+\item{scores}{A data frame with two columns: gene identifiers list
+and associated scores.}
 
 \item{nullDist}{A data frame with three columns : k, mu, sigma.
-Can be obtained thanks to nulldistribution() function}
+Can be obtained thanks to the \verb{nulldistribution()} function.}
 
-\item{replicates}{Number of replicates per network}
+\item{replicates}{Number of replicates per network.}
 
 \item{iterations}{Number of iterations.}
 
@@ -24,13 +26,13 @@ Can be obtained thanks to nulldistribution() function}
 
 \item{kmin}{The minimal size of a subnetwork.}
 
-\item{directed}{If TRUE, considers the edges direction, i.e. cannot go back.}
+\item{directed}{If \verb{TRUE}, considers the edges direction, i.e. cannot go back.}
 
-\item{verbose}{If TRUE, displays text in the R console.}
+\item{verbose}{If \verb{TRUE}, displays text in the R console.}
 
-\item{burnin}{Burnin}
+\item{burnin}{Number of iterations before the temperature begins to decrease.}
 
-\item{animPlot}{If TRUE, generates a HTML file}
+\item{animPlot}{For development purposes.}
 }
 \value{
 A list containing a table with genes, their state, their score;

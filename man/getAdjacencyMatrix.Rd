@@ -2,7 +2,7 @@
 % Please edit documentation in R/getAdjacencyMatrix.R
 \name{getAdjacencyMatrix}
 \alias{getAdjacencyMatrix}
-\title{Build adjacency matrix of a graph}
+\title{Build the adjacency matrix of a graph}
 \usage{
 getAdjacencyMatrix(pathway, directed = FALSE)
 }

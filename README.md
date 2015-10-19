@@ -5,7 +5,7 @@
 On the basis of a biological pathways database, and a gene scores list, 
 one could search for high-scoring subnetworks and test their significance in pathways.
 
-The method implemented is based on Ideker et al. (2002) heuristics, 
+The method implemented is based on Ideker et al. (2002) heuristic, 
 but several improvements are considered.
 
 ## Installation

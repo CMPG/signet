@@ -4,7 +4,8 @@
 \alias{nullDistribution}
 \title{Null distribution}
 \usage{
-nullDistribution(pathwaysList, scores, kmin, kmax, iterations)
+nullDistribution(pathwaysList, scores, kmin, kmax, iterations,
+  distribution = FALSE)
 }
 \arguments{
 \item{pathwaysList}{A graph object, or a liste of graphNEL objects.}
@@ -16,6 +17,8 @@ nullDistribution(pathwaysList, scores, kmin, kmax, iterations)
 \item{kmax}{kmax}
 
 \item{iterations}{Number of iterations.}
+
+\item{distribution}{If TRUE, returns the whole simulated data. Else, returns the mean and sd.}
 }
 \description{
 Generate the temperature function used in simulated annealing.
