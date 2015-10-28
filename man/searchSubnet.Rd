@@ -4,9 +4,9 @@
 \alias{searchSubnet}
 \title{Search for a high scoring subnetwork}
 \usage{
-searchSubnet(pathway, scores, nullDist = FALSE, replicates = 1,
-  iterations = 2000, temperature = 0.995, kmin = 3, directed = FALSE,
-  verbose = TRUE, burnin = 100, animPlot = 0)
+searchSubnet(pathway, scores, nullDist, replicates = 1, iterations = 2000,
+  temperature = 0.995, kmin = 3, directed = FALSE, verbose = TRUE,
+  burnin = 100, animPlot = 0, diagnostic = FALSE)
 }
 \arguments{
 \item{pathway}{A gene network, or a list of networks,
@@ -33,6 +33,8 @@ Can be obtained thanks to the \verb{nulldistribution()} function.}
 \item{burnin}{Number of iterations before the temperature begins to decrease.}
 
 \item{animPlot}{For development purposes.}
+
+\item{diagnostic}{If TRUE, plots the evolution of different stats along the run.}
 }
 \value{
 A list containing a table with genes, their state, their score;

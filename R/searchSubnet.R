@@ -17,6 +17,7 @@
 #' @param verbose If \verb{TRUE}, displays text in the R console.
 #' @param burnin Number of iterations before the temperature begins to decrease.
 #' @param animPlot For development purposes.
+#' @param diagnostic If TRUE, plots the evolution of different stats along the run.
 #'
 #' @keywords subnetwork, simulated annealing, heuristics, search algorithm
 #'
@@ -37,7 +38,7 @@
 
 searchSubnet<-function(pathway,
                        scores,
-                       nullDist = FALSE,
+                       nullDist,
                        replicates = 1,
                        iterations = 2000,
                        temperature = 0.995,
@@ -45,7 +46,8 @@ searchSubnet<-function(pathway,
                        directed = FALSE,
                        verbose = TRUE,
                        burnin = 100,
-                       animPlot = 0)
+                       animPlot = 0,
+                       diagnostic=FALSE)
 {
   #check for the package graph and load it
   if(sum(installed.packages()[,1]=="graph")==0)
@@ -60,10 +62,17 @@ searchSubnet<-function(pathway,
   if(missing(pathway)) stop("Pathway is missing !")
   if(missing(scores)) stop("Gene scores are missing !")
   if(verbose) cat("  Running simulated annealing...\n")
+  if(missing(nullDist))
+  {
+    maximean<-TRUE
+  }
+  else maximean<-FALSE
+  colnames(scores)<-c("gene","score")
+
+  # if(diagnostic & replicates>0) par(mfrow=c(replicates,2))
 
   if(replicates>1)
   {
-    co<-replicates
     if(verbose) cat("  Replicating: ")
     allReturn<-replicate(replicates,{out<-searchSubnet(pathway=pathway,
                       scores = scores,
@@ -75,7 +84,8 @@ searchSubnet<-function(pathway,
                       directed = directed,
                       verbose = FALSE,
                       burnin = burnin,
-                      animPlot = 0);cat("+");return(out)},
+                      animPlot = 0,
+                      diagnostic=diagnostic);cat("+");return(out)},
 
                       simplify=FALSE)
     cat("\n  ... Done !")
@@ -116,7 +126,7 @@ searchSubnet<-function(pathway,
     names(scores)[[1]]<-"gene";names(scores)[[2]]<-"score"
     scores<-scores[scores$gene %in% graph::nodes(pathway),]
 
-    if(nullDist == FALSE & verbose)
+    if(maximean & verbose)
     {
       cat("  No null distribution provided. The mean will be maximized.\n")
     }
@@ -169,11 +179,16 @@ searchSubnet<-function(pathway,
     workingTable[which(workingTable$gene%in%geneSampled),]$state <- TRUE
     workingTable[which(!workingTable$gene%in%geneSampled),]$state <- FALSE
     sumStat<-mean(workingTable[workingTable$state,]$score)
-    if(nullDist == FALSE)
+
+    if(maximean)
     {
       s <- sumStat
     }
-    else  s<-(sumStat-nullDist[nullDist$k==kmin,]$mu)/nullDist[nullDist$k==kmin,]$sigma
+    else
+    {
+      s<-(sumStat-nullDist[nullDist$k==kmin,]$mu)/nullDist[nullDist$k==kmin,]$sigma
+    }
+
 
     ###2. OPTIMISATION
     ######
@@ -223,7 +238,7 @@ searchSubnet<-function(pathway,
         sampBound<-TRUE
       }
 
-      if(nullDist & verbose  != FALSE)
+      if(!maximean & verbose)
       {
         if(length(activeNet)>=max(nullDist$k)) stop(paste("No null distribution for subnetwork
                                    of size > ",max(nullDist$k)))
@@ -238,7 +253,8 @@ searchSubnet<-function(pathway,
 
         #Compute the subnet score
         sumStat<-mean(workingTable[workingTable$state,]$score)
-        if(nullDist == FALSE)
+
+        if(maximean)
         {
           s2 <- sumStat
         }
@@ -287,12 +303,69 @@ searchSubnet<-function(pathway,
         requireNamespace("animation",quietly=TRUE)
         animation::ani.pause()
       }
+      if(diagnostic)
+      {
+        if(i==1)size<-NULL
+        size<-c(size,length(workingTable[workingTable$state,]$gene))
+        if(i==1)score<-NULL
+        score<-c(score,s)
+        if(i==iterations)
+        {
+
+        # par(mfrow=c(2,2))
+
+        par(mfrow=c(1,1))
+
+        x <- 1:iterations
+        y <- size
+
+        z <- score
+        par(mar = c(4, 4, 4, 4))  # Leave space for z axis
+
+        plot(x, z, type="p",pch=16,cex=0.6,
+             col="red",ylab="Subnetwork score",
+             xlab="Iterations") # first plot
+
+        par(new = TRUE)
+        plot(x, y, type = "l", axes = FALSE,cex=0.8,
+             bty = "n", xlab = "", ylab = "",
+             pch=16,lwd=1,col="blue")
+        axis(side=4, at = pretty(range(y)))
+        mtext("Subnetwork size", side=4, line=3)
+
+        par(new=TRUE)
+
+        plot(1:iterations,temp, type="l",lwd=1,
+             xlab="", ylab="",axes=F,
+             col="grey")
+#         axis(1, labels=NA,at=c(0,5))
+#         axis(2, labels=NA,at=c(0,150))
+
+
+#         plot(1:iterations,size,ylim=c(0,max(size)),xlim=c(0,iterations),
+#              ylab="Subnetwork size",xlab="Iteration",pch=16,cex=0.5)
+#         plot(1:iterations,temp,ylim=c(0,1),xlim=c(0,iterations),
+#              ylab="Temperature",xlab="Iteration",pch=16,cex=0.5)
+#         plot(1:iterations,score,ylim=c(min(score),max(score)),xlim=c(0,iterations),
+#              ylab="Subnetwork score",xlab="Iteration",pch=16,cex=0.5)
+#         abline(h=0,lty=2)
+
+#         plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n',
+#              xaxt = 'n', yaxt = 'n')
+#
+#         text(x = 0.5, y = 0.5, paste("Subnet size : ",size[iterations],"\n",
+#                              "Score :",format(score[iterations],digits=4)),
+#         cex = 1.5, col = "darkred")
+
+
+        }
+      }
     }
 
     ### Return the results (subnetwork, size, score and p-value)
     Stat<-mean(workingTable[workingTable$state,]$score)
     subnetSize<-length(workingTable[workingTable$state,]$gene)
-    if(nullDist != FALSE)
+    if(!missing(nullDist))
     {
     pval<-1-pnorm(Stat,
                   mean=nullDist[nullDist$k==length(activeNet),]$mu,
