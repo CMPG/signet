@@ -42,7 +42,7 @@ searchSubnet<-function(pathway,
                        replicates = 1,
                        iterations = 2000,
                        temperature = 0.995,
-                       kmin = 3,
+                       kmin = 2,
                        directed = FALSE,
                        verbose = TRUE,
                        burnin = 100,
@@ -92,7 +92,7 @@ searchSubnet<-function(pathway,
     sz<-unlist(lapply(allReturn,function(x) return(x$size)))
 
 
-    condS<-which(sz > kmin) #plusieurs maxima possibles,
+    condS<-which(sz > 1) #plusieurs maxima possibles,
     allReturn<-allReturn[condS]
 
     vec<-unlist(lapply(allReturn,function(x) return(x$score)))
@@ -207,6 +207,8 @@ searchSubnet<-function(pathway,
       # boundaries<-boundary(activeNet,newpath)
       bu<-adjMatrix[activeNet,]
 
+      # print(length(activeNet))
+
       if(length(dim(bu))>0)
       {
         boundaries<-bu[apply(bu,1,sum)>0,]
@@ -226,17 +228,19 @@ searchSubnet<-function(pathway,
         if(bla==1) neighbours<-c(ge)
       }
 
-      pro<-1
+      probneighbour<-0
+      sampNeighbour<-FALSE
       if(length(activeNet)>2)
       {
-        pro<-length(boundaries)/(length(boundaries)+length(activeNet))
+        probneighbour<-length(activeNet)/(length(boundaries)+length(activeNet))
+        if(probneighbour>runif(1))
+        {
+          sampNeighbour<-TRUE
+        }
       }
 
-      sampBound<-FALSE
-      if(pro>runif(1))
-      {
-        sampBound<-TRUE
-      }
+
+
 
       if(!maximean & verbose)
       {
@@ -244,10 +248,10 @@ searchSubnet<-function(pathway,
                                    of size > ",max(nullDist$k)))
       }
 
-      if(length(activeNet)>=kmin & length(unique(c(neighbours,boundaries)))>0)
+      if(length(activeNet)>1 & length(unique(c(neighbours,boundaries)))>0)
       {
         #Sample a new gene to toggle its state
-        if(sampBound) newG<-as.character(sample(unique(c(neighbours,boundaries)),1))
+        if(!sampNeighbour) newG<-as.character(sample(unique(c(boundaries)),1))
         else newG<-neighbours
         workingTable[which(workingTable$gene==newG),]$state <- !workingTable[which(workingTable$gene==newG),]$state
 
@@ -278,6 +282,10 @@ searchSubnet<-function(pathway,
         {
           s<-s2
         }
+      }
+      else
+      {
+
       }
 
       if(animPlot>0 & i<animPlot)
@@ -311,16 +319,12 @@ searchSubnet<-function(pathway,
         score<-c(score,s)
         if(i==iterations)
         {
-
-        # par(mfrow=c(2,2))
-
         par(mfrow=c(1,1))
 
         x <- 1:iterations
         y <- size
-
         z <- score
-        par(mar = c(4, 4, 4, 4))  # Leave space for z axis
+        par(mar = c(5, 5, 5, 5))  # Leave space for z axis
 
         plot(x, z, type="p",pch=16,cex=0.6,
              col="red",ylab="Subnetwork score",
@@ -334,28 +338,12 @@ searchSubnet<-function(pathway,
         mtext("Subnetwork size", side=4, line=3)
 
         par(new=TRUE)
-
         plot(1:iterations,temp, type="l",lwd=1,
              xlab="", ylab="",axes=F,
              col="grey")
-#         axis(1, labels=NA,at=c(0,5))
-#         axis(2, labels=NA,at=c(0,150))
 
-
-#         plot(1:iterations,size,ylim=c(0,max(size)),xlim=c(0,iterations),
-#              ylab="Subnetwork size",xlab="Iteration",pch=16,cex=0.5)
-#         plot(1:iterations,temp,ylim=c(0,1),xlim=c(0,iterations),
-#              ylab="Temperature",xlab="Iteration",pch=16,cex=0.5)
-#         plot(1:iterations,score,ylim=c(min(score),max(score)),xlim=c(0,iterations),
-#              ylab="Subnetwork score",xlab="Iteration",pch=16,cex=0.5)
-#         abline(h=0,lty=2)
-
-#         plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n',
-#              xaxt = 'n', yaxt = 'n')
-#
-#         text(x = 0.5, y = 0.5, paste("Subnet size : ",size[iterations],"\n",
-#                              "Score :",format(score[iterations],digits=4)),
-#         cex = 1.5, col = "darkred")
+        axis(2,labels=F,col=2,lwd=2,tck=0)
+        axis(4,labels=F,col="blue",lwd=2,tck=0)
 
 
         }

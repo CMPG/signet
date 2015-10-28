@@ -5,7 +5,7 @@
 \title{Search for a high scoring subnetwork}
 \usage{
 searchSubnet(pathway, scores, nullDist, replicates = 1, iterations = 2000,
-  temperature = 0.995, kmin = 3, directed = FALSE, verbose = TRUE,
+  temperature = 0.995, kmin = 2, directed = FALSE, verbose = TRUE,
   burnin = 100, animPlot = 0, diagnostic = FALSE)
 }
 \arguments{
