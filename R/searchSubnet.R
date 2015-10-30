@@ -111,7 +111,9 @@ searchSubnet<-function(pathway,
   {
   #remove conn components of size < threshold
   threshold<-10
-  X<-unlist(graph::connComp(pathway)[!lapply(graph::connComp(pathway),length)<threshold])
+
+  if(length(nodes(pathway))==0) X<-NULL
+  else  X<-unlist(graph::connComp(pathway)[!lapply(graph::connComp(pathway),length)<threshold])
   if(is.null(X))
   {
     cat("\r  No connected component of size greater than 10 ")
@@ -128,7 +130,7 @@ searchSubnet<-function(pathway,
 
     if(maximean & verbose)
     {
-      cat("  No null distribution provided. The mean will be maximized.\n")
+      cat("  No background distribution provided. The mean will be maximized.\n")
     }
 
     ### Initialization of the graph
@@ -239,9 +241,6 @@ searchSubnet<-function(pathway,
         }
       }
 
-
-
-
       if(!maximean & verbose)
       {
         if(length(activeNet)>=max(nullDist$k)) stop(paste("No null distribution for subnetwork
@@ -319,33 +318,36 @@ searchSubnet<-function(pathway,
         score<-c(score,s)
         if(i==iterations)
         {
-        par(mfrow=c(1,1))
+        par(mfrow=c(1,2))
 
         x <- 1:iterations
         y <- size
         z <- score
         par(mar = c(5, 5, 5, 5))  # Leave space for z axis
 
-        plot(x, z, type="p",pch=16,cex=0.6,
-             col="red",ylab="Subnetwork score",
+        plot(x, z, type="l",lwd=1,cex=0.2,pch=16,
+             col="firebrick",ylab="Subnetwork score",
              xlab="Iterations") # first plot
 
         par(new = TRUE)
-        plot(x, y, type = "l", axes = FALSE,cex=0.8,
-             bty = "n", xlab = "", ylab = "",
-             pch=16,lwd=1,col="blue")
-        axis(side=4, at = pretty(range(y)))
-        mtext("Subnetwork size", side=4, line=3)
+        plot(1:iterations,temp, type="l",lwd=1,
+             xlab="", ylab="",axes=F,lty=2,
+             col="grey")
+        axis(side=4, at = pretty(range(temp)))
+        mtext("Temperature", side=4, line=3)
+
+        plot(x, y, type = "l", cex=0.5,
+             xlab = "Iterations", ylab = "Subnetwork size",
+             pch=16,lwd=1,col="dodgerblue")
 
         par(new=TRUE)
         plot(1:iterations,temp, type="l",lwd=1,
-             xlab="", ylab="",axes=F,
+             xlab="", ylab="",axes=F,lty=2,
              col="grey")
+        axis(side=4, at = pretty(range(temp)))
+        mtext("Temperature", side=4, line=3)
 
-        axis(2,labels=F,col=2,lwd=2,tck=0)
-        axis(4,labels=F,col="blue",lwd=2,tck=0)
-
-
+        par(mfrow=c(1,1))
         }
       }
     }

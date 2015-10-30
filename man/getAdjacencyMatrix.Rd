@@ -4,7 +4,7 @@
 \alias{getAdjacencyMatrix}
 \title{Build the adjacency matrix of a graph}
 \usage{
-getAdjacencyMatrix(pathway, directed = FALSE)
+getAdjacencyMatrix(pathway, directed = FALSE, selfLoops = FALSE)
 }
 \arguments{
 \item{pathway}{A \verb{graphNEL} object.}

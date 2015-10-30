@@ -11,7 +11,8 @@
 #' #adj<-getAdjacencyMatrix(keggPathways[[1]])
 
 getAdjacencyMatrix<-function(pathway,
-                             directed = FALSE)
+                             directed = FALSE,
+                             selfLoops=FALSE)
 {
   requireNamespace("graph",quietly=TRUE)
   x<-graph::edges(pathway)
@@ -33,6 +34,8 @@ getAdjacencyMatrix<-function(pathway,
       adjMatrix[i,x[[i]]]<-1
     }
   }
+
+  if(!selfLoops) diag(adjMatrix)<-0
 
   rownames(adjMatrix)<-colnames(adjMatrix)<-GList
 
