@@ -71,6 +71,35 @@ searchSubnet<-function(pathway,
 
   # if(diagnostic & replicates>0) par(mfrow=c(replicates,2))
 
+  if(class(pathway)=="list")
+  {
+    all<-list()
+    for(i in 1:length(pathway))
+      {
+        res<-try(
+           searchSubnet(pathway[[i]],
+                        scores=scores,
+                        nullDist = nullDist,
+                        iterations = iterations,
+                        replicates = replicates,
+                        temperature = temperature,
+                        diagnostic=diagnostic,
+                        verbose=verbose)
+        )
+        if(class(res)=="try-error")
+        {
+          res<-NULL
+        }
+        all[[i]]<-res
+        cat("\r  ",i,"/",length(pathway)," pathways analyzed.",sep="")
+    }
+    invisible(all)
+  }
+  else if(class(pathway)!="graphNEL")
+  {
+    stop("Pathway is not a graphNEL object")
+  }
+  else{
   if(replicates>1)
   {
     if(verbose) cat("  Replicating: ")
@@ -85,10 +114,10 @@ searchSubnet<-function(pathway,
                       verbose = FALSE,
                       burnin = burnin,
                       animPlot = 0,
-                      diagnostic=diagnostic);cat("+");return(out)},
+                      diagnostic=diagnostic);if(verbose) cat("+");return(out)},
 
                       simplify=FALSE)
-    cat("\n  ... Done !")
+    if(verbose) cat("\n  ... Done !")
     sz<-unlist(lapply(allReturn,function(x) return(x$size)))
 
 
@@ -98,7 +127,7 @@ searchSubnet<-function(pathway,
     vec<-unlist(lapply(allReturn,function(x) return(x$score)))
 
     if(length(vec)==0){
-      cat("\n  No high-scoring subnetwork found\n\n")
+      if(verbose) cat("\n  No high-scoring subnetwork found\n\n")
       ret <- NULL
     }
     else
@@ -116,7 +145,7 @@ searchSubnet<-function(pathway,
   else  X<-unlist(graph::connComp(pathway)[!lapply(graph::connComp(pathway),length)<threshold])
   if(is.null(X))
   {
-    cat("\r  No connected component of size greater than 10 ")
+    if(verbose) cat("\r  No connected component of size greater than 10 ")
     ret<-NULL
   }
   else
@@ -375,5 +404,5 @@ searchSubnet<-function(pathway,
   }
 
   invisible(ret)
-
+  }
 }

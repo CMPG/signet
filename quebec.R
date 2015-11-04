@@ -80,21 +80,23 @@ library(signet);library(devtools)
 document()
 data("keggPathways")
 
-quebecNullR<-nullDistribution(reactGraph,scores = scores,kmin=2,kmax=50,iterations=100)
+quebecNullR<-nullDistribution(reactGraph[-toremove],scores = scores,kmin=2,kmax=50,iterations=100)
 save(quebecNull,file="quebecNull.rda")
 load("quebecNull.rda")
 #before generating the entire null distribution
 for(i in 1:450) quebecNullR<-rbind(quebecNullR,quebecNullR[49,])
 quebecNullR$k<-2:500
 plot(quebecNullR)
-
-quebecKegg<-lapply(reactGraph[1:10],searchSubnet,
+length(reactGraph[-toremove])
+glistR<-reactGraph[-toremove]
+quebecKegg<-lapply(glistR,searchSubnet,
                          scores=scores,
                          nullDist = quebecNullR,
                          iterations = 5000,
-                         replicates = 5,
+                         replicates = 3,
                          temperature = 0.999,
                          diagnostic=TRUE)
+
 #bug with kegg pathway 106
 
 resultsQuebec<-list()
@@ -112,6 +114,25 @@ quebecKegg3a1<-lapply(keggPathways[101:105],searchSubnet,
                    diagnostic=FALSE)
 
 
+###OR:
+all<-list()
+for(i in 1:length(glistR))
+{
+  res<-try(
+    searchSubnet(glistR[[i]],
+                 scores=scores,
+                 nullDist = quebecNull,
+                 iterations = 5000,
+                 replicates = 3,
+                 temperature = 0.999,
+                 diagnostic=FALSE,
+                 verbose=FALSE)
+  )
+  if(class(res)=="try-error"){res<-NULL}
+  all[[i]]<-res
+  print(i)
+}
+
 par(mar=rep(5,4))
 hist(unlist(lapply(resultsQuebec,function(x) return(x$score))))
 qqline(unlist(lapply(output,function(x) return(x$score))))
@@ -120,11 +141,11 @@ writeResults<-function(output)
 {
 
 
-pvalues<-unlist(lapply(resultsQuebec,function(x) {stat<-x$pvalue;if(is.null(stat)) stat<-NA; return(stat)}))
-subnetSize<-unlist(lapply(resultsQuebec,function(x) {stat<-x$size;if(is.null(stat)) stat<-NA; return(stat)}))
-netSize<-unlist(lapply(resultsQuebec,function(x) {stat<-length(x$table$gene);if(is.null(stat)) stat<-NA; return(stat)}))
-
-subnetScore<-unlist(lapply(resultsQuebec,function(x) {stat<-x$score;if(is.null(stat)) stat<-NA; return(stat)}))
+pvalues<-unlist(lapply(quebecR150,function(x) {stat<-x$pvalue;if(is.null(stat)) stat<-NA; return(stat)}))
+subnetSize<-unlist(lapply(quebecR150,function(x) {stat<-x$size;if(is.null(stat)) stat<-NA; return(stat)}))
+netSize<-unlist(lapply(quebecR150,function(x) {stat<-length(x$table$gene);if(is.null(stat)) stat<-NA; return(stat)}))
+length(subnetScore[!is.na(subnetScore)])
+subnetScore<-unlist(lapply(quebecR150,function(x) {stat<-x$score;if(is.null(stat)) stat<-NA; return(stat)}))
 
 abline(lm(subnetSize~netSize))
 
@@ -206,18 +227,18 @@ for(i in 1:length(reactGraph))
 }
 
 hist(overlap[overlap>0.0])
-save(overlap,file="overlapReactome.rda")
 
 diag(overlap)<-0
 
-sum(overlap>0.05,na.rm=TRUE)
+sum(overlap>0.5,na.rm=TRUE)
+
 mat<-matrix(NA,ncol=6,nrow=length(reactGraph)^2)
 for(i in 1:length(reactGraph))
 {
   for(j in 1:length(reactGraph))
   {
     line<-c(i,j,length(reactGraph[[i]]@nodes),length(reactGraph[[j]]@nodes),
-            max(c(overlap[i,j],overlap[j,i])),
+            c(overlap[i,j]),
             sum(reactGraph[[i]]@nodes %in% reactGraph[[j]]@nodes))
     mat[i+(j-1)+(i-1)*length(reactGraph),]<-line
   }
@@ -226,9 +247,37 @@ for(i in 1:length(reactGraph))
 
 mat2<-mat[mat[,5]>0.1&!is.na(mat[,5]),]
 
+colnames(mat2)<-c("pathI","pathJ","sizeI","sizeJ","overlap","commonGenes")
+
+save(mat,mat2,react,reactGraph,overlap,file="overlapReactome.rda")
+load(file="overlapReactome.rda")
+
+mat3<-as.data.frame(mat2)
 #case1
-case1<-mat2[mat2[,5]==1,]
-case1<-case1[case1[,2]%in%as.numeric(names(table(case1[,2])[table(case1[,2])>1])),]
+case<-mat3[mat3$overlap==1,]
+
+case1<-case[case$pathJ%in%as.numeric(names(table(case$pathJ)[table(case$pathJ)>1])),]
+
+toremove<-as.numeric(unique(case1$pathI))
+#case 1 and 2: juste have to remove the p. we dont care about the names
+
+case3<-case[case$pathJ%in%as.numeric(names(table(case$pathJ)[table(case$pathJ)>1])),]
+
+
+react[[131]]
+superpathways
+toremove<-
+
+
+
+
+
+
+
+
+
+
+
 
 library(graph)
 
