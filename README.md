@@ -26,6 +26,11 @@ algorithm used in the package:
 
 ![simulatedAnnealing](misc/anim_50fps.gif)
 
+You can learn more about the methodology here:
+
+[methodo](misc/methodo.md)
+
+
 ## Application
 
 Data: we will use KEGG Pathways data, and genetic data from Daub et al. (2013), 
