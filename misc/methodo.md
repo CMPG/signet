@@ -43,6 +43,8 @@ A pathway is randomly sampled (the sampling probability being conditioned by the
 
 ## High-scoring subnetwork search
 
+We consider that genes can yield two states: active or inactive.
+
 The selected gene is not an articulation point of the subgraph, i.e. its removal doesn’t disconnect the active subgraph.
 
 The selected gene is randomly picked in the following nodes: i) nodes in the boundary; ii) leaves, iii) nodes which are not articulation points of the subgraph.

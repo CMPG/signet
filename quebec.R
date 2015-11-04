@@ -2,7 +2,7 @@ source("https://bioconductor.org/biocLite.R")
 biocLite("mygene")
 library("mygene")#problems with dependencies versions... -> reinstall all BioC packages
 
-dat<-read.table("quebec.txt",header=TRUE,sep="\t")
+dat<-read.table("./analysis/quebec.txt",header=TRUE,sep="\t")
 dat$ensembleID<-substring(as.character(dat$ens.gene),1,15)
 #ensemble ID -> entrez ID +
 #
@@ -38,41 +38,79 @@ dat$ensembleID<-substring(as.character(dat$ens.gene),1,15)
 
 
 
-annot<-read.table("gene_annotation_unique.tsv", sep="\t",header=TRUE,na.strings="NA",quote = '"')
+annot<-read.table("./analysis/gene_annotation_unique.tsv", sep="\t",header=TRUE,na.strings="NA",quote = '"')
 annot<-annot[annot$keep==1,]
 annot$entrezID<-as.numeric(as.character(annot$entrezID))
 
-head(annot)
-
 entrezID<-lapply(dat$ensembleID,function(x) annot[annot$query==x,][1,]$entrezgene)
-name<-lapply(dat$ensembleID,function(x) annot[annot$query==x,][1,]$name)
-name<-lapply(dat$ensembleID,function(x) annot[annot$query==x,][1,]$summary)
+# name<-lapply(dat$ensembleID,function(x) annot[annot$query==x,][1,]$name)
+# summa<-lapply(dat$ensembleID,function(x) annot[annot$query==x,][1,]$summary)
 
 dat$entrezID <- entrezID
 # dat$symbol <- out2$symbol
-dat$name <- name
-dat$alias <- alias
-dat$summary <- summa
+# dat$name <- name
+# # dat$alias <- alias
+# dat$summary <- summa
 
 ## compute delta freq
-dat$score<-c(dat$freq.front-dat$freq.core)
+within<-((1-(dat$freq.front/100)^2)+(1-(dat$freq.core/100)^2))/2
+between<-(1-((dat$freq.front-dat$freq.front)/200)^2)
+fst<-1-(within/between)
+hist(fst)
+dat$score<-fst#c(dat$freq.front-dat$freq.core)
 
+# save(dat,file="quebecRawData.rda")
+load(file="quebecRawData.rda")
+
+###tronche des stats
+plot(dat$score~as.factor(dat$annovar))
+
+
+plot(dat$gerp,dat$score,cex=0.5,pch=16,col=rgb(.0,.0,.0,alpha=0.1))
+
+snpPerGene<-tapply(dat$score,dat$ensembleID,length)
 maxScore<-tapply(dat$score,dat$ensembleID,max)
+meanScore<-tapply(dat$score,dat$ensembleID,mean,na.rm=TRUE)
+q90Score<-tapply(dat$score,dat$ensembleID,function(x) mean(x[x>quantile(x,probs=c(0.9),na.rm=TRUE)]))
+quant80Score<-tapply(dat$score,dat$ensembleID,function(x) quantile(x,probs=c(0.8),na.rm=TRUE))
+quant90Score<-tapply(dat$score,dat$ensembleID,function(x) quantile(x,probs=c(0.9),na.rm=TRUE))
+
+par(mfrow=c(2,2))
+hist(snpPerGene,breaks=50)
+hist(maxScore)
+hist(meanScore)
+hist(quant80Score)
+
+
+plot(log10(snpPerGene),maxScore,cex=0.5,pch=16,col=rgb(.0,.0,.0,alpha=0.1),
+     main=format(cor(log10(snpPerGene),maxScore),digits=3))
+plot(log10(snpPerGene),meanScore,cex=0.5,pch=16,col=rgb(.0,.0,.0,alpha=0.1),
+     main=format(cor(log10(snpPerGene),meanScore),digits=3))
+plot(log10(snpPerGene),q90Score,cex=0.5,pch=16,col=rgb(.0,.0,.0,alpha=0.1),
+     main=format(cor.test(log10(snpPerGene),q90Score)$estimate,digits=3))
+plot(log10(snpPerGene),quant80Score,cex=0.5,pch=16,col=rgb(.0,.0,.0,alpha=0.1),
+     main=format(cor.test(log10(snpPerGene),quant80Score)$estimate,digits=3))
+
+
+plot(meanScore,maxScore,cex=0.5,pch=16,col=rgb(.0,.0,.0,alpha=0.1))
+plot(meanScore,q90Score,cex=0.5,pch=16,col=rgb(.0,.0,.0,alpha=0.1))
+plot(maxScore,q90Score,cex=0.5,pch=16,col=rgb(.0,.0,.0,alpha=0.1))
+
+
+##get scores for the gene list
 bla<-NULL
-gene<-lapply(names(maxScore),function(x){bla<-c(annot[annot$query==x,]$entrezID);
-  print(bla);
-  if(sum(bla,na.rm = TRUE)<1) bla<- NA;
+gene<-lapply(names(quant90Score),function(x){bla<-c(annot[annot$query==x,]$entrezID);
+    if(sum(bla,na.rm = TRUE)<1) bla<- NA;
   # if(is.na(bla)) bla<- c(-1);
   return(bla)})
 
-
 gene<-unlist(gene)
+scores<-data.frame(gene=gene,score=quant90Score)
 
-scores<-data.frame(gene=gene,score=maxScore)
+save(scores,file="./analysis/fstQuebec.rda")
+hist(scores$score)
 
-save(scores,file="scoresQuebec.rda")
-head(scores)
-
+load("./analysis/scoresQuebec.rda")
 
 
 #now we can run the analysis
@@ -80,140 +118,134 @@ library(signet);library(devtools)
 document()
 data("keggPathways")
 
-quebecNullR<-nullDistribution(reactGraph[-toremove],scores = scores,kmin=2,kmax=50,iterations=100)
-save(quebecNull,file="quebecNull.rda")
+quebecNullKegg<-nullDistribution(keggGraph,scores = scores,kmin=2,kmax=50,iterations=100)
+for(i in 1:450) quebecNullKegg<-rbind(quebecNullKegg,quebecNullKegg[49,])
+quebecNullKegg$k<-2:500
+
+save(quebecNullKegg,file="./analysis/quebecBackgroundKegg.rda")
+
 load("quebecNull.rda")
 #before generating the entire null distribution
-for(i in 1:450) quebecNullR<-rbind(quebecNullR,quebecNullR[49,])
-quebecNullR$k<-2:500
-plot(quebecNullR)
-length(reactGraph[-toremove])
-glistR<-reactGraph[-toremove]
-quebecKegg<-lapply(glistR,searchSubnet,
-                         scores=scores,
-                         nullDist = quebecNullR,
-                         iterations = 5000,
-                         replicates = 3,
-                         temperature = 0.999,
-                         diagnostic=TRUE)
 
-#bug with kegg pathway 106
+# save(resultsQuebec,file="resultsQuebec.rda") #WITH DELTA F
+# load(file="resultsQuebec.rda") #WITH DELTA F
 
-resultsQuebec<-list()
-resultsQuebec<-c(quebecKegg,quebecKegg2,quebecKegg3b,
-            quebecKegg3a1,quebecKegg3a2,quebecKegg3a3,
-            quebecKegg3c,quebecKegg3d,quebecKegg3e,quebecKegg4,quebecKegg5)
-save(resultsQuebec,file="resultsQuebec.rda")
-load(file="resultsQuebec.rda")
-quebecKegg3a1<-lapply(keggPathways[101:105],searchSubnet,
-                   scores=scores,
-                   nullDist = quebecNull,
-                   iterations = 5000,
-                   replicates = 5,
-                   temperature = 0.999,
-                   diagnostic=FALSE)
-
-
-###OR:
-all<-list()
-for(i in 1:length(glistR))
-{
-  res<-try(
-    searchSubnet(glistR[[i]],
+all3<-searchSubnet(keggGraph[101:length(keggGraph)],
                  scores=scores,
-                 nullDist = quebecNull,
-                 iterations = 5000,
+                 nullDist = quebecNullKegg,
+                 iterations = 4000,
                  replicates = 3,
                  temperature = 0.999,
-                 diagnostic=FALSE,
+                 diagnostic=TRUE,
                  verbose=FALSE)
-  )
-  if(class(res)=="try-error"){res<-NULL}
-  all[[i]]<-res
-  print(i)
+
+c(all,all2,all3)
+
+#####
+### Test the significance of the subnetworks
+#####
+
+# compute the null distribution. Permute the scores and apply the algorithm N times
+iter<-1000
+# test<-array(NA,iter)
+for (i in 51:iter)
+{
+  newscores<-data.frame(gene=scores$gene,score=sample(scores$score))
+  sc<-searchSubnet(keggGraph[[sample(1:250,1)]],newscores,
+                   quebecNullKegg,
+                   replicates=1,iterations=3000,
+                   temperature=0.999,verbose=FALSE)$score
+  cat("\r  ",i,"/",iter,sep="")
+  if(!is.null(sc)) test[i]<-sc
 }
 
-par(mar=rep(5,4))
-hist(unlist(lapply(resultsQuebec,function(x) return(x$score))))
-qqline(unlist(lapply(output,function(x) return(x$score))))
+#plot null distribution
+hist(test,
+     main="Null distribution",
+     xlab="Subnetwork score",
+     breaks=5)
+
+# compute empirical p-value and return the pathways IDs for which FDR < 0.001
+require(qvalue)
+candidates<-which(qvalue(unlist(lapply(subnetScore,function(x) return(mean(test>x,na.rm=TRUE)))),
+                         fdr.level=0.01)$significant)
+
+namesKegg[qvalue(
+  unlist(lapply(subnetScore,function(x) return(mean(test>x,na.rm=TRUE))))
+  ,fdr.level=0.01)$significant]
+
+hist(unlist(lapply(subnetScore,function(x) return(mean(test>x,na.rm=TRUE)))),breaks=40)
+
+#####
+### Write the results in a table
+### Pathway: name, size, edges, nodes
+### Subp: genes, score, size, pvalue
+#####
 
 writeResults<-function(output)
 {
 
 
-pvalues<-unlist(lapply(quebecR150,function(x) {stat<-x$pvalue;if(is.null(stat)) stat<-NA; return(stat)}))
-subnetSize<-unlist(lapply(quebecR150,function(x) {stat<-x$size;if(is.null(stat)) stat<-NA; return(stat)}))
-netSize<-unlist(lapply(quebecR150,function(x) {stat<-length(x$table$gene);if(is.null(stat)) stat<-NA; return(stat)}))
-length(subnetScore[!is.na(subnetScore)])
-subnetScore<-unlist(lapply(quebecR150,function(x) {stat<-x$score;if(is.null(stat)) stat<-NA; return(stat)}))
+  pvalues<-unlist(lapply(all,function(x) {stat<-x$pvalue;if(is.null(stat)) stat<-NA; return(stat)}))
+  subnetSize<-unlist(lapply(all,function(x) {stat<-x$size;if(is.null(stat)) stat<-NA; return(stat)}))
+  netSize<-unlist(lapply(all,function(x) {stat<-length(x$table$gene);if(is.null(stat)) stat<-NA; return(stat)}))
+  length(subnetScore[!is.na(subnetScore)])
+  subnetScore<-unlist(lapply(all,function(x) {stat<-x$score;if(is.null(stat)) stat<-NA; return(stat)}))
+  plot(subnetScore,subnetSize)
+  abline(lm(subnetSize~netSize))
 
-abline(lm(subnetSize~netSize))
+  names(glistR[which(subnetScore>3)])
 
-
-
-namesKegg<-names(pathways("hsapiens","kegg"))
+  namesKegg<-names(pathways("hsapiens","kegg"))
 }
 
 
-iter<-1000
-test<-array(NA,iter)
-for (i in 1:iter)
-{
-  newscores<-data.frame(gene=scores$gene,score=sample(scores$score))
-  sc<-searchSubnet(keggPathways[[sample(1:244,1)]],newscores,
-                   quebecNull,
-                   replicates=1,iterations=2000,
-                   temperature=0.99,verbose=FALSE)$score
-  print(i)
-  if(!is.null(sc)) test[i]<-sc
-}
-hist(test,breaks=20)
 
-
-library(qvalue)
-
-subnetScore[
-  which(qvalue(unlist(lapply(subnetScore,function(x) return(mean(test>x,na.rm=TRUE)))))$lfdr<0.05)
-  ]
-
-
-
-namesKegg[qvalue(unlist(lapply(subnetScore,function(x) return(mean(test>x,na.rm=TRUE)))),fdr.level=0.001)$significant]
-
-
-
-namesKegg[which(qvalue(unlist(lapply(subnetScore,function(x) return(mean(test>x,na.rm=TRUE)))))$lfdr<0.05)]
-subnetScore[which(qvalue(unlist(lapply(subnetScore,function(x) return(mean(test>x,na.rm=TRUE)))))$lfdr<0.05)]
-subnetSize[which(qvalue(unlist(lapply(subnetScore,function(x) return(mean(test>x,na.rm=TRUE)))))$lfdr<0.05)]
-
-which(qvalue(unlist(lapply(subnetScore,function(x) return(mean(test>x,na.rm=TRUE)))))$lfdr<0.05)[29]
 
 (lapply(resultsQuebec,function(x) {stat<-x$table[x$table$state,]$gene;if(is.null(stat)) stat<-NA; return(paste(stat,sep=";"))}))
 
 test[which(qvalue(unlist(lapply(subnetScore,function(x) return(mean(test>x,na.rm=TRUE)))))$lfdr<0.05)]
 
 
-quebecKegg[[2]]
-kegg[[2]]
-cat(quebecKegg[[2]]$table[quebecKegg[[2]]$table$state,]$gene,sep="+")
 
+#####
+### Procedure for pathways overlapping correction
+#####
 
-
-
-
-### procedure overlapping
 library(graphite)
-?pathways
+
 react<-pathways("hsapiens","reactome")
+react<-convertIdentifiers(react, "entrez")
+reactGraph<-lapply(react,pathwayGraph,edge.types=NULL)
+
 kegg<-pathways("hsapiens","kegg")
+kegg<-convertIdentifiers(kegg, "entrez")
+keggGraph<-lapply(kegg,pathwayGraph,edge.types=NULL)
+
 biocarta<-pathways("hsapiens","biocarta")
+biocarta<-convertIdentifiers(biocarta, "entrez")
+biocartaGraph<-lapply(biocarta,pathwayGraph,edge.types=NULL)
+
 panther<-pathways("hsapiens","panther")
+panther<-convertIdentifiers(panther, "entrez")
+pantherGraph<-lapply(panther,pathwayGraph,edge.types=NULL)
+
 nci<-pathways("hsapiens","nci")
+nci<-convertIdentifiers(nci, "entrez")
+nciGraph<-lapply(nci,pathwayGraph,edge.types=NULL)
+
+
+all<-searchSubnet(nciGraph,
+                  scores=scores,
+                  nullDist = quebecNull,
+                  iterations = 5000,
+                  replicates = 3,
+                  temperature = 0.9995,
+                  diagnostic=TRUE,
+                  verbose=FALSE)
 
 
 #pathway object to graphNEL
-react<-convertIdentifiers(react, "entrez")
-reactGraph<-lapply(react,pathwayGraph,edge.types=NULL)
 
 overlap<-matrix(0,nrow=length(reactGraph),ncol=length(reactGraph))
 #we build a matrix with the pairwise overlap between pathways

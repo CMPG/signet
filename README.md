@@ -26,9 +26,7 @@ algorithm used in the package:
 
 ![simulatedAnnealing](misc/anim_50fps.gif)
 
-You can learn more about the methodology here:
-
-[methodo](misc/methodo.md)
+You can learn more about the methodology by clicking [here](misc/methodo.md).
 
 
 ## Application

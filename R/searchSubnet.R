@@ -165,6 +165,15 @@ searchSubnet<-function(pathway,
     ### Initialization of the graph
 
     newpath<-graph::subGraph(as.character(scores[!is.na(scores$score),]$gene),pathway) #remove missing values
+
+    X2<-unlist(graph::connComp(newpath)[!lapply(graph::connComp(newpath),length)<threshold])
+    if(is.null(X2))
+    {
+      if(verbose) cat("\r  No connected component of size greater than 10 ")
+      ret<-NULL
+    }
+    else
+    {
     adjMatrix<-getAdjacencyMatrix(pathway=newpath) #get the adjacency matrix of the graph
 
     #initialize the gene scores list (gene names, scores, and state)
@@ -365,7 +374,7 @@ searchSubnet<-function(pathway,
         axis(side=4, at = pretty(range(temp)))
         mtext("Temperature", side=4, line=3)
 
-        plot(x, y, type = "l", cex=0.5,
+        plot(x, y, type = "l", cex=0.5,ylim=c(0,max(y)),
              xlab = "Iterations", ylab = "Subnetwork size",
              pch=16,lwd=1,col="dodgerblue")
 
@@ -394,6 +403,7 @@ searchSubnet<-function(pathway,
     ret<-list(table=workingTable,score=s,size=subnetSize,pvalue=pval)
 
     }
+  }
   }
   }
   if(verbose & !is.null(ret))
