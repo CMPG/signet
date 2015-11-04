@@ -16,20 +16,17 @@ In order to gather curated information about human pathways, we have collected d
 
 ## Pathway data preparation
 
-Pathway data. Different problems to transform a pathway object to a graph. The procedure implemented in the R package graphite is used (described in X et al, XXX). The principle is as follows:
-Nodes with multiple elements
+### Transformation to graph objects
 
-Within a pathway nodes often correspond to multiple gene products. These can be divided into protein complexes (proteins linked by protein-protein interactions) and the groups containing alternative members (genes generally with similar biochemical functions). Thus, when considering signal propagation these groups should be considered differently; the first (hereafter group AND) should be expanded into a clique (all proteins connected to the others), while the second (hereafter group OR) should be expanded without connection among the contained elements. In the KGML format there are two ways of defining nodes with multiple elements: protein complexes (group AND defined by entry type="group") and group with alternative members (group OR defined by entry type="gene"). In the BioPax format only one type of group is allowed: protein complexes (group AND) with the owl tag complex. However, it often happened that protein tag contains multiple xref pointing to alternative elements of the process (group OR).
+To transform pathway object to graphs, we use the procedure implemented in the R package graphite (X et al, XXX).
 
-Compound mediated interactions
+Within a pathway, nodes often correspond to multiple gene products. These can be divided into protein complexes (proteins linked by protein-protein interactions) and the groups containing alternative members (genes generally with similar biochemical functions). Thus, when considering signal propagation these groups should be considered differently; the first (hereafter group AND) should be expanded into a clique (all proteins connected to the others), while the second (hereafter group OR) should be expanded without connection among the contained elements (X et al, XXX).
 
 Compound mediated interactions are interactions for which a compound acts as a bridge between two elements. Since we are interested in gene networks, they should be removed from the graph. However, the trivial elimination of the compounds, without signal propagation, will strongly bias the topology interrupting the signals that pass through them. If element A is linked to compound c and compound c is linked to element B, thus elements A should be linked to elements B.
 
-REF: Since signal propagation reconstruction is crucial for topological gene set analysis we decide to include additional rules for the propagation reconstructing a connection between two genes connected through a series of chemical compounds. Not all compound are considered for the propagation because some of them, such as Hydrogen, H2O, ATP, ADP etc., are highly frequent in map descriptions and the signal propagation through them would lead to degenerate too long chains of compounds. The compounds not considered for propagation are not characteristic of a specific reaction but secondary substrates/products widely shared among different processes.
+X et al, (XXX) handle this problem as follows: since signal propagation reconstruction is crucial for topological gene set analysis we decide to include additional rules for the propagation reconstructing a connection between two genes connected through a series of chemical compounds. Not all compound are considered for the propagation because some of them, such as Hydrogen, H2O, ATP, ADP etc., are highly frequent in map descriptions and the signal propagation through them would lead to degenerate too long chains of compounds. The compounds not considered for propagation are not characteristic of a specific reaction but secondary substrates/products widely shared among different processes.
 
-We finally use
-
-Overlapping correction
+### Overlapping correction
 
 We will first exclude all pathways completely included in at least another pathway (overlap = 1). 
 I still need to implement a procedure to merge pathways with an overlapping level greater than a given threshold. Or use a pruning method afterwards.
