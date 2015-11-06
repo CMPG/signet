@@ -118,7 +118,7 @@ library(signet);library(devtools)
 document()
 data("keggPathways")
 
-quebecNullKegg<-nullDistribution(keggGraph,scores = scores,kmin=2,kmax=50,iterations=100)
+quebecNull2<-nullDistribution(keggGraph,scores = scores,kmin=2,kmax=4,iterations=10000)
 for(i in 1:450) quebecNullKegg<-rbind(quebecNullKegg,quebecNullKegg[49,])
 quebecNullKegg$k<-2:500
 
@@ -134,12 +134,12 @@ all3<-searchSubnet(keggGraph[101:length(keggGraph)],
                  scores=scores,
                  nullDist = quebecNullKegg,
                  iterations = 4000,
-                 replicates = 3,
+                 replicates = 2,
                  temperature = 0.999,
                  diagnostic=TRUE,
                  verbose=FALSE)
 
-c(all,all2,all3)
+allKEGG<-c(all[1:9],list(NULL),all[10:99],all3)
 
 #####
 ### Test the significance of the subnetworks
@@ -148,63 +148,50 @@ c(all,all2,all3)
 # compute the null distribution. Permute the scores and apply the algorithm N times
 iter<-1000
 # test<-array(NA,iter)
-for (i in 51:iter)
-{
-  newscores<-data.frame(gene=scores$gene,score=sample(scores$score))
-  sc<-searchSubnet(keggGraph[[sample(1:250,1)]],newscores,
-                   quebecNullKegg,
-                   replicates=1,iterations=3000,
-                   temperature=0.999,verbose=FALSE)$score
-  cat("\r  ",i,"/",iter,sep="")
-  if(!is.null(sc)) test[i]<-sc
-}
-
 #plot null distribution
 hist(test,
      main="Null distribution",
      xlab="Subnetwork score",
      breaks=5)
 
-# compute empirical p-value and return the pathways IDs for which FDR < 0.001
-require(qvalue)
-candidates<-which(qvalue(unlist(lapply(subnetScore,function(x) return(mean(test>x,na.rm=TRUE)))),
-                         fdr.level=0.01)$significant)
 
-namesKegg[qvalue(
-  unlist(lapply(subnetScore,function(x) return(mean(test>x,na.rm=TRUE))))
-  ,fdr.level=0.01)$significant]
-
-hist(unlist(lapply(subnetScore,function(x) return(mean(test>x,na.rm=TRUE)))),breaks=40)
-
-#####
-### Write the results in a table
-### Pathway: name, size, edges, nodes
-### Subp: genes, score, size, pvalue
-#####
-
-writeResults<-function(output)
+#check for uniformity
+pvalnull<-array(NA,length(test[!is.na(test)]))
+for(i in 1:150)
 {
-
-
-  pvalues<-unlist(lapply(all,function(x) {stat<-x$pvalue;if(is.null(stat)) stat<-NA; return(stat)}))
-  subnetSize<-unlist(lapply(all,function(x) {stat<-x$size;if(is.null(stat)) stat<-NA; return(stat)}))
-  netSize<-unlist(lapply(all,function(x) {stat<-length(x$table$gene);if(is.null(stat)) stat<-NA; return(stat)}))
-  length(subnetScore[!is.na(subnetScore)])
-  subnetScore<-unlist(lapply(all,function(x) {stat<-x$score;if(is.null(stat)) stat<-NA; return(stat)}))
-  plot(subnetScore,subnetSize)
-  abline(lm(subnetSize~netSize))
-
-  names(glistR[which(subnetScore>3)])
-
-  namesKegg<-names(pathways("hsapiens","kegg"))
+  pvalnull[i]<-mean(test[!is.na(test)][i]<test[!is.na(test)])
 }
+hist(pvalnull)
+
+# compute empirical p-value and return the pathways IDs for which FDR < 0.001
+subnetSize<-unlist(lapply(allKEGG,function(x) {stat<-x$size;if(is.null(stat)) stat<-NA; return(stat)}))
+netSize<-unlist(lapply(allKEGG,function(x) {stat<-length(x$table$gene);if(is.null(stat)) stat<-NA; return(stat)}))
+subnetScore<-unlist(lapply(allKEGG,function(x) {stat<-x$score;if(is.null(stat)) stat<-NA; return(stat)}))
+hist(subnetScore)
+
+pvalues<-unlist(lapply(subnetScore,function(x) {stat<-mean(test>x,na.rm=TRUE);if(is.null(stat)) stat<-NA; return(stat)}))
+hist(pvalues)
+
+require(qvalue)
+qvalues<-qvalue(pvalues,fdr.level=0.05)$qvalues
+
+candidates<-which(qvalue(pvalues)$qvalues<0.1)
+names(kegg[candidates])
+
+resultsKEGG<-data.frame(name=names(kegg),qvalues=qvalue(pvalues)$qvalues,pvalue=pvalues,subnetScore=subnetScore,
+           subnetSize=subnetSize,netSize=netSize)
+
+write.table(resultsKEGG,quote = FALSE,row.names = FALSE,file="quebecKEGG.tsv",sep="\t")
 
 
+save(allKEGG,resultsKEGG,test,quebecNullKegg,file="auebecKEGGall.rda")
+
+##overlapping proportion in the results
+#percentage of genes appearing more than once
+mean(table(unlist(lapply(allKEGG[which(qvalue(pvalues)$qvalues<0.05)],function(x)
+  return(x$table[x$table$state,]$gene))))>3)
 
 
-(lapply(resultsQuebec,function(x) {stat<-x$table[x$table$state,]$gene;if(is.null(stat)) stat<-NA; return(paste(stat,sep=";"))}))
-
-test[which(qvalue(unlist(lapply(subnetScore,function(x) return(mean(test>x,na.rm=TRUE)))))$lfdr<0.05)]
 
 
 
