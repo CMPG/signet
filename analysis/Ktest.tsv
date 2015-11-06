@@ -1,0 +1,251 @@
+pathwaysNames	netSize	subnetSize	subnetScore	pvalues	qvalues
+Focal adhesion	201	28	8.415648229	0.004750594	0.040530048
+Purine metabolism	153	4	8.37339595	0.004750594	0.040530048
+Rap1 signaling pathway	188	15	8.170130999	0.007125891	0.040530048
+Calcium signaling pathway	161	21	7.658632303	0.011876485	0.040530048
+ECM-receptor interaction	82	8	7.597011148	0.011876485	0.040530048
+Proteoglycans in cancer	180	26	7.501627455	0.012826603	0.040530048
+Phosphatidylinositol signaling system	81	6	7.364039645	0.014251781	0.040530048
+Starch and sucrose metabolism	42	7	6.921647079	0.022327791	0.047663337
+cAMP signaling pathway	182	13	6.736010597	0.027078385	0.047663337
+Pyrimidine metabolism	96	3	6.665224204	0.029928741	0.047663337
+HIF-1 signaling pathway	100	10	6.432035378	0.035629454	0.047663337
+Circadian entrainment	90	10	6.411054347	0.036104513	0.047663337
+Oxytocin signaling pathway	143	25	6.390896431	0.036579572	0.047663337
+Olfactory transduction	315	35	6.386532056	0.037054632	0.047663337
+Steroid biosynthesis	17	3	6.303796263	0.041805226	0.047663337
+Axon guidance	100	15	6.223909677	0.046555819	0.047663337
+Wnt signaling pathway	124	10	6.203183959	0.047980998	0.047663337
+Jak-STAT signaling pathway	138	10	6.131046488	0.050831354	0.047663337
+Glycerophospholipid metabolism	89	7	6.117724991	0.051306413	0.047663337
+Inflammatory mediator regulation of TRP channels	83	14	6.100637159	0.052256532	0.047663337
+Tight junction	120	10	6.03974735	0.055106888	0.047663337
+Retinol metabolism	49	5	5.995784635	0.056532067	0.047663337
+cGMP-PKG signaling pathway	144	20	5.966471034	0.059382423	0.047663337
+Tuberculosis	138	26	5.967454336	0.059382423	0.047663337
+Regulation of actin cytoskeleton	169	23	5.960476829	0.059857482	0.047663337
+Hippo signaling pathway	138	20	5.843546729	0.065558195	0.049736874
+Vascular smooth muscle contraction	98	14	5.801362563	0.067458432	0.049736874
+Aldosterone synthesis and secretion	60	8	5.762924647	0.071733967	0.051000311
+Neurotrophin signaling pathway	110	15	5.717992762	0.076484561	0.052502718
+Melanogenesis	95	10	5.643129122	0.081235154	0.053904964
+Dopaminergic synapse	116	19	5.619389856	0.08456057	0.054301549
+Signaling pathways regulating pluripotency of stem cells	107	17	5.503215797	0.095011876	0.054559681
+Inositol phosphate metabolism	65	7	5.464766205	0.098812352	0.054559681
+MAPK signaling pathway	234	35	5.435803125	0.102137767	0.054559681
+Platelet activation	114	11	5.419239022	0.103087886	0.054559681
+Sphingolipid metabolism	44	5	5.390068643	0.104513064	0.054559681
+Metabolism of xenobiotics by cytochrome P450	56	4	5.359260723	0.106413302	0.054559681
+NF-kappa B signaling pathway	66	5	5.36812788	0.106413302	0.054559681
+Glioma	61	6	5.346916145	0.106888361	0.054559681
+Oocyte meiosis	105	20	5.267277973	0.116389549	0.055022611
+Choline metabolism in cancer	63	11	5.252701577	0.119239905	0.055022611
+GnRH signaling pathway	79	7	5.239405413	0.119239905	0.055022611
+Adrenergic signaling in cardiomyocytes	139	17	5.22262037	0.121615202	0.055022611
+Insulin resistance	93	8	5.222089675	0.121615202	0.055022611
+Hedgehog signaling pathway	46	7	5.123392731	0.13064133	0.05536292
+Long-term potentiation	63	6	5.118642989	0.13064133	0.05536292
+Serotonergic synapse	69	7	5.108523247	0.132066508	0.05536292
+Glucagon signaling pathway	77	10	5.09680239	0.133491686	0.05536292
+Chemokine signaling pathway	164	18	5.022775224	0.140617577	0.057128068
+Fc gamma R-mediated phagocytosis	85	7	4.987582216	0.144893112	0.057257905
+Cholinergic synapse	89	11	4.922238372	0.154394299	0.057257905
+GABAergic synapse	60	4	4.910460405	0.156294537	0.057257905
+Pathways in cancer	282	85	4.910232407	0.156294537	0.057257905
+Thyroid hormone signaling pathway	108	10	4.904063249	0.156769596	0.057257905
+Steroid hormone biosynthesis	45	3	4.900250039	0.158194774	0.057257905
+Glutamatergic synapse	84	15	4.832601067	0.168171021	0.059024795
+Basal cell carcinoma	43	3	4.807612087	0.171496437	0.059024795
+T cell receptor signaling pathway	89	6	4.793365134	0.171971496	0.059024795
+AMPK signaling pathway	87	10	4.655929602	0.195249406	0.065878503
+HTLV-I infection	166	17	4.581504705	0.211876485	0.070297117
+Estrogen signaling pathway	85	18	4.538591485	0.22327791	0.07099816
+Apoptosis	81	6	4.500880792	0.228028504	0.07099816
+Chemical carcinogenesis	51	3	4.506162071	0.228028504	0.07099816
+Small cell lung cancer	74	14	4.468948539	0.232779097	0.07099816
+Morphine addiction	52	3	4.456213631	0.234679335	0.07099816
+Adherens junction	59	8	4.450536683	0.236104513	0.07099816
+Ether lipid metabolism	40	3	4.42324237	0.238954869	0.07099816
+Insulin signaling pathway	126	26	4.386408339	0.243230404	0.071205732
+Ascorbate and aldarate metabolism	13	3	4.353459448	0.248931116	0.071738186
+Toxoplasmosis	88	3	4.326300262	0.252256532	0.071738186
+Leukocyte transendothelial migration	79	12	4.278697839	0.260807601	0.073029143
+Long-term depression	55	7	4.257466621	0.264133017	0.073029143
+Sphingolipid signaling pathway	95	14	4.11106716	0.287885986	0.078212039
+TGF-beta signaling pathway	78	7	4.094055987	0.290736342	0.078212039
+Retrograde endocannabinoid signaling	57	3	4.034837356	0.302137767	0.080195456
+Cell cycle	122	21	3.941054265	0.317814727	0.082165462
+Notch signaling pathway	45	7	3.940316419	0.317814727	0.082165462
+Prostate cancer	85	5	3.874093317	0.333016627	0.084991858
+Insulin secretion	51	5	3.78743975	0.349643705	0.088005835
+Glycosaminoglycan degradation	19	3	3.768287933	0.355819477	0.088005835
+Arginine and proline metabolism	45	4	3.736553586	0.361995249	0.088005835
+Influenza A	67	10	3.723840624	0.364370546	0.088005835
+p53 signaling pathway	67	7	3.701936846	0.370071259	0.088005835
+Linoleic acid metabolism	26	3	3.695100735	0.372446556	0.088005835
+Glycerolipid metabolism	54	4	3.685432202	0.375771971	0.088005835
+Non-alcoholic fatty liver disease (NAFLD)	61	5	3.648358562	0.382897862	0.08863199
+Gap junction	85	15	3.621853358	0.388123515	0.088808945
+Epstein-Barr virus infection	52	6	3.399306379	0.434204276	0.095877998
+Complement and coagulation cascades	64	10	3.38798788	0.435629454	0.095877998
+Thyroid hormone synthesis	44	5	3.367251597	0.442280285	0.095877998
+NOD-like receptor signaling pathway	44	3	3.361898447	0.443705463	0.095877998
+alpha-Linolenic acid metabolism	19	4	3.314588959	0.450356295	0.095877998
+Alcoholism	100	16	3.310130866	0.452731591	0.095877998
+N-Glycan biosynthesis	48	3	3.307824296	0.452731591	0.095877998
+FoxO signaling pathway	111	15	3.228755319	0.46935867	0.097328408
+Prolactin signaling pathway	68	13	3.226255629	0.46935867	0.097328408
+Aldosterone-regulated sodium reabsorption	32	3	3.187749159	0.475534442	0.097592457
+Bile secretion	27	3	3.163810746	0.482185273	0.097947617
+Lysine degradation	46	3	3.12620116	0.495486936	0.099632958
+Colorectal cancer	42	3	3.04928987	0.513064133	0.100874787
+Measles	65	3	3.04928987	0.513064133	0.100874787
+Hepatitis B	118	16	3.026929349	0.516864608	0.100874787
+TNF signaling pathway	71	15	2.928331843	0.542517815	0.104853465
+Osteoclast differentiation	101	15	2.853211893	0.565320665	0.107629795
+Bacterial invasion of epithelial cells	55	16	2.832797139	0.567695962	0.107629795
+Glutathione metabolism	40	4	2.81717599	0.574346793	0.107739222
+Oxidative phosphorylation	44	3	2.798231554	0.579097387	0.107739222
+Glycolysis / Gluconeogenesis	61	11	2.674856809	0.603800475	0.111295013
+Natural killer cell mediated cytotoxicity	107	14	2.631571048	0.612826603	0.111922427
+Adipocytokine signaling pathway	61	7	2.602943054	0.619477435	0.11210857
+Acute myeloid leukemia	52	3	2.526707146	0.637054632	0.113648605
+"Alanine, aspartate and glutamate metabolism"	30	4	2.487110845	0.646555819	0.113648605
+Cell adhesion molecules (CAMs)	29	3	2.47591687	0.647505938	0.113648605
+"Valine, leucine and isoleucine degradation"	45	10	2.447200045	0.654631829	0.113648605
+mTOR signaling pathway	53	10	2.439748027	0.656532067	0.113648605
+Glycosaminoglycan biosynthesis - chondroitin sulfate / dermatan sulfate	11	3	2.39204806	0.668408551	0.114707025
+Cocaine addiction	42	13	2.312125758	0.684085511	0.116186139
+Leishmaniasis	43	3	2.27856288	0.693111639	0.116186139
+RIG-I-like receptor signaling pathway	45	4	2.274464128	0.694536817	0.116186139
+Toll-like receptor signaling pathway	88	23	2.123601024	0.728741093	0.119452905
+Pyruvate metabolism	37	3	2.121407465	0.729691211	0.119452905
+Chagas disease (American trypanosomiasis)	74	10	2.111014583	0.732066508	0.119452905
+Hepatitis C	86	4	2.013206014	0.754394299	0.122095398
+Amyotrophic lateral sclerosis (ALS)	32	3	1.793861218	0.795724466	0.127745919
+Taste transduction	43	3	1.509461682	0.842755344	0.13418531
+Histidine metabolism	21	3	1.484461073	0.849406176	0.13418531
+Amoebiasis	20	3	1.419005983	0.856057007	0.13418531
+Cytosolic DNA-sensing pathway	16	3	1.300328566	0.875534442	0.136166186
+Fatty acid elongation	16	3	1.182964469	0.889311164	0.136835679
+Propanoate metabolism	22	3	1.162952634	0.893586698	0.136835679
+Pertussis	38	7	1.09843104	0.906413302	0.137556528
+Cardiac muscle contraction	11	4	1.061871686	0.912114014	0.137556528
+MicroRNAs in cancer	101	7	0.65439079	0.949643705	0.142139591
+African trypanosomiasis	0	NA	NA	NA	NA
+Allograft rejection	0	NA	NA	NA	NA
+Alzheimer's disease	10	2	1.84626091	NA	NA
+Aminoacyl-tRNA biosynthesis	0	NA	NA	NA	NA
+Amino sugar and nucleotide sugar metabolism	43	2	3.560510811	NA	NA
+Amphetamine addiction	58	2	4.398780102	NA	NA
+Antigen processing and presentation	29	2	3.049944699	NA	NA
+Arachidonic acid metabolism	56	2	5.237658903	NA	NA
+Arginine biosynthesis	19	2	2.100042176	NA	NA
+Arrhythmogenic right ventricular cardiomyopathy (ARVC)	0	NA	NA	NA	NA
+Asthma	0	NA	NA	NA	NA
+Autoimmune thyroid disease	0	NA	NA	NA	NA
+B cell receptor signaling pathway	54	2	3.717178442	NA	NA
+beta-Alanine metabolism	26	2	2.045547184	NA	NA
+Biotin metabolism	0	NA	NA	NA	NA
+Bladder cancer	26	2	0.808144708	NA	NA
+Butanoate metabolism	21	2	1.84626091	NA	NA
+Caffeine metabolism	0	NA	NA	NA	NA
+Carbohydrate digestion and absorption	12	2	1.893805171	NA	NA
+Chronic myeloid leukemia	56	2	1.880396379	NA	NA
+Circadian rhythm	27	2	5.270762454	NA	NA
+Citrate cycle (TCA cycle)	28	2	7.796801077	NA	NA
+Cysteine and methionine metabolism	34	2	3.515012248	NA	NA
+Cytokine-cytokine receptor interaction	95	2	1.247687713	NA	NA
+D-Glutamine and D-glutamate metabolism	0	NA	NA	NA	NA
+Dilated cardiomyopathy	70	2	3.853596777	NA	NA
+Dorso-ventral axis formation	0	NA	NA	NA	NA
+Drug metabolism - cytochrome P450	52	2	2.184406633	NA	NA
+Drug metabolism - other enzymes	27	2	5.455930697	NA	NA
+Endocrine and other factor-regulated calcium reabsorption	35	2	2.788335611	NA	NA
+Endometrial cancer	44	2	4.061794166	NA	NA
+Epithelial cell signaling in Helicobacter pylori infection	24	2	1.542156634	NA	NA
+ErbB signaling pathway	83	2	5.706188019	NA	NA
+Fat digestion and absorption	0	NA	NA	NA	NA
+Fatty acid biosynthesis	12	2	1.970344122	NA	NA
+Fatty acid degradation	38	2	2.401796767	NA	NA
+Fc epsilon RI signaling pathway	58	2	4.126621355	NA	NA
+Folate biosynthesis	0	NA	NA	NA	NA
+Fructose and mannose metabolism	30	2	5.261493538	NA	NA
+Galactose metabolism	26	2	6.094760112	NA	NA
+Gastric acid secretion	50	2	3.606739497	NA	NA
+"Glycine, serine and threonine metabolism"	33	2	1.872683732	NA	NA
+Glycosaminoglycan biosynthesis - heparan sulfate / heparin	0	NA	NA	NA	NA
+Glycosphingolipid biosynthesis - ganglio series	15	2	3.206725453	NA	NA
+Glycosphingolipid biosynthesis - globo series	12	2	3.240844236	NA	NA
+Glycosphingolipid biosynthesis - lacto and neolacto series	21	2	4.016891481	NA	NA
+Glycosylphosphatidylinositol(GPI)-anchor biosynthesis	22	2	1.603034674	NA	NA
+Glyoxylate and dicarboxylate metabolism	14	2	2.499073781	NA	NA
+Graft-versus-host disease	0	NA	NA	NA	NA
+Herpes simplex infection	80	2	3.57547552	NA	NA
+Huntington's disease	22	2	4.408752594	NA	NA
+Hypertrophic cardiomyopathy (HCM)	22	2	3.074781383	NA	NA
+Inflammatory bowel disease (IBD)	43	2	2.250071829	NA	NA
+Intestinal immune network for IgA production	0	NA	NA	NA	NA
+Legionellosis	0	NA	NA	NA	NA
+Lipoic acid metabolism	0	NA	NA	NA	NA
+Lysine biosynthesis	0	NA	NA	NA	NA
+Malaria	0	NA	NA	NA	NA
+Maturity onset diabetes of the young	22	2	1.845783726	NA	NA
+Melanoma	68	2	7.459138895	NA	NA
+Mineral absorption	0	NA	NA	NA	NA
+Mucin type O-Glycan biosynthesis	28	2	3.164266656	NA	NA
+Neuroactive ligand-receptor interaction	11	2	1.833097842	NA	NA
+Nicotinate and nicotinamide metabolism	25	2	5.966335383	NA	NA
+Nitrogen metabolism	0	NA	NA	NA	NA
+Non-small cell lung cancer	47	2	4.574801513	NA	NA
+One carbon pool by folate	19	2	2.092052492	NA	NA
+Ovarian steroidogenesis	32	2	4.569340686	NA	NA
+Pancreatic cancer	46	2	3.388131494	NA	NA
+Pancreatic secretion	30	2	2.343422856	NA	NA
+Pantothenate and CoA biosynthesis	12	2	2.625309397	NA	NA
+Parkinson's disease	22	2	1.906434935	NA	NA
+Pathogenic Escherichia coli infection	34	2	2.592023348	NA	NA
+Pentose and glucuronate interconversions	17	2	5.455930697	NA	NA
+Pentose phosphate pathway	27	2	5.006322679	NA	NA
+Phenylalanine metabolism	16	2	2.314703289	NA	NA
+"Phenylalanine, tyrosine and tryptophan biosynthesis"	0	NA	NA	NA	NA
+Phototransduction	25	2	2.071759108	NA	NA
+PI3K-Akt signaling pathway	0	NA	NA	NA	NA
+Porphyrin and chlorophyll metabolism	30	2	5.455930697	NA	NA
+Primary bile acid biosynthesis	17	2	1.861469242	NA	NA
+Prion diseases	19	2	1.251147563	NA	NA
+Progesterone-mediated oocyte maturation	67	2	2.554792961	NA	NA
+Proximal tubule bicarbonate reclamation	0	NA	NA	NA	NA
+Ras signaling pathway	206	2	8.75309524	NA	NA
+Regulation of lipolysis in adipocytes	50	2	2.554792961	NA	NA
+Renal cell carcinoma	47	2	2.500805155	NA	NA
+Renin-angiotensin system	0	NA	NA	NA	NA
+Renin secretion	41	2	3.221011063	NA	NA
+Rheumatoid arthritis	0	NA	NA	NA	NA
+Riboflavin metabolism	0	NA	NA	NA	NA
+Salivary secretion	45	2	2.343422856	NA	NA
+Salmonella infection	41	2	2.690168642	NA	NA
+Selenocompound metabolism	13	2	2.401796767	NA	NA
+Shigellosis	45	2	4.245425249	NA	NA
+Staphylococcus aureus infection	19	2	2.45358989	NA	NA
+Sulfur metabolism	0	NA	NA	NA	NA
+Synaptic vesicle cycle	0	NA	NA	NA	NA
+Synthesis and degradation of ketone bodies	0	NA	NA	NA	NA
+Systemic lupus erythematosus	0	NA	NA	NA	NA
+Taurine and hypotaurine metabolism	10	2	0.009582089	NA	NA
+Terpenoid backbone biosynthesis	21	2	0.181197972	NA	NA
+Thiamine metabolism	0	NA	NA	NA	NA
+Thyroid cancer	14	2	2.42986498	NA	NA
+Transcriptional misregulation in cancer	0	NA	NA	NA	NA
+Tryptophan metabolism	29	2	2.314703289	NA	NA
+Type I diabetes mellitus	0	NA	NA	NA	NA
+Type II diabetes mellitus	38	2	4.783212644	NA	NA
+Tyrosine metabolism	30	2	2.314703289	NA	NA
+Ubiquinone and other terpenoid-quinone biosynthesis	0	NA	NA	NA	NA
+Vasopressin-regulated water reabsorption	18	2	0.578732212	NA	NA
+VEGF signaling pathway	58	2	5.285949083	NA	NA
+Vibrio cholerae infection	0	NA	NA	NA	NA
+Viral carcinogenesis	0	NA	NA	NA	NA
+Viral myocarditis	0	NA	NA	NA	NA
+Vitamin B6 metabolism	0	NA	NA	NA	NA
+Vitamin digestion and absorption	0	NA	NA	NA	NA
