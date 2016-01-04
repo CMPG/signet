@@ -1,12 +1,26 @@
 # signet: Selection Inference in Gene Networks
 
-`signet` is a R package for the evolutionary analysis of gene networks.
+## Introduction
 
-On the basis of a biological pathways database, and a gene scores list, 
-one could search for high-scoring subnetworks and test their significance in pathways.
+`signet` is a R package to detect natural selection in gene networks.
 
-The method implemented is based on Ideker et al. (2002) heuristic, 
-but several improvements are considered.
+### What is a gene network?
+
+A gene network. It can be a gene regulatory network, a biological pathway,
+protein-protein interactions, or every kind of data involving interactions
+between genes.
+
+### What is selection in gene networks?
+
+Natural selection is an evolutionary force shaping patterns of genetic
+diversity. Polygenic selection. Here, we consider the information given by the
+network information as a prior concerning the target of polygenic selection.
+
+### How to detect selection in gene networks?
+
+The methodology implemented in the signet package is an extension of 
+genome scans for selection to gene networks. Using a statistic to measure
+selection.
 
 ## Installation
 
@@ -21,13 +35,13 @@ devtools::install_github('algorythmes/signet')
 
 ## Methodology
 
-Here is an animation representing a run of the simulated annealing 
-algorithm used in the package:
+The method implemented is based on Ideker et al. (2002) heuristic, 
+but several improvements are considered. Here is an animation representing a 
+run of the simulated annealing algorithm used in the package:
 
 ![simulatedAnnealing](misc/anim_50fps.gif)
 
 You can learn more about the methodology by clicking [here](misc/methodo.md).
-
 
 ## Application
 
