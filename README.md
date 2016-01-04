@@ -2,21 +2,17 @@
 
 ## Introduction
 
-`signet` is a R package to detect natural selection in gene networks.
+`signet` is an R package to detect natural selection in gene networks.
 
-### What is a gene network?
+We call gene network every type of data involving interactions
+between genes or proteins. For example, it can be a gene regulatory network, 
+a biological pathway, or a protein-protein interactions dataset.
 
-A gene network. It can be a gene regulatory network, a biological pathway,
-protein-protein interactions, or every kind of data involving interactions
-between genes.
-
-### What is selection in gene networks?
-
-Natural selection is an evolutionary force shaping patterns of genetic
-diversity. Polygenic selection. Here, we consider the information given by the
+Natural selection, as an evolutionary force, shapes patterns of genetic
+diversity in natural populations. 
+Complex traits, polygenic selection. 
+Here, we consider the information given by the
 network information as a prior concerning the target of polygenic selection.
-
-### How to detect selection in gene networks?
 
 The methodology implemented in the signet package is an extension of 
 genome scans for selection to gene networks. Using a statistic to measure
@@ -24,9 +20,9 @@ selection.
 
 ## Installation
 
-There is no official release of the signet package at the moment. 
+There is no official release of the `signet` package at the moment. 
 But you can install the development version using the `devtools` package 
-(Rtools must also be installed and properly configured):
+(`Rtools` must also be installed and properly configured):
 
 ```
 #install.packages('devtools')
@@ -35,7 +31,7 @@ devtools::install_github('algorythmes/signet')
 
 ## Methodology
 
-The method implemented is based on Ideker et al. (2002) heuristic, 
+The method implemented is based on Ideker et al. (2002) heuristics, 
 but several improvements are considered. Here is an animation representing a 
 run of the simulated annealing algorithm used in the package:
 
@@ -46,7 +42,7 @@ You can learn more about the methodology by clicking [here](misc/methodo.md).
 ## Application
 
 Data: we will use KEGG Pathways data, and genetic data from Daub et al. (2013), 
-consisting in corrected Fst computed over 53 human populaions, 
+consisting in corrected Fst computed over 53 human populations, 
 for more than 17,000 genes.
 
 ```
