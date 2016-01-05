@@ -18,18 +18,13 @@ The methodology implemented in the signet package is an extension of
 genome scans for selection to gene networks. Using a statistic to measure
 selection.
 
-## Installation
+## Workflow
 
-There is no official release of the `signet` package at the moment. 
-But you can install the development version using the `devtools` package 
-(`Rtools` must also be installed and properly configured):
+### General principle
 
-```
-#install.packages('devtools')
-devtools::install_github('algorythmes/signet')
-```
 
-## Methodology
+
+### Search algorithm
 
 The method implemented is based on Ideker et al. (2002) heuristics, 
 but several improvements are considered. Here is an animation representing a 
@@ -41,7 +36,20 @@ You can learn more about the methodology by clicking [here](misc/methodo.md).
 
 ## Application
 
-Data: we will use KEGG Pathways data, and genetic data from Daub et al. (2013), 
+### Installation
+
+There is no official release of the `signet` package at the moment. 
+But you can install the development version on GitHub using the `devtools` 
+package (`Rtools` must also be installed and properly configured):
+
+```
+#install.packages('devtools')
+devtools::install_github('algorythmes/signet')
+```
+
+### Data
+
+We will use KEGG Pathways data, and genetic data from Daub et al. (2013), 
 consisting in corrected Fst computed over 53 human populations, 
 for more than 17,000 genes.
 
@@ -49,8 +57,10 @@ for more than 17,000 genes.
 data(keggPathways);data(zScores)
 ```
 
-First, we generate the null distribution of the subnetworks scores 
-for subnetworks of size kmin to kmax. 
+### Analysis
+
+First, we generate the background distribution of the subnetworks scores 
+for subnetworks of size f from 1 to 200 (the size of the biggest KEGG pathway). 
 This may be a little long, so you can use `data(nullDistExample)` instead.
 
 ```
