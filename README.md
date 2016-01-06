@@ -22,6 +22,7 @@ selection.
 
 ### General principle
 
+<img src="misc/workflow.png" width="100">
 ![workflow](misc/workflow.png)
 
 ### Search algorithm
