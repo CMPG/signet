@@ -121,11 +121,13 @@ method of X et al. (XXX) implemented in the R package `qvalue`.
 The output is, for each pathway tested, the subnetwork, its score and its 
 significance.
 
-Careful: Not the whole pathway is tested, just the subnetwork identified. 
-
 Need to characterize the function of this subnetwork, which is not necessarily 
 limited to the pathway function. For example, how can we interpret a subnetwork 
-of 10 genes inside a 1000 genes pathway?
+of 10 genes inside a 1000 genes pathway? 
+You have to be careful when 
+interpreting the name of the pathway as a significant function beacause 
+a part only of this pathway is significant.
+
 
 ## A walkthrough example
 
