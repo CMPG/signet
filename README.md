@@ -22,7 +22,7 @@ selection.
 
 ### General principle
 
-
+![workflow](misc/workflow.png)
 
 ### Search algorithm
 
