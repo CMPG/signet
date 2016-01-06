@@ -2,30 +2,38 @@
 
 ## Introduction
 
-`signet` is an R package to detect natural selection in gene networks.
+Understanding forces shaping patterns of genetic diversity is a central focus
+in populationg genetics. 
 
-We will call gene network every type of data involving interactions
-between genes or proteins. For example, it can be a gene regulatory network, 
-a biological pathway, or a protein-protein interactions dataset.
+Footprints of selection in the genome and methods of detection.
 
-Pritchard & Di Rienzo (2010) argued that many, or most, adaptive events in 
+Pritchard and Di Rienzo (2010) argued that many, or most, adaptive events in 
 natural populations occur by the evolution of polygenic traits, rather than 
 via the fixation of single beneficial mutations . Recent genome-wide association
-studies in humans (Yang et al. 2010; Stranger et al. 2011) and in various model 
-organisms (Atwell et al. 2010; Jumbo-Lucioni et al. 2010) have indeed  confirmed
-that  variation  at  many  important traits is controlled by a large number of 
-loci dispersed throughout the genome. Polygenic adaptation typically involves 
-small allele frequency changes at many loci (Mackay et al. 2009). Therefore, 
-quantitative trait loci (QTL) involved in polygenic adaptation will go 
-undetected using methods for detecting the molecular signature of selective 
-sweeps at individual loci (Pritchard & Di Rienzo 2010).
+studies in humans and in various model organisms (Yang et al. 2010; 
+Stranger et al. 2011; Atwell et al. 2010; Jumbo-Lucioni et al. 2010) 
+have indeed  confirmed that  variation  at  many  important 
+traits is controlled by a large number of loci dispersed throughout the genome. 
+Polygenic adaptation typically involves small allele frequency changes 
+at many loci (Mackay et al. 2009), which may remain below the detection 
+limit of most outlier detection methods (Le Corre and Kremer 2012).
+
+Even if FST outlier tests perform rather well when selection acts 
+on few loci with large effects, they are seriously challenged by selection
+acting on many small-effect loci.
 
 Here, we consider the information given by the network information as 
 a prior concerning the target of polygenic selection. Indeed, it is more likely
 that genes together under selection are found in the same biological network
 because they are all related to the same phenotype.
 
-The methodology implemented in the signet package is then an extension of 
+`signet` is an R package to detect natural selection in gene networks.
+
+We will call gene network every type of data involving interactions
+between genes or proteins. For example, it can be a gene regulatory network, 
+a biological pathway, or a protein-protein interactions dataset.
+
+The methodology implemented in the `signet` package is then an extension of 
 genome scans for selection to gene networks. Using a statistic to measure
 selection, the idea is to find in gene networks high scoring subgroups of genes.
 
@@ -93,12 +101,18 @@ keep the mean and standard error of this distribution.
 
 We consider that genes can yield two states: active or inactive.
 
+1. Start form blabla
+
+2. Randomly pick a gene
+
 The selected gene is not an articulation point of the subgraph, i.e. its 
 removal doesn’t disconnect the active subgraph.
 
 The selected gene is randomly picked in the following nodes: i) nodes in 
 the boundary; ii) leaves, iii) nodes which are not articulation points of 
 the subgraph.
+
+3. Compute the subnetwork score
 
 ### Testing the significance of the subnetworks scores
 
@@ -176,6 +190,27 @@ Robinson-Rechavi, M., & Excoffier, L. (2013). Evidence for polygenic
 adaptation to pathogens in the human genome. Molecular biology and evolution, 
 30 (7): 1544-1558.
 
+Ideker, T., Ozier, O., Schwikowski, B., & Siegel, A. F. (2002). 
+Discovering regulatory and signalling circuits in molecular interaction 
+networks. Bioinformatics, 18(suppl 1), S233-S240.
+
+Le Corre, V., and A. Kremer (2012). The genetic differentiation at quantitative 
+trait loci under local adaptation. Molecular Ecology 21:1548–1566.
+
+Mackay, T. F., Stone, E. A., & Ayroles, J. F. (2009). 
+The genetics of quantitative traits: challenges and prospects. 
+Nature Reviews Genetics, 10(8), 565-577.
+
+Pritchard, J. K., & Di Rienzo, A. (2010). Adaptation–not by sweeps alone. 
+Nature Reviews Genetics, 11(10), 665-667.
+
 Sales, G., Calura, E., Cavalieri, D., & Romualdi, C. (2012). 
 graphite-a Bioconductor package to convert pathway topology to gene network. 
 BMC bioinformatics, 13(1), 20.
+
+Stephan, W. (2016). Signatures of positive selection: from selective sweeps 
+at individual loci to subtle allele frequency changes in polygenic adaptation. 
+Molecular ecology, 25(1), 79-88.
+
+Wollstein, A., & Stephan, W. (2015). Inferring positive selection in humans 
+from genomic data. Investigative genetics, 6(1), 5.
