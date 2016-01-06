@@ -57,9 +57,9 @@ search in these data for high-scoring subnetworks. Then,
 In order to get information about relationships between genes,
 we advise to use the Bioconductor package `graphite`, which implements a 
 procedure to convert biological pathways data from different databases to 
-graphs (for more details, see Sales et al., 2012). 
-These databases have emerged as references in systems biology:
-KEGG, Reactome, BioCarta, NCI, Panther and HumanCyc.
+graphs (for more details, see Sales et al., 2012). These databases have emerged 
+as references in systems biology: KEGG, Reactome, BioCarta, NCI, Panther 
+and HumanCyc.
 
 #### Correction for overlapping between pathways
 
@@ -101,18 +101,27 @@ keep the mean and standard error of this distribution.
 
 We consider that genes can yield two states: active or inactive.
 
-1. Start form blabla
+1. Generate a random solution
 
-2. Randomly pick a gene
+2. Calculate its score using some scoring functionyou've defined
 
-The selected gene is not an articulation point of the subgraph, i.e. its 
-removal doesn’t disconnect the active subgraph.
-
-The selected gene is randomly picked in the following nodes: i) nodes in 
+3. Generate a random neighboring solution, i.e. a new subnetwork.
+To do so, we randomly pick a new gene and toggle its state (i.e. we activate
+or inactivate it). The selected gene is not an articulation point of 
+the subgraph, i.e. its removal doesn’t disconnect the active subgraph. The 
+selected gene is randomly picked from the following nodes: i) nodes in 
 the boundary; ii) leaves, iii) nodes which are not articulation points of 
 the subgraph.
 
-3. Compute the subnetwork score
+4. Calculate the new subnetwork's score
+
+5. Compare them:
+If snew < sold: move to the new solution
+If snew > sold: maybe move to the new solution (acceptance probability)
+
+
+6. Repeat steps 3-5 above until an acceptable solution is found or you reach 
+some maximum number of iterations.
 
 ### Testing the significance of the subnetworks scores
 
@@ -128,7 +137,7 @@ generated. This is the null distribution of the test.
 
 Finally, a correction for multiple testing is highly recommended as you usually
 apply this test to hundreds of pathways. We advise to use the FDR 
-method of X et al. (XXX) implemented in the R package `qvalue`.
+method of Storey (2002) implemented in the R package `qvalue`.
 
 ### Output
 
@@ -211,6 +220,9 @@ BMC bioinformatics, 13(1), 20.
 Stephan, W. (2016). Signatures of positive selection: from selective sweeps 
 at individual loci to subtle allele frequency changes in polygenic adaptation. 
 Molecular ecology, 25(1), 79-88.
+
+Storey JD. (2002) A direct approach to false discovery rates. 
+Journal of the Royal Statistical Society, Series B, 64: 479-498.
 
 Wollstein, A., & Stephan, W. (2015). Inferring positive selection in humans 
 from genomic data. Investigative genetics, 6(1), 5.
