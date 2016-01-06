@@ -103,7 +103,9 @@ We consider that genes can yield two states: active or inactive.
 
 1. Generate a random solution
 
-2. Calculate its score using some scoring functionyou've defined
+2. Calculate its score using some scoring function you've defined. Here, the 
+score s is the average FST, standardized by the background distribution for
+a network of size k.
 
 3. Generate a random neighboring solution, i.e. a new subnetwork.
 To do so, we randomly pick a new gene and toggle its state (i.e. we activate
@@ -112,6 +114,10 @@ the subgraph, i.e. its removal doesn’t disconnect the active subgraph. The
 selected gene is randomly picked from the following nodes: i) nodes in 
 the boundary; ii) leaves, iii) nodes which are not articulation points of 
 the subgraph.
+
+
+<img src="misc/net.png" width="400">
+
 
 4. Calculate the new subnetwork's score
 
@@ -135,9 +141,20 @@ the search algorithm is applied to this pathway. The score of the high-scoring
 subnetwork found in the randomized data is computed and its distribution is
 generated. This is the null distribution of the test.
 
+### Correct for subnetwork overlapping and multiple testing
+
+Subnetwork overlapping. Corresponds to Jaccard index.
+Arbitrary threshold (e.g. define clusters of pathways having at least 30% 
+of genes in common). Then, you can decide for each cluster either to
+keep the most significant subnetwork in the cluster, or to merge all the 
+subnetworks.
+
 Finally, a correction for multiple testing is highly recommended as you usually
 apply this test to hundreds of pathways. We advise to use the FDR 
-method of Storey (2002) implemented in the R package `qvalue`.
+method of Storey (2002) implemented in the R package `qvalue`. This correction 
+must be done after taking into account of overlapping as it would lead to
+correlated p-values (not recommended for most methods of correction for 
+multiple testing).
 
 ### Output
 

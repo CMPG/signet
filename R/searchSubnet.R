@@ -47,7 +47,7 @@ searchSubnet<-function(pathway,
                        verbose = TRUE,
                        burnin = 100,
                        animPlot = 0,
-                       diagnostic=FALSE)
+                       diagnostic = FALSE)
 {
   #check for the package graph and load it
   if(sum(installed.packages()[,1]=="graph")==0)
@@ -141,7 +141,7 @@ searchSubnet<-function(pathway,
   #remove conn components of size < threshold
   threshold<-10
 
-  if(length(nodes(pathway))==0) X<-NULL
+  if(length(graph::nodes(pathway))==0) X<-NULL
   else  X<-unlist(graph::connComp(pathway)[!lapply(graph::connComp(pathway),length)<threshold])
   if(is.null(X))
   {
