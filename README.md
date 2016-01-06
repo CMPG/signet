@@ -42,6 +42,26 @@ search in these data for high-scoring subnetworks. Then,
 
 <img src="misc/workflow.png" width="400">
 
+### Input preparation
+
+#### Biological networks conversion to graphs
+
+In order to get information about relationships between genes,
+we advise to use the Bioconductor package `graphite`, which implements a 
+procedure to convert biological pathways data from different databases to 
+graphs (for more details, see Sales et al., 2012). 
+These databases have emerged as references in systems biology:
+KEGG, Reactome, BioCarta, NCI, Panther and HumanCyc.
+
+#### Correction for overlapping between pathways
+
+We will first exclude all pathways completely included in at least another 
+pathway (overlap = 1). I still need to implement a procedure to merge pathways 
+with an overlapping level greater than a given threshold.
+
+Finally, pathways with no connected component of size greater than 10 
+(arbitratry threshold) are removed.
+
 ### Search algorithm
 
 The method implemented is based on Ideker et al. (2002) heuristics, 
@@ -53,8 +73,32 @@ representing a run of the simulated annealing algorithm used in the package.
 As you can see, as we add or remove new genes in the active subnetwork (in red),
 the score is maximized as we iterate.
 
-You can read a more detailed description of the algorithm by clicking 
-[here](misc/methodo.md).
+#### Background distribution
+
+To apply the algorithm to a list of pathways, you have to first generate the 
+background distribution of your summary statistic.
+
+The input is the list of all the pathways you want to analyze, and a list of 
+scores for each gene. The background distribution or the statistic will be 
+generated for each possible subnetwork size (kmin to kmax).
+
+A pathway is randomly sampled (the sampling probability being conditioned by 
+the number of genes in the pathway) and a connected subnetwork of size k is 
+randomly picked (one gene is sampled in the pathway, then k genes in the 
+boundary). The score of the subnetwork is then computed. This is done N times 
+for each k, to get the background distribution of subnetworks scores, we just 
+keep the mean and standard error of this distribution.
+
+#### Algorithm for high-scoring subnetwork search
+
+We consider that genes can yield two states: active or inactive.
+
+The selected gene is not an articulation point of the subgraph, i.e. its 
+removal doesn’t disconnect the active subgraph.
+
+The selected gene is randomly picked in the following nodes: i) nodes in 
+the boundary; ii) leaves, iii) nodes which are not articulation points of 
+the subgraph.
 
 ### Testing the significance of the subnetworks scores
 
@@ -71,6 +115,17 @@ generated. This is the null distribution of the test.
 Finally, a correction for multiple testing is highly recommended as you usually
 apply this test to hundreds of pathways. We advise to use the FDR 
 method of X et al. (XXX) implemented in the R package `qvalue`.
+
+### Output
+
+The output is, for each pathway tested, the subnetwork, its score and its 
+significance.
+
+Careful: Not the whole pathway is tested, just the subnetwork identified. 
+
+Need to characterize the function of this subnetwork, which is not necessarily 
+limited to the pathway function. For example, how can we interpret a subnetwork 
+of 10 genes inside a 1000 genes pathway?
 
 ## A walkthrough example
 
