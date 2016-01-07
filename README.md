@@ -1,41 +1,42 @@
-# signet: Selection Inference in Gene Networks
+# signet: Selection Inference in Gene NETworks
 
 ## Introduction
 
 Understanding forces shaping patterns of genetic diversity is a central focus
-in populationg genetics. 
+in population genetics. The development of theoretical models allowed us to
+have some expectations concerning the impact of various neutral or adaptive 
+forces in the genome. These expectations permitted to develop methods of 
+detection of the footprints of selection in the genome. A large number of these 
+methods are based on a measure of genetic differentiation between populations,
+FST. Indeed, they aim at detecting loci showing a higher differentiation than
+expected under a neutral model; possibly due to positive selection.
 
-Footprints of selection in the genome and methods of detection.
-
-Pritchard and Di Rienzo (2010) argued that many, or most, adaptive events in 
+But Pritchard and Di Rienzo (2010) argued that many adaptive events in 
 natural populations occur by the evolution of polygenic traits, rather than 
-via the fixation of single beneficial mutations . Recent genome-wide association
-studies in humans and in various model organisms (Yang et al. 2010; 
-Stranger et al. 2011; Atwell et al. 2010; Jumbo-Lucioni et al. 2010) 
-have indeed  confirmed that  variation  at  many  important 
-traits is controlled by a large number of loci dispersed throughout the genome. 
-Polygenic adaptation typically involves small allele frequency changes 
-at many loci (Mackay et al. 2009), which may remain below the detection 
-limit of most outlier detection methods (Le Corre and Kremer 2012).
+via the fixation of single beneficial mutations. Recent studies in various model
+organisms have indeed confirmed that variation at many important 
+traits is controlled by a large number of loci dispersed throughout the genome
+(Yang et al. 2010; Stranger et al. 2011; Atwell et al. 2010; 
+Jumbo-Lucioni et al. 2010). Polygenic adaptation typically involves small 
+allele frequency changes at many loci (Mackay et al. 2009), which may remain 
+below the detection limit of most outlier detection methods 
+(Le Corre and Kremer 2012). Then, FST outlier tests are seriously 
+challenged by selection acting on many small-effect loci.
 
-Even if FST outlier tests perform rather well when selection acts 
-on few loci with large effects, they are seriously challenged by selection
-acting on many small-effect loci.
-
-Here, we consider the information given by the network information as 
+In this context, we developed a method to detect polygenic adaptation in the
+genome. We consider the information given by the network information as 
 a prior concerning the target of polygenic selection. Indeed, it is more likely
 that genes together under selection are found in the same biological network
 because they are all related to the same phenotype.
-
-`signet` is an R package to detect natural selection in gene networks.
 
 We will call gene network every type of data involving interactions
 between genes or proteins. For example, it can be a gene regulatory network, 
 a biological pathway, or a protein-protein interactions dataset.
 
-The methodology implemented in the `signet` package is then an extension of 
-genome scans for selection to gene networks. Using a statistic to measure
-selection, the idea is to find in gene networks high scoring subgroups of genes.
+The methodology implemented in the `signet` package presented here is an 
+extension of genome scans for selection to gene networks. Using a statistic to 
+measure selection, the idea is to find in gene networks high scoring subgroups 
+of genes.
 
 ## Workflow
 
@@ -95,17 +96,21 @@ generated for each possible subnetwork size (kmin to kmax).
 A pathway is randomly sampled (the sampling probability being conditioned by 
 the number of genes in the pathway) and a connected subnetwork of size k is 
 randomly picked (one gene is sampled in the pathway, then k genes in the 
-boundary). The score of the subnetwork is then computed. This is done N times 
-for each k, to get the background distribution of subnetworks scores, we just 
-keep the mean and standard error of this distribution.
+boundary). The score of the subnetwork is then computed. Here, the score is 
+simply the average Fst over all genes in the subnetwork.
+
+This is done N times for each k, to get the background distribution of 
+subnetworks scores, we just keep the mean and standard error of this 
+distribution.
 
 #### Algorithm for high-scoring subnetwork search
 
 We consider that genes can yield two states: active or inactive.
 
-1. Generate a random solution
+1. Generate a random solution, i.e. pick a random subnetwork of arbitrary size k
+in the gene network.
 
-2. Calculate its score using some scoring function you've defined. Here, the 
+2. Calculate its score using a scoring function. Here, the 
 score s is the average FST, standardized by the background distribution for
 a network of size k.
 
@@ -117,7 +122,6 @@ selected gene is randomly picked from the following nodes: i) nodes in
 the boundary; ii) leaves, iii) nodes which are not articulation points of 
 the subgraph.
 
-
 <p align="center"><img src="misc/net.png" width="400"></p>
 <p align="center">Figure 3: Schematic representation of a network.</p>
 
@@ -126,7 +130,6 @@ the subgraph.
 5. Compare them:
 If snew < sold: move to the new solution
 If snew > sold: maybe move to the new solution (acceptance probability)
-
 
 6. Repeat steps 3-5 above until an acceptable solution is found or you reach 
 some maximum number of iterations.
@@ -181,13 +184,13 @@ package (`Rtools` must also be installed and properly configured):
 
 ```r
 #install.packages('devtools')
-devtools::install_github('algorythmes/signet')
+devtools::install_github('CMPG/signet')
 ```
 
 ### Data
 
 We will use KEGG Pathways data, and genetic data from Daub et al. (2013), 
-consisting in corrected Fst computed over 53 human populations, 
+consisting in corrected FST (zST) computed over 53 human populations, 
 for more than 17,000 genes.
 
 ```r
@@ -198,17 +201,51 @@ data(keggPathways);data(zScores)
 
 First, we generate the background distribution of the subnetworks scores 
 for subnetworks of size f from 1 to 200 (the size of the biggest KEGG pathway). 
-This may be a little long, so you can use `data(nullDistExample)` instead.
+This may be a little long, so you can use `data(backgroundDist)` instead.
 
 ```r
-nullDistribution(keggPathways,zScores,iterations = 10000)
+backgroundDist(keggPathways,zScores,iterations = 5000)
 ```
 Then, we apply the simulated annealing algorithm 
 on pathways of your choice. Pathways must be in the `graphNEL` format. 
 You can provide the `searchSubnet()` function a graph list, or a single graph.
 
 ```r
-searchSubnet(keggPathways[[1]],zScores,iterations = 10000)
+signetObject <- searchSubnet(pathways = keggPathways[[1]],
+                             score = zScores,
+                             null = backgroundDist,
+                             iterations = 5000,
+                             temperature = 0.995)
+```
+
+This function returns a list of N elements (corresponding to N pathways),
+including a table with the whole list of genes, their scores, 
+and a boolean indicating if they are found in the high-scoring subnetwork.
+
+```r
+testSubnet(signetObject,
+           cluster = "max",
+           multipleTesting = TRUE,
+           threshold = 0.05)
+```
+
+The subnetwork score and the p-value are also included.
+
+Then, you can make a correction for overlapping and multiple testing.
+
+```r
+results <- correctSubnet(signetObject,
+                         cluster = "max",
+                         multipleTesting = TRUE,
+                         threshold = 0.05)
+```
+This will return only the subnetworks resisting to overlapping and/or 
+multiple testing correction.
+
+You can then write the results in a file in your working directory.
+
+```r
+writeResults(results)
 ```
 
 ## References
