@@ -48,7 +48,8 @@ yielding a highest score than expected under a null hypothesis.
 To do so, we will use an interaction database (e.g. biological pathways) and
 search in these data for high-scoring subnetworks. Then, 
 
-<img src="misc/workflow.png" width="400">
+<p align="center"><img src="misc/workflow.png" width="400"></p>
+<p align="center">Figure 1: Workflow.</p>
 
 ### Input preparation
 
@@ -76,7 +77,8 @@ The method implemented is based on Ideker et al. (2002) heuristics,
 but several improvements are considered. You can see below an animation 
 representing a run of the simulated annealing algorithm used in the package.
 
-![simulatedAnnealing](misc/anim_50fps.gif)
+<p align="center">![simulatedAnnealing](misc/anim_50fps.gif)</p>
+<p align="center">Figure 2: Simulated annealing run in a gene network.</p>
 
 As you can see, as we add or remove new genes in the active subnetwork (in red),
 the score is maximized as we iterate.
@@ -116,8 +118,8 @@ the boundary; ii) leaves, iii) nodes which are not articulation points of
 the subgraph.
 
 
-<img src="misc/net.png" width="400">
-
+<p align="center"><img src="misc/net.png" width="400"></p>
+<p align="center">Figure 3: Schematic representation of a network.</p>
 
 4. Calculate the new subnetwork's score
 
