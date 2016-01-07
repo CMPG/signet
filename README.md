@@ -77,7 +77,7 @@ The method implemented is based on Ideker et al. (2002) heuristics,
 but several improvements are considered. You can see below an animation 
 representing a run of the simulated annealing algorithm used in the package.
 
-<p align="center">![simulatedAnnealing](misc/anim_50fps.gif)</p>
+<p align="center"><img src="misc/anim_50fps.gif"></p>
 <p align="center">Figure 2: Simulated annealing run in a gene network.</p>
 
 As you can see, as we add or remove new genes in the active subnetwork (in red),
