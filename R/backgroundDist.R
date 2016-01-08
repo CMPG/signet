@@ -27,6 +27,7 @@ backgroundDist<-function(pathwaysList,
                          kmin = 1,
                          kmax,
                          iterations = 1000,
+                         subnetScore="sum",
                          distribution = FALSE)
 {
   requireNamespace("graph",quietly=TRUE)
@@ -47,15 +48,14 @@ backgroundDist<-function(pathwaysList,
   nullD<-NULL
   for(k in kmin:kmax)
   {
-    # flush.console()
     cat("\r  ... for k =",k)
 
     ba<-NULL
+
     for(i in 1:iterations)
     {
       if(length(pathwaysList)>0)
       {
-
         glis<-NULL
         while(length(glis)<k+5)
         {
@@ -64,8 +64,14 @@ backgroundDist<-function(pathwaysList,
         }
         gList<-scores[scores$gene %in% glis,]
       }
-      ba<-rbind(ba,c(mean(gList[sample(length(gList$gene),
-                                       k,replace=TRUE),]$score,na.rm=TRUE)))
+
+      if(subnetScore=="mean"){
+        sumStat<-c(mean(gList[sample(length(gList$gene),k,replace=TRUE),]$score,na.rm=TRUE))
+      }
+      if(subnetScore=="sum") {
+        sumStat<-c(sum(gList[sample(length(gList$gene),k,replace=TRUE),]$score,na.rm=TRUE))
+      }
+      ba<-rbind(ba,sumStat)
     }
 
     nullD<-rbind(nullD,c(k,mean(ba,na.rm=TRUE),sd(ba,na.rm=TRUE)))

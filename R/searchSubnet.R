@@ -42,6 +42,7 @@ searchSubnet<-function(pathway,
                        replicates = 1,
                        iterations = 2000,
                        temperature = 0.995,
+                       subnetScore="sum",
                        kmin = 2,
                        directed = FALSE,
                        verbose = TRUE,
@@ -218,8 +219,11 @@ searchSubnet<-function(pathway,
     #toggle state in final list
     workingTable[which(workingTable$gene%in%geneSampled),]$state <- TRUE
     workingTable[which(!workingTable$gene%in%geneSampled),]$state <- FALSE
-    sumStat<-mean(workingTable[workingTable$state,]$score)
 
+    if(subnetScore=="mean") sumStat<-mean(workingTable[workingTable$state,]$score)
+    if(subnetScore=="sum") sumStat<-sum(workingTable[workingTable$state,]$score)
+
+    ### SCORE COMPUTATION
     if(maximean)
     {
       s <- sumStat
@@ -293,7 +297,8 @@ searchSubnet<-function(pathway,
         workingTable[which(workingTable$gene==newG),]$state <- !workingTable[which(workingTable$gene==newG),]$state
 
         #Compute the subnet score
-        sumStat<-mean(workingTable[workingTable$state,]$score)
+        if(subnetScore=="mean") sumStat<-mean(workingTable[workingTable$state,]$score)
+        if(subnetScore=="sum") sumStat<-sum(workingTable[workingTable$state,]$score)
 
         if(maximean)
         {
@@ -393,14 +398,7 @@ searchSubnet<-function(pathway,
     ### Return the results (subnetwork, size, score and p-value)
     Stat<-mean(workingTable[workingTable$state,]$score)
     subnetSize<-length(workingTable[workingTable$state,]$gene)
-    if(!missing(nullDist))
-    {
-    pval<-1-pnorm(Stat,
-                  mean=nullDist[nullDist$k==length(activeNet),]$mu,
-                  sd=nullDist[nullDist$k==length(activeNet),]$sigma)
-    }
-    else pval <- NA
-    ret<-list(table=workingTable,score=s,size=subnetSize,pvalue=pval)
+    ret<-list(table=workingTable,score=s,size=subnetSize)
 
     }
   }
@@ -410,7 +408,7 @@ searchSubnet<-function(pathway,
   {
     cat(paste("\n\n  Subnetwork size:",ret$size,
               "genes\n  Subnetwork score:",format(ret$score,digits=4),
-              "\n  p-value:",ret$pvalue,"\n\n"))
+              "\n"))
   }
 
   invisible(ret)

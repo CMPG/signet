@@ -1,9 +1,3 @@
----
-output:
-  html_document: default
-  word_document:
-    highlight: tango
----
 # signet: Selection Inference in Gene NETworks
 
 ## Introduction

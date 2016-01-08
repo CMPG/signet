@@ -5,7 +5,7 @@
 \title{Background distribution}
 \usage{
 backgroundDist(pathwaysList, scores, kmin = 1, kmax, iterations = 1000,
-  distribution = FALSE)
+  subnetScore = "sum", distribution = FALSE)
 }
 \arguments{
 \item{pathwaysList}{A graphNEL object, or a list of graphNEL objects.}
