@@ -189,13 +189,20 @@ devtools::install_github('CMPG/signet')
 
 ### Data
 
-We will use KEGG Pathways data, and genetic data from Daub et al. (2013), 
-consisting in corrected FST (zST) computed over 53 human populations, 
-for more than 17,000 genes.
+We will consider simulated data for the moment. We will simulate 100 gene 
+networks of size randomly picked between 50 and 100. The gene scores are drawn 
+from a standard normal distribution:
 
 ```r
-data(keggPathways);data(zScores)
+library(graph)
 ```
+
+We will simulate 10 high-scoring subnetworks as follow:
+
+```r
+library(graph)
+```
+
 
 ### Analysis
 

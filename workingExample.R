@@ -1,8 +1,8 @@
 ### Example
 
-# library(roxygen2)
-# library(devtools)
-# document()
+library(roxygen2)
+library(devtools)
+document()
 
 library(signet)
 data(keggPathways)
@@ -28,25 +28,49 @@ writeResults(results)
 
 
 library(graph)
-help(graph)
-data(MAPKsig)
-nat = rep(TRUE, length(nodes(MAPKsig)))
-names(nat) = nodes(MAPKsig)
-plot(MAPKsig)
+data("MAPKsig")
 
-MAPKsig<-graphNEL(MAPKsig)
-g1 = randomEGraph(paste(1:50), edges=120)
+set.seed(1)
+g1 <- randomEGraph(paste(1:70),0.05)
 plot(g1)
 
-randomScore<-data.frame(nodes(g1),rnorm(length(nodes(g1))))
-randomScore[c(1,8,2,6,49,16,15),2] <- sort(rnorm(1000),decreasing = TRUE)[1:7]+1
+randomScore<-data.frame(nodes(g1),(rnorm(length(nodes(g1)))))
+
+bkgd<-matrix(NA,ncol=3,nrow=50)
+colnames(bkgd)<-c("k","mu","sigma")
+
+for(k in 1:50)
+{
+  ba<-NULL
+  for(i in 1:10000)
+  {
+    ba<-c(ba,mean((rnorm(k))))
+  }
+  bkgd[k,]<-c(k,mean(ba),sd(ba))
+}
+bkgd<-as.data.frame(bkgd)
+
+
+randomScore[c(41,42,36,50,6,31,45,14,55,66),2] <-
+  sort((rnorm(10000)),decreasing=TRUE)[1:10]+5
 
 signetObject <- searchSubnet(pathway = g1,
-                             nullDist = data.frame(k=c(1:50),mu=0,sigma=seq(1,0.2,length.out = 50)),
+                             nullDist = bkgd,
                              scores = randomScore,
-                             iterations = 5000,
-                             temperature=0.999,
-                             directed=FALSE,
-                             diagnostic=TRUE)
+                             subnetScore = "mean",
+                             iterations = 3000,
+                             temperature=0.9995,
+                             diagnostic=TRUE,animPlot = 5000)
 
-plotSubnet(MAPKsig,signetObject$table)
+Rprof(NULL)
+summaryRprof("file.out")
+
+
+plotSubnet(g1,signetObject$table)
+
+
+
+
+
+hist(replicate(1000,sum(sample(runif(1000),10))))
+hist(zScores$z)
