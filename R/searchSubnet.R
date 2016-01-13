@@ -197,6 +197,7 @@ searchSubnet<-function(pathway,
 
     if(subnetScore=="mean") sumStat<-mean(workingTable[workingTable$state,]$score)
     if(subnetScore=="sum") sumStat<-sum(workingTable[workingTable$state,]$score)
+    if(subnetScore=="delta") sumStat<-mean(workingTable[workingTable$state,]$score)-mean(tail(sort(workingTable[!workingTable$state,]$score),5))
 
     ### SCORE COMPUTATION
     if(maximean)
@@ -278,6 +279,8 @@ searchSubnet<-function(pathway,
           sumStat<-mean(workingTable[workingTable$state,]$score)
         } else if(subnetScore=="sum") {
           sumStat<-sum(workingTable[workingTable$state,]$score)
+        } else if(subnetScore=="delta") {
+          sumStat<-mean(workingTable[workingTable$state,]$score)-mean(tail(sort(workingTable[!workingTable$state,]$score),5))
         }
 
         # SCale the subnet score

@@ -44,23 +44,25 @@ for(k in 1:50)
   ba<-NULL
   for(i in 1:10000)
   {
-    ba<-c(ba,mean((rnorm(k))))
+    sc<-mean(rnorm(k))-mean(tail(sort(mean(rnorm(50))),5))
+    ba<-c(ba,sc)
   }
   bkgd[k,]<-c(k,mean(ba),sd(ba))
+  print(k)
 }
 bkgd<-as.data.frame(bkgd)
 
 
-randomScore[c(41,42,36,50,6,31,45,14,55,66),2] <-
-  sort((rnorm(10000)),decreasing=TRUE)[1:10]+5
+randomScore[c(41,42,36,50,6,31,45,14,55,66,51),2] <- rnorm(11,mean=5)
 
 signetObject <- searchSubnet(pathway = g1,
                              nullDist = bkgd,
                              scores = randomScore,
-                             subnetScore = "mean",
-                             iterations = 3000,
+                             subnetScore = "delta",
+                             iterations = 5000,
                              temperature=0.9995,
-                             diagnostic=TRUE,animPlot = 5000)
+                             diagnostic=TRUE,
+                             animPlot = 5000)
 
 Rprof(NULL)
 summaryRprof("file.out")
