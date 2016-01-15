@@ -7,11 +7,17 @@ Authors@R: c(person("Alexandre", "Gouy",
   email = "alexandre.gouy@iee.unibe.ch", role = c("aut", "cre")),
   person("Laurent", "Excoffier",role = c("aut")))
 Description: An R package to detect and test for selection in biological
-  pathways. From a gene list with associated scores, and biological pathways
-  data, one can search for a high-scoring subnetwork and test for its
-  significance against the score's null distribution.
-Depends: R (>= 3.2.1)
-Imports: graph
-Suggests: animation, graphite, RCytoscape
+    pathways. From a gene list with associated scores, and biological pathways
+    data, one can search for a high-scoring subnetwork and test for its
+    significance against the score's null distribution.
+Depends:
+    R (>= 3.2.1)
+Imports:
+    graph
+Suggests:
+    animation,
+    graphite,
+    RCytoscape
 License: GPL-2
 LazyData: true
+RoxygenNote: 5.0.1

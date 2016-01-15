@@ -64,8 +64,13 @@ signetObject <- searchSubnet(pathway = g1,
                              diagnostic=TRUE,
                              animPlot = 5000)
 
-Rprof(NULL)
-summaryRprof("file.out")
+library(devtools)
+install_github("thomasp85/ggraph")
+library(ggraph)
+library(igraph)
+g2<-igraph.from.graphNEL(g1, name = TRUE, weight = TRUE,
+                     unlist.attrs = TRUE)
+g2
 
 
 plotSubnet(g1,signetObject$table)
