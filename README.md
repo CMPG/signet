@@ -182,7 +182,7 @@ There is no official release of the `signet` package at the moment.
 But you can install the development version on GitHub using the `devtools` 
 package (`Rtools` must also be installed and properly configured):
 
-```r
+```{r}
 #install.packages('devtools')
 devtools::install_github('CMPG/signet')
 ```
@@ -193,16 +193,15 @@ We will consider simulated data for the moment. We will simulate 100 gene
 networks of size randomly picked between 50 and 100. The gene scores are drawn 
 from a standard normal distribution:
 
-```r
+```{r}
 library(graph)
 ```
 
 We will simulate 10 high-scoring subnetworks as follow:
 
-```r
+```{r}
 library(graph)
 ```
-
 
 ### Analysis
 
@@ -210,14 +209,14 @@ First, we generate the background distribution of the subnetworks scores
 for subnetworks of size f from 1 to 200 (the size of the biggest KEGG pathway). 
 This may be a little long, so you can use `data(backgroundDist)` instead.
 
-```r
+```{r}
 backgroundDist(keggPathways,zScores,iterations = 5000)
 ```
 Then, we apply the simulated annealing algorithm 
 on pathways of your choice. Pathways must be in the `graphNEL` format. 
 You can provide the `searchSubnet()` function a graph list, or a single graph.
 
-```r
+```{r}
 signetObject <- searchSubnet(pathways = keggPathways[[1]],
                              score = zScores,
                              null = backgroundDist,
@@ -229,7 +228,7 @@ This function returns a list of N elements (corresponding to N pathways),
 including a table with the whole list of genes, their scores, 
 and a boolean indicating if they are found in the high-scoring subnetwork.
 
-```r
+```{r}
 testSubnet(signetObject,
            cluster = "max",
            multipleTesting = TRUE,
@@ -240,7 +239,7 @@ The subnetwork score and the p-value are also included.
 
 Then, you can make a correction for overlapping and multiple testing.
 
-```r
+```{r}
 results <- correctSubnet(signetObject,
                          cluster = "max",
                          multipleTesting = TRUE,
@@ -251,7 +250,7 @@ multiple testing correction.
 
 You can then write the results in a file in your working directory.
 
-```r
+```{r}
 writeResults(results)
 ```
 

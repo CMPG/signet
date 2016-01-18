@@ -54,7 +54,9 @@ bkgd<-as.data.frame(bkgd)
 
 
 randomScore[c(41,42,36,50,6,31,45,14,55,66,51),2] <- rnorm(11,mean=5)
+library(signet)
 
+help(signet)
 signetObject <- searchSubnet(pathway = g1,
                              nullDist = bkgd,
                              scores = randomScore,
@@ -65,13 +67,30 @@ signetObject <- searchSubnet(pathway = g1,
                              animPlot = 5000)
 
 library(devtools)
-install_github("thomasp85/ggraph")
-library(ggraph)
+devtools::install_github('thomasp85/ggplot2@patch-2')
+devtools::install_github('thomasp85/ggforce')
+devtools::install_github('thomasp85/ggraph')
+library(ggplot2);library(ggforce);library(ggraph)
 library(igraph)
 g2<-igraph.from.graphNEL(g1, name = TRUE, weight = TRUE,
                      unlist.attrs = TRUE)
-g2
+V(g2)$class[signetObject$table$gene] <- signetObject$table$state
+V(g2)$class[V(g2)$class] <- "active"
+V(g2)$class[V(g2)$class=="FALSE"] <- "inactive"
 
+V(g2)$size[signetObject$table$gene] <- signetObject$table$score
+E(g2)$weight <- rep(10, gsize(g2))
+
+ggraph(graph = g2, layout = 'fr') +
+  geom_edge_link(aes(size = weight)) +
+  geom_node_point(aes(color = class, size = size)) +
+  coord_fixed() +
+  ggforce::theme_no_axes()
+
+
+plot(g2)
+g <- igraph::ring(10)
+plot.igraph(g2, layout=layout_with_kk, vertex.color="green")
 
 plotSubnet(g1,signetObject$table)
 
