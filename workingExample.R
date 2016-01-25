@@ -26,7 +26,6 @@ results <- correctOverlap(signetObject,
 
 writeResults(results)
 
-
 library(graph)
 data("MAPKsig")
 
@@ -87,16 +86,12 @@ ggraph(graph = g2, layout = 'fr') +
   coord_fixed() +
   ggforce::theme_no_axes()
 
-
 plot(g2)
 g <- igraph::ring(10)
+plot(g)
 plot.igraph(g2, layout=layout_with_kk, vertex.color="green")
 
 plotSubnet(g1,signetObject$table)
-
-
-
-
 
 hist(replicate(1000,sum(sample(runif(1000),10))))
 hist(zScores$z)

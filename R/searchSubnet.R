@@ -80,7 +80,8 @@ searchSubnet<-function(pathway,
                      replicates = replicates,
                      temperature = temperature,
                      diagnostic=diagnostic,
-                     verbose=verbose)
+                     verbose=verbose,
+                     subnetScore=subnetScore)
       )
       if (class(res)=="try-error") {
         res<-NULL
@@ -105,6 +106,7 @@ searchSubnet<-function(pathway,
                                                          verbose = FALSE,
                                                          burnin = burnin,
                                                          animPlot = 0,
+                                                         subnetScore = subnetScore,
                                                          diagnostic=diagnostic);if (verbose) cat("+");return(out)},
 
                            simplify=FALSE)
