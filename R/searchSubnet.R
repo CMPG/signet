@@ -181,7 +181,7 @@ searchSubnet<-function(pathway,
           #toggle state in final list
           signetObject[which(signetObject$gene%in%geneSampled),]$state <- TRUE
           #     signetObject[which(!signetObject$gene%in%geneSampled),]$state <- FALSE
-          sumStat <- computeScore(signetObject,score = subnetScore)
+          # sumStat <- computeScore(signetObject,score = subnetScore)
           if (subnetScore=="mean") sumStat<-mean(signetObject[signetObject$state,]$score)
           if (subnetScore=="sum") sumStat<-sum(signetObject[signetObject$state,]$score)
           if (subnetScore=="delta") sumStat<-mean(signetObject[signetObject$state,]$score)-mean(tail(sort(signetObject[!signetObject$state,]$score),5))
