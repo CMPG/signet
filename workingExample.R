@@ -8,16 +8,60 @@ library(signet)
 data(keggPathways)
 data(zScores)
 
+rm(graphSummary())
+#select graphs
+library(graphite)
+reactome<-pathways("hsapiens", "reactome")
+kegg<-pathways("hsapiens", "kegg")
+nci<-pathways("hsapiens", "nci")
+
+#choose type of gene identifier
+kegg<- convertIdentifiers(kegg, "SYMBOL")
+reactome<-convertIdentifiers(reactome, "SYMBOL")
+nci<-convertIdentifiers(nci, "SYMBOL")
+
+# convert to graphNEL format
+kegg<-lapply(kegg,pathwayGraph)
+attr(kegg,"database")<-"kegg"
+
+reactome<-lapply(reactome,pathwayGraph)
+attr(reactome,"database")<-"reactome"
+
+nci<-lapply(nci,pathwayGraph)
+attr(nci,"database")<-"nci"
+
+allgraphs<-c(kegg,reactome,nci)
+
+
+
+# save(kegg,reactome,nci,file="allgraphs.rda")
+
+reactome_summary<-graphSummary(reactome)
+kegg_summary<-graphSummary(kegg)
+nci_summary<-graphSummary(nci)
+hist((n_summary$density))
+
+save(kegg_summary,reactome_summary,nci_summary,file="pathways_summary.rda")
+
+nci_clean<-filterGraphs(nci,n_summary,10,0.5)
+length(nci_clean)
+
+save(kegg_clean,reactome_clean,nci_clean,file="allgraphs_clean.rda")
+
 bkgd <- backgroundDist(pathwaysList = keggPathways,
                        scores = zScores,
-                       kmax = 10)
-# data(bkgd)
+                       subnetScore = "mean",
+                       iterations = 5000)
+# save(bkgd,file="kegg_bkgd.rda")
 
-
-signetObject <- searchSubnet(pathway = keggPathways,
+signetObject <- searchSubnet(pathway = kegg,
                              scores = zScores,
-                             nullDist = bkgd)
-
+                             subnetScore = "mean",
+                             iterations = 5000,
+                             replicate = 5,
+                             nullDist = bkgd,
+                             temperature=0.9995,
+                             diagnostic=TRUE)
 
 results <- correctOverlap(signetObject,
                           cluster = "max",
@@ -65,33 +109,3 @@ signetObject <- searchSubnet(pathway = g1,
                              diagnostic=TRUE,
                              animPlot = 5000)
 
-library(devtools)
-devtools::install_github('thomasp85/ggplot2@patch-2')
-devtools::install_github('thomasp85/ggforce')
-devtools::install_github('thomasp85/ggraph')
-library(ggplot2);library(ggforce);library(ggraph)
-library(igraph)
-g2<-igraph.from.graphNEL(g1, name = TRUE, weight = TRUE,
-                     unlist.attrs = TRUE)
-V(g2)$class[signetObject$table$gene] <- signetObject$table$state
-V(g2)$class[V(g2)$class] <- "active"
-V(g2)$class[V(g2)$class=="FALSE"] <- "inactive"
-
-V(g2)$size[signetObject$table$gene] <- signetObject$table$score
-E(g2)$weight <- rep(10, gsize(g2))
-
-ggraph(graph = g2, layout = 'fr') +
-  geom_edge_link(aes(size = weight)) +
-  geom_node_point(aes(color = class, size = size)) +
-  coord_fixed() +
-  ggforce::theme_no_axes()
-
-plot(g2)
-g <- igraph::ring(10)
-plot(g)
-plot.igraph(g2, layout=layout_with_kk, vertex.color="green")
-
-plotSubnet(g1,signetObject$table)
-
-hist(replicate(1000,sum(sample(runif(1000),10))))
-hist(zScores$z)
