@@ -1,12 +1,12 @@
-#undocumented functions
-
+#' Undocumented functions
+#' @export
 
 #returns summary statistics for all graphs in a database
 graphSummary<-function(allgraphs){
   require(igraph)
   output<-matrix(NA,ncol=12,nrow=length(allgraphs))
   for(i in 1:length(allgraphs)){
-    
+
     g<-igraph.from.graphNEL(allgraphs[[i]], name = TRUE, weight = TRUE,
                             unlist.attrs = TRUE)
     comp<-components(g)
@@ -25,7 +25,7 @@ graphSummary<-function(allgraphs){
     output[i,1]<-names(allgraphs[i])
     output[i,2:12]<-as.numeric(as.character(bla))
   }
-  
+
   output<-as.data.frame(output)
   colnames(output)<-c("name",
                       "nodes",
@@ -69,7 +69,7 @@ returnTable<-function(outputSignet,
     stat<-x$score;if(is.null(stat)) stat<-NA; return(stat)
   }))
   print(subnetScore)
-  
+
   if(length(density_cuts) == 1){
     pvalues<-unlist(lapply(subnetScore,function(x) {
       stat<-mean(nullDistribution>x,na.rm=TRUE);if(is.null(stat)) stat<-NA; return(stat)
@@ -78,22 +78,22 @@ returnTable<-function(outputSignet,
   } else {
     X<-graphSummary(pDatabase)
     pvalues<-c()
-    
+
     for(i in 1:(length(density_cuts)-1)) {
       ids<-which(X$density > density_cuts[i] & X$density < density_cuts[i+1] & X$nodes >= 10)
-      
+
       for (ii in ids) {
         pvalues[ii]<-mean(nullDistribution[[i]]>subnetScore[ii],na.rm=TRUE);
         if(is.null(pvalues[ii])) pvalues[ii]<-NA;
       }
     }
   }
-  
+
   pathwaysNames<-names(pDatabase)
-  
+
   if(correction){
-  require(qvalue)
-  qvalues<-qvalue(pvalues)$qvalues
+    require(qvalue)
+    qvalues<-qvalue(pvalues)$qvalues
   }
   geneListEntrez<-unlist(lapply(outputSignet,function(x) {
     stat<-paste(x$table[x$table$state,]$gene,collapse=";");
@@ -110,9 +110,6 @@ returnTable<-function(outputSignet,
 
   return(out)
 }
-
-
-
 
 
 overlapMatrix<-function(signetObject){
@@ -138,13 +135,13 @@ correctOverlap<-function(overlapMatrix,
                          threshold,
                          pvalue = 0.01,
                          cex) {
-  
+
   torm <- (!is.na(signetTable$pvalues) & signetTable$pvalues < pvalue)
   overlap2 <- overlapMatrix[c(torm),c(torm)]
-  d <- as.dist(100*(1-overlap2)) 
+  d <- as.dist(100*(1-overlap2))
   h <- hclust(d)
-  
-  plot(h, main = "Overlapping correction", sub = "", xlab="", 
+
+  plot(h, main = "Overlapping correction", sub = "", xlab="",
        ylab="Overlapping percentage between subnetworks",
        axes = FALSE, hang = -1,
        labels=paste(signetTable$pathwaysNames[torm]," (p = ",
@@ -153,10 +150,10 @@ correctOverlap<-function(overlapMatrix,
   lines(x = c(0,0), y = c(0,100), type = "n") # force extension of y axis
   axis(side = 2, at = seq(0,100,10), labels = seq(100,0,-10))
   abline(h=c(100*(1-threshold)),col=2,lty=2,lwd=2)
-  
+
   torm <- !is.na(signetTable$pvalues)
   overlap3 <- overlapMatrix[c(torm),c(torm)]
-  d2 <- as.dist(100*(1-overlap3)) 
+  d2 <- as.dist(100*(1-overlap3))
   h2 <- hclust(d2)
 
   clust <- as.factor(cutree(h2,h=100*(1-threshold)))
@@ -164,17 +161,17 @@ correctOverlap<-function(overlapMatrix,
   group[group]<-clust
   group[!group]<-NA
   signetTable$group<-group
-  
+
   tapply(signetTable$pvalues,signetTable$group,max)
-  
+
   #need ids of remaining subnetworks
-  
+
   require(qvalue)
-  
+
   #compute qvalue
-  
+
   #add qvalues to table
-  
+
   #plot histogram
 }
 

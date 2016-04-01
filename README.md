@@ -2,41 +2,44 @@
 
 ## Introduction
 
-Understanding forces shaping patterns of genetic diversity is a central focus
-in population genetics. The development of theoretical models allowed us to
-have some expectations concerning the impact of various neutral or adaptive 
-forces in the genome. These expectations permitted to develop methods of 
-detection of the footprints of selection in the genome. A large number of these 
-methods are based on a measure of genetic differentiation between populations,
-FST. Indeed, they aim at detecting loci showing a higher differentiation than
-expected under a neutral model; possibly due to positive selection.
+To better predict how species will adapt to changing environments, 
+it is of central importance to understand the genetic basis of adaptation. 
+This process is typically viewed as involving selective sweeps that drive 
+beneficial alleles from low to high frequency in a population. By contrast, 
+classical models of artificial and natural selection in the quantitative 
+genetics literature emphasize the importance of modest changes in allele 
+frequencies at many loci (Stephan, 2016). Indeed, adaptive events in natural 
+populations could occur by the evolution of polygenic traits rather than via 
+the fixation of single beneficial mutations (Pritchard and Di Rienzo, 2010). 
+Recent studies in various model organisms have confirmed that variation at many 
+important traits is controlled by a large number of loci dispersed throughout 
+the genome (e.g. Allen et al., 2010).
 
-But Pritchard and Di Rienzo (2010) argued that many adaptive events in 
-natural populations occur by the evolution of polygenic traits, rather than 
-via the fixation of single beneficial mutations. Recent studies in various model
-organisms have indeed confirmed that variation at many important 
-traits is controlled by a large number of loci dispersed throughout the genome
-(Yang et al. 2010; Stranger et al. 2011; Atwell et al. 2010; 
-Jumbo-Lucioni et al. 2010). Polygenic adaptation typically involves small 
-allele frequency changes at many loci (Mackay et al. 2009), which may remain 
-below the detection limit of most outlier detection methods 
-(Le Corre and Kremer 2012). Then, FST outlier tests are seriously 
-challenged by selection acting on many small-effect loci.
+Numerous statistical tests have been developed to detect selection from genomic 
+data based on a simple selective sweep model (Stephan, 2016). Small allele 
+frequency changes due to polygenic selection may however remain below the 
+detection limit of most of these outlier detection methods (Le Corre and Kremer,
+2012). Moreover, the conclusions drawn from significant tests can be seriously 
+challenged because phenotypic traits exhibiting clear-cut molecular signatures 
+of selection may represent a biased subset of all adaptive traits (Chevin and 
+Hospital, 2008).
 
-In this context, we developed a method to detect polygenic adaptation in the
-genome. We consider the information given by the network information as 
-a prior concerning the target of polygenic selection. Indeed, it is more likely
-that genes together under selection are found in the same biological network
-because they are all related to the same phenotype.
+In order to better understand to what extent species adapt by polygenic 
+selection, we have developed a method to detect and measure this type of 
+selection in natural populations. The general idea is to search for subsets of 
+interacting genes within gene networks (e.g. biological pathways) that present 
+unusual features. This search is a typical combinatorial optimization problem 
+that can be solved using a heuristic approach like simulated annealing. We 
+implemented such an algorithm to search for high-scoring subnetworks of genes 
+in biological pathways data. We also developed a significance test procedure 
+that explicitly takes into account the optimization process involved in this 
+search.
 
-We will call gene network every type of data involving interactions
-between genes or proteins. For example, it can be a gene regulatory network, 
-a biological pathway, or a protein-protein interactions dataset.
-
-The methodology implemented in the `signet` package presented here is an 
+This workflow is implemented in the `signet` package presented here. It is an 
 extension of genome scans for selection to gene networks. Using a statistic to 
 measure selection, the idea is to find in gene networks high scoring subgroups 
 of genes.
+
 
 ## Workflow
 
@@ -255,6 +258,15 @@ writeResults(results)
 ```
 
 ## References
+
+Allen, H. L., Estrada, K., Lettre, G., Berndt, S. I., Weedon, M. N., 
+Rivadeneira, F., ... & Ferreira, T. (2010). Hundreds of variants clustered 
+in genomic loci and biological pathways affect human height. Nature, 467(7317), 
+832-838.
+
+Chevin, L. M., & Hospital, F. (2008). Selective sweep at a quantitative trait 
+locus in the presence of background genetic variation. Genetics, 180(3), 
+1645-1660.
 
 Daub, J. T., Hofer, T., Cutivet, E., Dupanloup, I., Quintana-Murci, L., 
 Robinson-Rechavi, M., & Excoffier, L. (2013). Evidence for polygenic 
