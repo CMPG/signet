@@ -43,12 +43,13 @@ searchSubnet<-function(pathway,
                        iterations = 2000,
                        temperature = 0.995,
                        subnetScore="sum",
-                       kmin = 2,
+                       kmin = 4,
                        directed = FALSE,
                        verbose = TRUE,
                        burnin = 100,
                        animPlot = 0,
-                       diagnostic = FALSE)
+                       diagnostic = FALSE,
+                       dev.diag=TRUE)
 {
 
   # check for packages =========================================================
@@ -56,6 +57,10 @@ searchSubnet<-function(pathway,
     stop("Package graph is not installed !")
   } else {
     requireNamespace("graph",quietly=TRUE)
+  }
+
+  if(diagnostic & dev.diag){
+    pdf(file="signet_plots.pdf",width=10,height=10)
   }
 
   #check for arguments =========================================================
@@ -81,7 +86,8 @@ searchSubnet<-function(pathway,
                      temperature = temperature,
                      diagnostic=diagnostic,
                      verbose=verbose,
-                     subnetScore=subnetScore)
+                     subnetScore=subnetScore,
+                     dev.diag=FALSE)
       )
       if (class(res)=="try-error") {
         res<-NULL
@@ -107,7 +113,8 @@ searchSubnet<-function(pathway,
                                                          burnin = burnin,
                                                          animPlot = 0,
                                                          subnetScore = subnetScore,
-                                                         diagnostic=diagnostic);if (verbose) cat("+");return(out)},
+                                                         diagnostic=diagnostic,
+                                                         dev.diag=FALSE);if (verbose) cat("+");return(out)},
 
                            simplify=FALSE)
       if (verbose) cat("\n  ... Done !")
@@ -169,10 +176,10 @@ searchSubnet<-function(pathway,
                                       param = temperature,
                                       burnin = burnin)
 
-          if (animPlot > 0) {
-            sizeEvolution <- array(NA,animPlot)
-            scoreEvolution <- array(NA,animPlot)
-          }
+
+            sizeEvolution <- array(NA,iterations)
+            scoreEvolution <- array(NA,iterations)
+
           boundaries<-NULL
 
           geneSampled<-sample(colnames(adjMatrix),1)
@@ -222,7 +229,7 @@ searchSubnet<-function(pathway,
 
             probneighbour <- 0
             sampNeighbour <- FALSE
-            if (length(activeNet) > 2) {
+            if (length(activeNet) > kmin) {
               probneighbour <- length(activeNet)/(length(boundaries)+length(activeNet))
               if (probneighbour > runif(1)) {
                 sampNeighbour <- TRUE
@@ -312,7 +319,23 @@ searchSubnet<-function(pathway,
               if (i==1) score <- NULL
               score <- c(score,s)
               if (i==iterations) {
-                par(mfrow = c(1,2))
+                # par(mfrow = c(1,2))
+                m <- rbind(c(0,1,1,0),c(2,2,3,3))
+                layout(m)
+
+                liste<-signetObject[signetObject$state,]$gene
+                subg<-graph::subGraph(as.character(signetObject[signetObject$state,]$gene),newpath)
+
+                subs<-as.character(liste)
+
+                col<-c(rep("red",length(subs)))
+                nAttrs<-list()
+                nAttrs$fillcolor <- col
+                nAttrs$height <- nAttrs$width <- rep("0.4", length(graph::nodes(newpath)))
+                names(nAttrs$width)<-names(nAttrs$height)<-graph::nodes(newpath)
+                names(nAttrs$fillcolor)<-c(subs)
+
+                graph::plot(newpath, y="neato", nodeAttrs = nAttrs,graph=list(overlap="scale"))
 
                 x <- 1:iterations
                 y <- sizeEvolution
@@ -357,6 +380,9 @@ searchSubnet<-function(pathway,
       cat(paste("\n\n  Subnetwork size:",ret$size,
                 "genes\n  Subnetwork score:",format(ret$score,digits=4),
                 "\n"))
+    }
+    if(diagnostic & dev.diag){
+      dev.off()
     }
     invisible(ret)
   }

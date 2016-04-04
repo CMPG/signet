@@ -8,17 +8,18 @@ library(signet)
 data(keggPathways)
 data(zScores)
 
-rm(graphSummary())
+rm(list=ls())
 #select graphs
 library(graphite)
 reactome<-pathways("hsapiens", "reactome")
 kegg<-pathways("hsapiens", "kegg")
 nci<-pathways("hsapiens", "nci")
 
+nodes(pathwayGraph(reactome[[1]]))
 #choose type of gene identifier
-kegg<- convertIdentifiers(kegg, "SYMBOL")
-reactome<-convertIdentifiers(reactome, "SYMBOL")
-nci<-convertIdentifiers(nci, "SYMBOL")
+kegg<- convertIdentifiers(kegg, "entrez")
+reactome<-convertIdentifiers(reactome, "entrez")
+nci<-convertIdentifiers(nci, "entrez")
 
 # convert to graphNEL format
 kegg<-lapply(kegg,pathwayGraph)
@@ -32,36 +33,38 @@ attr(nci,"database")<-"nci"
 
 allgraphs<-c(kegg,reactome,nci)
 
-
-
 # save(kegg,reactome,nci,file="allgraphs.rda")
 
 reactome_summary<-graphSummary(reactome)
 kegg_summary<-graphSummary(kegg)
 nci_summary<-graphSummary(nci)
-hist((n_summary$density))
 
-save(kegg_summary,reactome_summary,nci_summary,file="pathways_summary.rda")
+save(kegg_summary,reactome_summary,nci_summary,file="pathways_summary_entrez.rda")
 
-nci_clean<-filterGraphs(nci,n_summary,10,0.5)
-length(nci_clean)
+kegg_clean<-filterGraphs(kegg,kegg_summary,10,0.5)
+reactome_clean<-filterGraphs(reactome,reactome_summary,10,1)
+nci_clean<-filterGraphs(nci,nci_summary,10,0.5)
+length(kegg_clean)
 
-save(kegg_clean,reactome_clean,nci_clean,file="allgraphs_clean.rda")
+save(kegg_clean,reactome_clean,nci_clean,file="allgraphs_clean_entrez.rda")
 
 bkgd <- backgroundDist(pathwaysList = keggPathways,
                        scores = zScores,
                        subnetScore = "mean",
-                       iterations = 5000)
+                       kmax = 50,
+                       iterations = 200)
+
 # save(bkgd,file="kegg_bkgd.rda")
 
-signetObject <- searchSubnet(pathway = kegg,
+signetObject <- searchSubnet(pathway = keggPathways[[2]],
                              scores = zScores,
                              subnetScore = "mean",
-                             iterations = 5000,
-                             replicate = 5,
+                             iterations = 2000,
+                             replicate = 1,
                              nullDist = bkgd,
                              temperature=0.9995,
-                             diagnostic=TRUE)
+                             diagnostic=TRUE,
+                             animPlot = 1000)
 
 results <- correctOverlap(signetObject,
                           cluster = "max",

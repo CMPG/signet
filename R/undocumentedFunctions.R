@@ -57,6 +57,7 @@ returnTable<-function(outputSignet,
                       pDatabase,
                       nullDistribution,
                       density_cuts=0,
+                      database = NA,
                       correction=TRUE)
 {
   subnetSize<-unlist(lapply(outputSignet,function(x) {
@@ -90,7 +91,7 @@ returnTable<-function(outputSignet,
   }
 
   pathwaysNames<-names(pDatabase)
-
+  datab<-rep(database,length(pathwaysNames))
   if(correction){
     require(qvalue)
     qvalues<-qvalue(pvalues)$qvalues
@@ -101,10 +102,10 @@ returnTable<-function(outputSignet,
   }))
 
   if(correction){
-    out<-data.frame(pathwaysNames,netSize,subnetSize,subnetScore,
+    out<-data.frame(datab,pathwaysNames,netSize,subnetSize,subnetScore,
                     pvalues,qvalues,geneListEntrez)
   } else {
-    out<-data.frame(pathwaysNames,netSize,subnetSize,subnetScore,
+    out<-data.frame(datab,pathwaysNames,netSize,subnetSize,subnetScore,
                     pvalues,geneListEntrez)
   }
 
@@ -134,9 +135,11 @@ correctOverlap<-function(overlapMatrix,
                          signetTable,
                          threshold,
                          pvalue = 0.01,
-                         cex) {
+                         cex = 1,
+                         graphics = TRUE) {
 
-  torm <- (!is.na(signetTable$pvalues) & signetTable$pvalues < pvalue)
+  if(graphics) {
+    torm <- (!is.na(signetTable$pvalues) & signetTable$pvalues < pvalue)
   overlap2 <- overlapMatrix[c(torm),c(torm)]
   d <- as.dist(100*(1-overlap2))
   h <- hclust(d)
@@ -150,6 +153,7 @@ correctOverlap<-function(overlapMatrix,
   lines(x = c(0,0), y = c(0,100), type = "n") # force extension of y axis
   axis(side = 2, at = seq(0,100,10), labels = seq(100,0,-10))
   abline(h=c(100*(1-threshold)),col=2,lty=2,lwd=2)
+  }
 
   torm <- !is.na(signetTable$pvalues)
   overlap3 <- overlapMatrix[c(torm),c(torm)]
@@ -162,17 +166,37 @@ correctOverlap<-function(overlapMatrix,
   group[!group]<-NA
   signetTable$group<-group
 
-  tapply(signetTable$pvalues,signetTable$group,max)
+  pvalmax<-tapply(signetTable$pvalues,signetTable$group,max)
+  require(qvalue)
+  qvalmax<-qvalue(pvalmax)
+  signetTable$qvalues<-rep(NA,length(signetTable$pvalues))
+
+
+
+  for(i in 1:length(signetTable$pvalues)){
+
+
+    if(!is.na(signetTable[i,]$pvalues)) {
+      print(signetTable[which(signetTable$group==signetTable[i,]$group),1])
+      minp<-min(signetTable[which(signetTable$group==signetTable[i,]$group),]$pvalues)
+      print(minp)
+
+
+      if(minp==signetTable[i,]$pvalues) {
+        print(qvalmax$q[which(abs(qvalmax$pvalues-minp) == min(abs(qvalmax$pvalues-minp)))])
+        signetTable[i,]$qvalues<-qvalmax$q[which(abs(qvalmax$pvalues-minp) == min(abs(qvalmax$pvalues-minp)))][1]
+      }
+    }
+  }
 
   #need ids of remaining subnetworks
 
-  require(qvalue)
-
-  #compute qvalue
+  #compute qvalue using FDR method
 
   #add qvalues to table
 
   #plot histogram
+  return(signetTable)
 }
 
 
