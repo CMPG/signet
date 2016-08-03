@@ -1,25 +1,20 @@
 #' Generate the temperature function
 #'
 #' A function to generate the temperature function used in simulated annealing.
-#' After a burnin period, the temperature decreases geometrically.
+#' The temperature starts from 1 and decreases geometrically for a given number
+#' of iterations.
 #'
 #' @param iterations Number of iterations.
-#' @param param Geometric parameter
-#' @param burnin Burnin
-#' @keywords subnetwork, simulated annealing
+#' @param threshold Temperature desired at the last iteration.
+#' @keywords subnetwork, simulated annealing, temperature
 #' @export
 #' @examples
-#' t<-temperatureFunction(iterations=1500,param=0.995,burnin=100)
-#' plot(t)
+#' t <- temperatureFunction(iterations = 5000)
+#' plot(t, ylab = "Temperature", xlab = "Iterations")
 
-temperatureFunction<-function(iterations,threshold=0.01)
+temperatureFunction<-function(iterations,threshold=0.02)
 {
   alpha <- exp(log(threshold)/iterations)
-  t<-array(0,iterations)
-  t[1]<-1
-  for(i in 2:iterations)
-  {
-    t[i]<-alpha*t[i-1]
-  }
+  t<-1*alpha^(1:iterations)
   return(t)
 }

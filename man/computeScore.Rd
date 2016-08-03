@@ -4,7 +4,7 @@
 \alias{computeScore}
 \title{Compute a subnetwork score}
 \usage{
-computeScore(signetObject, score = "mean")
+computeScore(signetObject, score = "ideker")
 }
 \description{
 Compute a subnetwork score

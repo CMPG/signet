@@ -5,9 +5,8 @@
 \title{Search for a high scoring subnetwork}
 \usage{
 searchSubnet(pathway, scores, nullDist, replicates = 1, iterations = 2000,
-  temperature = 0.995, subnetScore = "sum", kmin = 4, directed = FALSE,
-  verbose = TRUE, burnin = 100, animPlot = 0, diagnostic = FALSE,
-  dev.diag = TRUE)
+  subnetScore = "ideker", kmin = 4, directed = FALSE, verbose = TRUE,
+  burnin = 100, animPlot = 0, diagnostic = FALSE)
 }
 \arguments{
 \item{pathway}{A gene network, or a list of networks,
@@ -22,8 +21,6 @@ Can be obtained thanks to the \verb{nulldistribution()} function.}
 \item{replicates}{Number of replicates per network.}
 
 \item{iterations}{Number of iterations.}
-
-\item{temperature}{The temperature function parameter.}
 
 \item{kmin}{The minimal size of a subnetwork.}
 
@@ -50,10 +47,7 @@ require(signet)
 data(keggPathways)
 data(zScores)
 
-example1 <- searchSubnet(keggPathways[[1]],zScores)
-
-#data() #a previously generated null distribution
-#example2 <- searchSubnet(keggPathways[[1]],zScores,null)
+example1 <- searchSubnet(keggPathways[[1]], zScores)
 }
 \keyword{algorithm}
 \keyword{annealing,}

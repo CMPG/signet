@@ -4,24 +4,24 @@
 \alias{temperatureFunction}
 \title{Generate the temperature function}
 \usage{
-temperatureFunction(iterations, param, burnin)
+temperatureFunction(iterations, threshold = 0.02)
 }
 \arguments{
 \item{iterations}{Number of iterations.}
 
-\item{param}{Geometric parameter}
-
-\item{burnin}{Burnin}
+\item{threshold}{Temperature desired at the last iteration.}
 }
 \description{
 A function to generate the temperature function used in simulated annealing.
-After a burnin period, the temperature decreases geometrically.
+The temperature starts from 1 and decreases geometrically for a given number
+of iterations.
 }
 \examples{
-t<-temperatureFunction(iterations=1500,param=0.995,burnin=100)
-plot(t)
+t <- temperatureFunction(iterations = 5000)
+plot(t, ylab = "Temperature", xlab = "Iterations")
 }
-\keyword{annealing}
+\keyword{annealing,}
 \keyword{simulated}
 \keyword{subnetwork,}
+\keyword{temperature}
 

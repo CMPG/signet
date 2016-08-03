@@ -1,21 +1,26 @@
 #' Compute a subnetwork score
 
-computeScore <- function(signetObject,score="mean")
+computeScore <- function(signetObject, score = "ideker")
 {
-  if(score == "mean") {
-    subnetStat <- mean(signetObject[signetObject$state,]$score)
+  activeNet <- signetObject$network[signetObject$network$active, ]
+
+  if (score == "mean") {
+    subnetStat <- mean(activeNet$score)
   }
-  if(score == "sum") {
-    subnetStat <- sum(signetObject[signetObject$state,]$score)
+
+  if (score == "sum") {
+    subnetStat <- sum(activeNet$score)
   }
-  if(score == "ideker") {
-    k<-length(signetObject[signetObject$state,]$score)
-    subnetStat <- (1/sqrt(k))*sum(signetObject[signetObject$state,]$score)
+
+  if (score == "ideker") {
+    k <- length(activeNet$score)
+    subnetStat <- (1/sqrt(k))*sum(activeNet$score)
   }
-  if(score == "delta") {
-    subnetStat <- mean(signetObject[signetObject$state,]$score)-mean(
-      tail(sort(signetObject[!signetObject$state,]$score),5))
+
+  if (score == "delta") {
+    subnetStat <- mean(activeNet$score)-mean(tail(sort(activeNet$score),5))
   }
+
   return(subnetStat)
 }
 

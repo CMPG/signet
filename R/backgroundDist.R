@@ -36,12 +36,12 @@ backgroundDist<-function(pathwaysList,
     pathwaysList<-NULL
     gList<-scores
   }
- colnames(scores)<-c("gene","score")
+  colnames(scores)<-c("gene","score")
 
- if(missing(kmax)) # kmax not specified: max k in the graph list
- {
-   kmax <- max(unlist(lapply(pathwaysList,function(x)length(nodes(x)))))
- }
+  if(missing(kmax)) # kmax not specified: max k in the graph list
+  {
+    kmax <- max(unlist(lapply(pathwaysList,function(x)length(nodes(x)))))
+  }
 
   cat("  Generating null distribution...\n")
   distrib<-NULL
@@ -71,6 +71,10 @@ backgroundDist<-function(pathwaysList,
       if(subnetScore=="sum") {
         sumStat<-c(sum(gList[sample(length(gList$gene),k,replace=TRUE),]$score,na.rm=TRUE))
       }
+      if(subnetScore == "ideker") {
+        gList2<-gList[sample(length(gList$gene),k,replace=TRUE),]
+        sumStat <- (1/sqrt(k))*sum(gList2$score)
+      }
       ba<-rbind(ba,sumStat)
     }
 
@@ -82,6 +86,5 @@ backgroundDist<-function(pathwaysList,
   colnames(nullD)<-c("k","mu","sigma")
 
   if(distribution) nullD<-list(parameters=nullD,distributions=distrib)
-  # print(nullD)
   return(nullD)
 }

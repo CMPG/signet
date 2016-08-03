@@ -61,13 +61,13 @@ returnTable<-function(outputSignet,
                       correction=TRUE)
 {
   subnetSize<-unlist(lapply(outputSignet,function(x) {
-    stat<-x$size;if(is.null(stat)) stat<-NA; return(stat)
+    if(!is.null(x)){ stat<-x$subnet_size} else { stat<-NA}; return(stat)
   }))
   netSize<-unlist(lapply(outputSignet,function(x) {
-    stat<-length(x$table$gene);if(is.null(stat)) stat<-NA; return(stat)
+    if(!is.null(x)){ stat<-length(x$network$gene)} else { stat<-NA}; return(stat)
   }))
   subnetScore<-unlist(lapply(outputSignet,function(x) {
-    stat<-x$score;if(is.null(stat)) stat<-NA; return(stat)
+    if(!is.null(x)){ stat<-x$subnet_score*(sqrt(x$subnet_size)/x$subnet_size)}else { stat<-NA}; return(stat)
   }))
   print(subnetScore)
 
@@ -97,7 +97,7 @@ returnTable<-function(outputSignet,
     qvalues<-qvalue(pvalues)$qvalues
   }
   geneListEntrez<-unlist(lapply(outputSignet,function(x) {
-    stat<-paste(x$table[x$table$state,]$gene,collapse=";");
+    stat<-paste(x$network[x$network$active,]$gene,collapse=";");
     if(is.null(stat)) stat<-NA; return(stat)
   }))
 
@@ -199,28 +199,46 @@ correctOverlap<-function(overlapMatrix,
   return(signetTable)
 }
 
-createSignetObject <- function(scores,iterations) {
+createSignetObject <- function(pathway, scores, iterations, minimumSize) {
+
+  threshold <- minimumSize
+  if (length(graph::nodes(pathway))==0) X<-NULL
+  else  X<-unlist(graph::connComp(pathway)[!lapply(graph::connComp(pathway),
+                                                         length)<threshold])
+  if (is.null(X)) {
+    stop("\r  No connected component of size greater than the specified threshold")
+  } else {
+    connected_comp<-graph::subGraph(X,pathway)
+    connected_comp<-graph::ugraph(connected_comp)
+  }
+
+  names(scores)[[1]]<-"gene";names(scores)[[2]]<-"score"
+  scores<-scores[scores$gene %in% graph::nodes(pathway),]
+
+  connected_comp<-graph::subGraph(as.character(scores[!is.na(scores$score),]$gene),pathway)
 
   nnodes<-dim(scores)[1]
   subnet_score <- NA
   subnet_size <- NA
   subnet_genes <- rep(NA,nnodes)
   network<-data.frame(
-    genes=scores$genes,
-    scores=scores$scores,
-    active=rep(NA,nnodes)
+    gene=scores$gene,
+    score=scores$score,
+    active=rep(FALSE,nnodes)
   )
   simulated_annealing<-data.frame(
-    temperature=rep(NA,iterations),
+    temperature=temperatureFunction(iterations),
     size_evolution=rep(NA,iterations),
     score_evolution=rep(NA,iterations)
   )
 
-  object<-list(network,
-               subnet_score,
-               subnet_size,
-               subnet_genes,
-               simulated_annealing)
+  object<-list(pathway=pathway,
+               connected_comp=connected_comp,
+               network=network,
+               subnet_score=subnet_score,
+               subnet_size=subnet_size,
+               subnet_genes=subnet_genes,
+               simulated_annealing=simulated_annealing)
   class(object)<-"signet"
   return(object)
 }
@@ -232,3 +250,117 @@ print.signet <- summary.signet <- function(object) {
   cat(paste("  Genes in subnetwork: ",object$subnet_genes,"\n",sep=""))
 }
 
+plot.signet <- function(object) {
+  m <- rbind(c(0,1,1,0),c(2,2,3,3))
+  layout(m)
+
+  glist<-object$network[object$network$active,]$genes
+
+  subs<-as.character(glist)
+  subg<-graph::subGraph(subs,object$connected_comp)
+
+  col<-c(rep("red",length(subs)))
+  nAttrs<-list()
+  nAttrs$fillcolor <- col
+  nAttrs$height <- nAttrs$width <- rep("0.4", length(graph::nodes(object$connected_comp)))
+  names(nAttrs$width)<-names(nAttrs$height)<-graph::nodes(object$connected_comp)
+  names(nAttrs$fillcolor)<-c(subs)
+
+  graph::plot(object$connected_comp, y="neato", nodeAttrs = nAttrs,graph=list(overlap="scale"))
+
+  x <- 1:length(object$simulated_annealing$temperature)
+  y <- object$simulated_annealing$size_evolution
+  z <- object$simulated_annealing$score_evolution
+  par(mar = c(5, 5, 5, 5))  # Leave space for z axis
+
+  plot(x, z, type = "l",lwd = 1,cex = 0.2,pch = 16,
+       col = "firebrick",ylab = "Subnetwork score",
+       xlab = "Iterations") # first plot
+
+  par(new = TRUE)
+  plot(x, object$simulated_annealing$temperature, type = "l", lwd=1,
+       xlab = "", ylab = "", axes=F, lty=2,
+       col = "grey")
+  axis(side = 4, at = pretty(range(object$simulated_annealing$temperature)))
+  mtext("Temperature", side = 4, line = 3)
+
+  plot(x, y, type = "l", cex = 0.5,
+       xlab = "Iterations", ylab = "Subnetwork size",
+       pch=16,lwd=1,col="dodgerblue")
+
+  par(new=TRUE)
+  plot(x,object$simulated_annealing$temperature, type="l",lwd=1,
+       xlab="", ylab="",axes=F,lty=2,
+       col="grey")
+  axis(side=4, at = pretty(range(object$simulated_annealing$temperature)))
+  mtext("Temperature", side=4, line=3)
+
+  par(mfrow = c(1,1))
+
+}
+
+adjacencyMatrixToList <- function(adjMatrix) {
+  adjList <- apply(adjMatrix, 1, function(x) return(names(x[x==1])))
+  return(adjList)
+}
+
+bfs <- function(graph, seeds) {
+
+  # graph<-remove_loops(graph)
+  V <- names(graph)
+  N <- length(V)
+  reachable <- seeds
+  marks <- structure(rep(FALSE, N), names = V)
+
+  while (length(seeds)) {
+
+    s <- seeds[1]
+    seeds <- seeds[-1]
+
+    for (n in graph[[s]]) {
+      if (!marks[[n]]) {
+        seeds <- c(seeds, n)
+        reachable <- c(reachable, n)
+        marks[[n]] <- TRUE
+      }
+    }
+  }
+
+  reachable
+}
+
+remove_loops <- function(graph) {
+  structure(
+    lapply(names(graph), function(n) setdiff(graph[[n]], n)),
+    names = names(graph)
+  )
+}
+
+isArticulationPoint <- function(node, adjMatrix) {
+
+  adjNodes <- names(which(adjMatrix[node, ] == 1))
+
+  if(length(adjNodes) == 1) {
+    isTrue <- FALSE
+  } else {
+    cond <- !(colnames(adjMatrix) %in% node)
+    newMatrix <- adjMatrix[cond, cond]
+    newList <- adjacencyMatrixToList(newMatrix)
+
+    reachable <- list()
+    for(i in adjNodes) {
+      reachable[[i]] <- bfs(newList,adjNodes[adjNodes==i])
+    }
+
+    isTrue <- unlist(lapply(adjNodes,
+                            function(x) {
+                              sum(reachable[[x]] %in% adjNodes[adjNodes != x])
+                              }))
+    if(any(isTrue == 0)) {
+      isTrue <- TRUE
+    } else {
+      isTrue <- FALSE
+    }
+  }
+  return(isTrue)
+}
