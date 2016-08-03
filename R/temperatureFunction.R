@@ -12,16 +12,14 @@
 #' t<-temperatureFunction(iterations=1500,param=0.995,burnin=100)
 #' plot(t)
 
-temperatureFunction<-function(iterations,param,burnin)
+temperatureFunction<-function(iterations,threshold=0.01)
 {
-  if(missing(burnin)) burnin <- iterations/20
-
+  alpha <- exp(log(threshold)/iterations)
   t<-array(0,iterations)
-  t[1:burnin]<-1
-  for(i in burnin:iterations)
+  t[1]<-1
+  for(i in 2:iterations)
   {
-    t[i]<-param*t[i-1]
+    t[i]<-alpha*t[i-1]
   }
-
   return(t)
 }

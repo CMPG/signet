@@ -49,9 +49,8 @@ searchSubnet<-function(pathway,
                        burnin = 100,
                        animPlot = 0,
                        diagnostic = FALSE,
-                       dev.diag=TRUE)
+                       dev.diag=FALSE)
 {
-
   # check for packages =========================================================
   if (sum(installed.packages()[,1]=="graph")==0) {
     stop("Package graph is not installed !")
@@ -136,6 +135,7 @@ searchSubnet<-function(pathway,
       }
     } else {
       # remove connected components of size < threshold
+
       threshold<-10
 
       if (length(graph::nodes(pathway))==0) X<-NULL
@@ -177,8 +177,8 @@ searchSubnet<-function(pathway,
                                       burnin = burnin)
 
 
-            sizeEvolution <- array(NA,iterations)
-            scoreEvolution <- array(NA,iterations)
+          sizeEvolution <- array(NA,iterations)
+          scoreEvolution <- array(NA,iterations)
 
           boundaries<-NULL
 
@@ -188,10 +188,10 @@ searchSubnet<-function(pathway,
           #toggle state in final list
           signetObject[which(signetObject$gene%in%geneSampled),]$state <- TRUE
           #     signetObject[which(!signetObject$gene%in%geneSampled),]$state <- FALSE
-          # sumStat <- computeScore(signetObject,score = subnetScore)
-          if (subnetScore=="mean") sumStat<-mean(signetObject[signetObject$state,]$score)
-          if (subnetScore=="sum") sumStat<-sum(signetObject[signetObject$state,]$score)
-          if (subnetScore=="delta") sumStat<-mean(signetObject[signetObject$state,]$score)-mean(tail(sort(signetObject[!signetObject$state,]$score),5))
+          sumStat <- computeScore(signetObject,score = subnetScore)
+#           if (subnetScore=="mean") sumStat<-mean(signetObject[signetObject$state,]$score)
+#           if (subnetScore=="sum") sumStat<-sum(signetObject[signetObject$state,]$score)
+#           if (subnetScore=="delta") sumStat<-mean(signetObject[signetObject$state,]$score)-mean(tail(sort(signetObject[!signetObject$state,]$score),5))
 
           # SCORE COMPUTATION ==================================================
           if (maximean) {
@@ -250,13 +250,7 @@ searchSubnet<-function(pathway,
                 !signetObject[which(signetObject$gene==newG),]$state
 
               # Compute the subnet score
-              if (subnetScore=="mean") {
-                sumStat <- mean(signetObject[signetObject$state,]$score)
-              } else if (subnetScore=="sum") {
-                sumStat <- sum(signetObject[signetObject$state,]$score)
-              } else if (subnetScore=="delta") {
-                sumStat <- mean(signetObject[signetObject$state,]$score)-mean(tail(sort(signetObject[!signetObject$state,]$score),5))
-              }
+              sumStat <- computeScore(signetObject,score=subnetScore)
 
               # Scale the subnet score
               if (maximean) {
@@ -370,7 +364,7 @@ searchSubnet<-function(pathway,
           }
 
           ### Return the results (subnetwork, size, score and p-value)
-          Stat<-mean(signetObject[signetObject$state,]$score)
+          Stat<-computeScore(signetObject,score=subnetScore)
           subnetSize<-length(signetObject[signetObject$state,]$gene)
           ret<-list(table=signetObject,score=s,size=subnetSize)
         }

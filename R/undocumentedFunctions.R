@@ -199,4 +199,36 @@ correctOverlap<-function(overlapMatrix,
   return(signetTable)
 }
 
+createSignetObject <- function(scores,iterations) {
+
+  nnodes<-dim(scores)[1]
+  subnet_score <- NA
+  subnet_size <- NA
+  subnet_genes <- rep(NA,nnodes)
+  network<-data.frame(
+    genes=scores$genes,
+    scores=scores$scores,
+    active=rep(NA,nnodes)
+  )
+  simulated_annealing<-data.frame(
+    temperature=rep(NA,iterations),
+    size_evolution=rep(NA,iterations),
+    score_evolution=rep(NA,iterations)
+  )
+
+  object<-list(network,
+               subnet_score,
+               subnet_size,
+               subnet_genes,
+               simulated_annealing)
+  class(object)<-"signet"
+  return(object)
+}
+
+print.signet <- summary.signet <- function(object) {
+  cat("High-scoring subnetwork found with simulated annealing\n\n")
+  cat(paste("  Subnetwork score: ",object$subnet_score,"\n",sep=""))
+  cat(paste("  Subnetwork size: ",object$subnet_size,"\n",sep=""))
+  cat(paste("  Genes in subnetwork: ",object$subnet_genes,"\n",sep=""))
+}
 
