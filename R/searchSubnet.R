@@ -12,9 +12,7 @@
 #' @param replicates Number of replicates per network.
 #' @param iterations Number of iterations.
 #' @param kmin The minimal size of a subnetwork.
-#' @param directed If \verb{TRUE}, considers the edges direction, i.e. cannot go back.
 #' @param verbose If \verb{TRUE}, displays text in the R console.
-#' @param burnin Number of iterations before the temperature begins to decrease.
 #' @param animPlot For development purposes.
 #' @param diagnostic If TRUE, plots the evolution of different stats along the run.
 #'
@@ -38,9 +36,7 @@ searchSubnet<-function(pathway,
                        iterations = 5000,
                        subnetScore="ideker",
                        kmin = 2,
-                       directed = FALSE,
                        verbose = TRUE,
-                       burnin = 100,
                        animPlot = 0,
                        diagnostic = FALSE)
 {
@@ -54,10 +50,7 @@ searchSubnet<-function(pathway,
   #check for arguments =========================================================
   if (missing(pathway)) stop("Pathway data are missing.")
   if (missing(scores)) stop("Gene scores are missing.")
-  if (missing(nullDist)) {
-    maximean <- TRUE
-  }
-  else maximean <- FALSE
+  if (missing(nullDist)) stop("Background distribution is missing.")
   colnames(scores) <- c("gene", "score")
 
   #check if list or unique pathway =============================================
@@ -93,9 +86,7 @@ searchSubnet<-function(pathway,
                                                           replicates = -1,
                                                           iterations = iterations,
                                                           kmin = kmin,
-                                                          directed = directed,
                                                           verbose = FALSE,
-                                                          burnin = burnin,
                                                           animPlot = 0,
                                                           subnetScore = subnetScore,
                                                           diagnostic=diagnostic);if (verbose) cat("+");return(out)},
@@ -132,11 +123,7 @@ searchSubnet<-function(pathway,
       sumStat <- computeScore(signetObject, score = subnetScore)
 
       # SCORE COMPUTATION ==================================================
-      if (maximean) {
-        s <- sumStat
-      } else {
-        s <- (sumStat-nullDist[nullDist$k == kmin, ]$mu)/nullDist[nullDist$k==kmin,]$sigma
-      }
+      s <- (sumStat-nullDist[nullDist$k == kmin, ]$mu)/nullDist[nullDist$k==kmin,]$sigma
 
       # OPTIMISATION ==================================================
       for (i in 1:iterations) {
@@ -171,14 +158,14 @@ searchSubnet<-function(pathway,
           }
         }
 
-        if (!maximean & verbose) {
+        if (verbose) {
           if (length(activeNet) >= max(nullDist$k)) stop(paste("No null distribution
                                  for subnetwork
                                  of size > ",max(nullDist$k)))
         }
 
         if (length(activeNet) > 1 & length(unique(c(neighbours,boundaries))) > 0) {
-          
+
           # Sample a new gene to toggle its state
           if (!sampNeighbour) newG <- as.character(sample(unique(c(boundaries)),1))
           else newG <- neighbours
@@ -189,11 +176,7 @@ searchSubnet<-function(pathway,
           sumStat <- computeScore(signetObject, score = subnetScore)
 
           # Scale the subnet score
-          if (maximean) {
-            s2 <- sumStat
-          } else {
-            s2 <- (sumStat-nullDist[nullDist$k == length(activeNet),]$mu)/nullDist[nullDist$k==length(activeNet),]$sigma
-          }
+          s2 <- (sumStat-nullDist[nullDist$k == length(activeNet),]$mu)/nullDist[nullDist$k==length(activeNet),]$sigma
 
           # Keep or not the toggled gene, acceptance probability
           if (s2 < s) {

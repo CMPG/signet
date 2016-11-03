@@ -5,6 +5,7 @@
 #' @param directed If \verb{TRUE}, edges direction will be considered.
 #' @keywords adjacency matrix, graph
 #' @return A n x n matrix, n is the number of nodes in the graph.
+#' @export
 #' @examples
 #' require(signet)
 #' data(keggPathways)

@@ -45,13 +45,14 @@ graphSummary<-function(allgraphs){
   return(output)
 }
 
+#' @export
 #returns graphs
 filterGraphs<-function(allgraphs,gsummary,nodes_min = 0,density_max = 1){
   filter<-which(gsummary$nodes >= nodes_min & gsummary$density <= density_max)
   return(allgraphs[filter])
 }
 
-
+#' @export
 #O
 returnTable<-function(outputSignet,
                       pDatabase,
@@ -67,9 +68,8 @@ returnTable<-function(outputSignet,
     if(!is.null(x)){ stat<-length(x$network$gene)} else { stat<-NA}; return(stat)
   }))
   subnetScore<-unlist(lapply(outputSignet,function(x) {
-    if(!is.null(x)){ stat<-x$subnet_score*(sqrt(x$subnet_size)/x$subnet_size)}else { stat<-NA}; return(stat)
+    if(!is.null(x)){ stat<-x$subnet_score}else { stat<-NA}; return(stat)
   }))
-  print(subnetScore)
 
   if(length(density_cuts) == 1){
     pvalues<-unlist(lapply(subnetScore,function(x) {
@@ -112,15 +112,15 @@ returnTable<-function(outputSignet,
   return(out)
 }
 
-
+#' @export
 overlapMatrix<-function(signetObject){
   overlap<-matrix(0,nrow=length(signetObject),ncol=length(signetObject))
   for(i in 1:length(signetObject))
   {
     for(j in 1:length(signetObject))
     {
-      gi<-signetObject[[i]]$table[signetObject[[i]]$table$state,]$gene
-      gj<-signetObject[[j]]$table[signetObject[[j]]$table$state,]$gene
+      gi<-signetObject[[i]]$network[signetObject[[i]]$network$active,]$gene
+      gj<-signetObject[[j]]$network[signetObject[[j]]$network$active,]$gene
       inter<-length(intersect(gi,gj))
       un<-length(union(gi,gj))
       if(!is.null(inter)&!is.null(un)) overlap[i,j]<-inter/un
@@ -131,6 +131,7 @@ overlapMatrix<-function(signetObject){
   return(overlap)
 }
 
+#' @export
 correctOverlap<-function(overlapMatrix,
                          signetTable,
                          threshold,
@@ -152,7 +153,7 @@ correctOverlap<-function(overlapMatrix,
        cex=cex)
   lines(x = c(0,0), y = c(0,100), type = "n") # force extension of y axis
   axis(side = 2, at = seq(0,100,10), labels = seq(100,0,-10))
-  abline(h=c(100*(1-threshold)),col=2,lty=2,lwd=2)
+  # abline(h=c(100*(1-threshold)),col=2,lty=2,lwd=2)
   }
 
   torm <- !is.na(signetTable$pvalues)
@@ -199,6 +200,7 @@ correctOverlap<-function(overlapMatrix,
   return(signetTable)
 }
 
+#' @export
 createSignetObject <- function(pathway, scores, iterations, minimumSize) {
 
   threshold <- minimumSize
@@ -214,6 +216,11 @@ createSignetObject <- function(pathway, scores, iterations, minimumSize) {
 
   names(scores)[[1]]<-"gene";names(scores)[[2]]<-"score"
   scores<-scores[scores$gene %in% graph::nodes(pathway),]
+
+  #to avoid duplicated nodes:
+  X<-tapply(scores[!is.na(scores$score),]$score,scores[!is.na(scores$score),]$gene,max,na.rm=TRUE)
+  X2<-data.frame(gene=as.numeric(names(X)),score=X)
+  scores<-rbind(X2,scores[is.na(scores$score) & !scores$gene %in% X2$gene,])
 
   connected_comp<-graph::subGraph(as.character(scores[!is.na(scores$score),]$gene),pathway)
 
@@ -242,14 +249,14 @@ createSignetObject <- function(pathway, scores, iterations, minimumSize) {
   class(object)<-"signet"
   return(object)
 }
-
+#' @export
 print.signet <- summary.signet <- function(object) {
   cat("High-scoring subnetwork found with simulated annealing\n\n")
   cat(paste("  Subnetwork score: ",object$subnet_score,"\n",sep=""))
   cat(paste("  Subnetwork size: ",object$subnet_size,"\n",sep=""))
   cat(paste("  Genes in subnetwork: ",object$subnet_genes,"\n",sep=""))
 }
-
+#' @export
 plot.signet <- function(object) {
   m <- rbind(c(0,1,1,0),c(2,2,3,3))
   layout(m)
@@ -298,12 +305,12 @@ plot.signet <- function(object) {
   par(mfrow = c(1,1))
 
 }
-
+#' @export
 adjacencyMatrixToList <- function(adjMatrix) {
   adjList <- apply(adjMatrix, 1, function(x) return(names(x[x==1])))
   return(adjList)
 }
-
+#' @export
 bfs <- function(graph, seeds) {
 
   # graph<-remove_loops(graph)
@@ -328,14 +335,14 @@ bfs <- function(graph, seeds) {
 
   reachable
 }
-
+#' @export
 remove_loops <- function(graph) {
   structure(
     lapply(names(graph), function(n) setdiff(graph[[n]], n)),
     names = names(graph)
   )
 }
-
+#' @export
 isArticulationPoint <- function(node, adjMatrix) {
 
   adjNodes <- names(which(adjMatrix[node, ] == 1))
@@ -364,3 +371,172 @@ isArticulationPoint <- function(node, adjMatrix) {
   }
   return(isTrue)
 }
+#' @export
+plot.Cytoscape<-function(object,graphlist,results,threshold){
+  clust<-object[which(object$pvalue<threshold),]
+  #get number of occurences of a gene (color)
+  glist<-strsplit(as.character(clust[1,]$geneListEntrez), ";")[[1]]
+  ID<-which(names(graphlist)==clust$pathwaysNames[1])
+  GRAPH<-subGraph(glist,graphlist[ID][[1]])
+  GRAPH<-graph_from_graphnel(GRAPH)
+  for(i in 2:dim(clust)[1]){
+    glist2<-strsplit(as.character(clust[i,]$geneListEntrez), ";")[[1]]
+    glistInGraph<-glist2[glist2%in%nodes(graphlist[[as.character(clust$pathwaysNames[i])]])]
+    subG2<-subGraph(glistInGraph,graphlist[[as.character(clust$pathwaysNames[i])]])
+    subG2<-graph_from_graphnel(subG2)
+
+    GRAPH<-graph.union(GRAPH,subG2)
+    E(GRAPH)$weight_1[is.na(E(GRAPH)$weight_1)]<-0
+    E(GRAPH)$weight_2[is.na(E(GRAPH)$weight_2)]<-0
+
+    E(GRAPH)$weight <- E(GRAPH)$weight_1 + E(GRAPH)$weight_2
+  }
+  Glist<-names(GRAPH[1])
+
+  #create TABLE with gene and score and occurences
+  TABLE<-data.frame(gene=Glist,score=rep(NA,length(Glist)),occurence=rep(0,length(Glist)))
+  for(i in 1:dim(clust)[1]){ #scores
+    ID<-which(names(graphlist)==clust$pathwaysNames[i])
+    Gscor<-results[ID][[1]]$network[results[ID][[1]]$network$active,]$score
+    Gnam<-results[ID][[1]]$network[results[ID][[1]]$network$active,]$gene
+    for(ii in 1:length(Gscor)){
+      if(sum(TABLE$gene==as.character(Gnam[ii]))>0){
+        TABLE[TABLE$gene==as.character(Gnam[ii]),]$score<-Gscor[ii]
+      }
+    }
+  }
+
+  #nodes occurences
+  for(i in 1:dim(clust)[1]){ #scores
+    ID<-which(names(graphlist)==clust$pathwaysNames[i])
+    Gnam<-results[ID][[1]]$network[results[ID][[1]]$network$active,]$gene
+    for(ii in 1:length(Gnam)){
+      if(sum(TABLE$gene==as.character(Gnam[ii]))>0){
+        TABLE[TABLE$gene==as.character(Gnam[ii]),]$occurence<-TABLE[TABLE$gene==as.character(Gnam[ii]),]$occurence+1
+      }
+    }
+  }
+
+  #send to cytoscape
+  library(RCytoscape);library(biomaRt)
+  graph<-ugraph(as_graphnel(GRAPH))
+  ex<-nodes(graph)
+
+  mart <- useMart("ensembl", dataset = "hsapiens_gene_ensembl")
+  gene2genomeEx <- getBM(values = ex, filters = "entrezgene", mart = mart, attributes = c("hgnc_symbol","entrezgene"))
+
+  for(i in 1:length(nodes(graph))){
+    # nodes(graph)[i]<-gene2genomeEx[which(gene2genomeEx$entrezgene==nodes(graph)[i]),]$hgnc_symbol
+    interlist<-gene2genomeEx[which(gene2genomeEx$entrezgene==TABLE$gene[i]),]$hgnc_symbol
+    if(length(interlist)[1]>1) {
+      nodes(graph)[i]<-interlist[nchar(interlist)>0][1]
+    } else {
+      nodes(graph)[i]<-interlist
+    }
+  }
+  TABLE$gene<-as.character(TABLE$gene)
+  for(i in 1:length(TABLE$gene)){
+    interlist<-gene2genomeEx[which(gene2genomeEx$entrezgene==TABLE$gene[i]),]$hgnc_symbol
+    if(length(interlist)[1]>1) {
+      TABLE$gene[i]<-interlist[nchar(interlist)>0][1]
+    } else {
+      TABLE$gene[i]<-interlist
+    }
+  }
+
+  graph <- initNodeAttribute(graph=graph,  attribute.name='moleculeType',attribute.type='char',default.value='false')
+  graph <- initNodeAttribute(graph=graph,  attribute.name='occurence',attribute.type='numeric',default.value=1)
+  graph <- initNodeAttribute(graph=graph,  attribute.name='score',attribute.type='numeric',default.value=0)
+
+  graph <- initEdgeAttribute(graph=graph, attribute.name='edgeType',attribute.type='char',default.value='undefined')
+  graph <- initEdgeAttribute(graph=graph, attribute.name='weight',attribute.type='char',default.value=0)
+
+  glistz<-nodes(graph)
+  for(gene in glistz) nodeData(graph,gene,"score")<-TABLE[TABLE$gene==gene,]$score
+  for(gene in glistz) nodeData(graph,gene,"occurence")<-TABLE[TABLE$gene==gene,]$occurence
+
+
+  cw <- new.CytoscapeWindow("Coverage", graph=graph,overwriteWindow=TRUE)
+
+  displayGraph(cw)
+
+  setNodeColorRule(cw,"score",c(0,1),c('#ffffff','#b22222'),mode= 'interpolate')
+  setNodeSizeRule(cw,"score",c(0,1),c(40,70),mode= 'interpolate')
+  # setNodeBorderWidthRule(cw,"occurence",c(1:max(TABLE$occurence)),c(1,max(TABLE$occurence)),1)
+  setEdgeLineWidthRule(cw,"weight",c(1,10),c(1,50))
+  setDefaultBackgroundColor(cw,'#ffffff')
+  setDefaultEdgeColor(cw,'#bdbdbd')
+  layoutNetwork(cw,"jgraph-spring")
+
+}
+# displayGraph(cw)
+#' @export
+plot.single.Cytoscape<-function(object,pnumber,graphlist,results){
+  clust<-object[pnumber,]
+  #get number of occurences of a gene (color)
+  glist<-strsplit(as.character(clust[1,]$geneListEntrez), ";")[[1]]
+  ID<-pnumber
+  GRAPH<-graphlist[ID][[1]]#subGraph(glist,graphlist[ID][[1]])
+  GRAPH<-graph_from_graphnel(GRAPH)
+  Glist<-names(GRAPH[1])
+
+  #create TABLE with gene and score and occurences
+  TABLE<-data.frame(gene=Glist,score=rep(NA,length(Glist)),occurence=rep(0,length(Glist)))
+  # for(i in 1:dim(clust)[1]){ #scores
+  ID<-which(names(graphlist)==clust$pathwaysNames)
+  Gscor<-results[ID][[1]]$network$score
+  Gnam<-results[ID][[1]]$network$gene
+  for(ii in 1:length(Gscor)){
+    if(sum(TABLE$gene==as.character(Gnam[ii]))>0){
+      TABLE[TABLE$gene==as.character(Gnam[ii]),]$score<-Gscor[ii]
+    }
+  }
+  # }
+  #nodes occurences
+  Gnam<-results[ID][[1]]$network[results[ID][[1]]$network$active,]$gene
+  TABLE[TABLE$gene %in% as.character(Gnam),]$occurence<-1
+
+  #send to cytoscape
+  library(RCytoscape);library(biomaRt)
+  graph<-ugraph(as_graphnel(GRAPH))
+  ex<-nodes(graph)
+
+  mart <- useMart("ensembl", dataset = "hsapiens_gene_ensembl")
+  gene2genomeEx <- getBM(values = ex, filters = "entrezgene", mart = mart, attributes = c("hgnc_symbol","entrezgene"))
+
+  for(i in 1:length(nodes(graph))){
+    nodes(graph)[i]<-gene2genomeEx[which(gene2genomeEx$entrezgene==nodes(graph)[i]),]$hgnc_symbol
+  }
+  TABLE$gene<-as.character(TABLE$gene)
+  for(i in 1:length(TABLE$gene)){
+    TABLE$gene[i]<-gene2genomeEx[which(gene2genomeEx$entrezgene==TABLE$gene[i]),]$hgnc_symbol
+  }
+
+  TABLE$score[is.na(TABLE$score)]<-0
+  graph <- initNodeAttribute(graph=graph,  attribute.name='moleculeType',attribute.type='char',default.value='false')
+  graph <- initNodeAttribute(graph=graph,  attribute.name='occurence',attribute.type='numeric',default.value=1)
+  graph <- initNodeAttribute(graph=graph,  attribute.name='score',attribute.type='numeric',default.value=0)
+
+  graph <- initEdgeAttribute(graph=graph, attribute.name='edgeType',attribute.type='char',default.value='undefined')
+  graph <- initEdgeAttribute(graph=graph, attribute.name='weight',attribute.type='char',default.value=0)
+
+  glistz<-nodes(graph)
+  for(gene in glistz) nodeData(graph,gene,"score")<-TABLE[TABLE$gene==gene,]$score
+  for(gene in glistz) nodeData(graph,gene,"occurence")<-TABLE[TABLE$gene==gene,]$occurence
+
+
+  cw <- new.CytoscapeWindow("Coverage", graph=graph,overwriteWindow=TRUE)
+
+  displayGraph(cw)
+
+  setNodeColorRule(cw,"occurence",c(0,1),c('#ffffff','#b22222'),mode= 'interpolate')
+  setNodeSizeRule(cw,"score",c(min(TABLE$score),max(TABLE$score)),c(40,70),mode= 'interpolate')
+  # setNodeBorderWidthRule(cw,"occurence",c(1:max(TABLE$occurence)),c(1,max(TABLE$occurence)),1)
+  setEdgeLineWidthRule(cw,"weight",c(1,10),c(1,50))
+  setDefaultBackgroundColor(cw,'#ffffff')
+  setDefaultEdgeColor(cw,'#bdbdbd')
+  layoutNetwork(cw,"jgraph-spring")
+
+}
+
+

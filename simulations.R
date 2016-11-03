@@ -90,7 +90,7 @@ for(i in 1:3){
   }
 }
 
-#with mu0 qnd 1
+#with mu0 and 1
 for(i in 4:5){
   for(ii in 1:200){
     filename<-paste("//cmpgmatrix.unibe.ch/gouy/simulations/archive/3_2_2_",i,"_1_",ii,"_output.rda",sep="")
@@ -131,6 +131,17 @@ m<-glm(cbind((TP+TN),(FP+FN))~highScores+netSize+subnetSize,family = "binomial",
 summary(m)
 anova(m)
 
+
+m<-glm(cbind((TP),(FP))~highScores+netSize+subnetSize+connectivity+iter,family = "binomial",data=OUT)
+summary(m)
+anova(m)
+
+m<-glm(cbind((TP),(FN))~highScores+netSize+subnetSize+connectivity+iter,family = "binomial",data=OUT)
+summary(m)
+anova(m)
+
+
+
 m<-glm(correct~highScores+netSize+subnetSize,family = "binomial",data=OUT)
 summary(m)
 anova(m)
@@ -169,6 +180,12 @@ for(i in 1:3){
     }
   }
 }
+for(i in 4:5){
+  for(ii in 1:200){
+    filename<-paste("//cmpgmatrix.unibe.ch/gouy/simulations/archive/3_2_2_",i,"_1_",ii,"_output.rda",sep="")
+    try(load(filename))
+    scor<-rbind(scor,mean(signetObject$network$score[signetObject$network$active]))  }
+}
 
 plot(dnorm(scor),OUT$FP)
 pval <- 1-pnorm(scor)
@@ -201,6 +218,18 @@ tapply(OUT$FPR[cond],pclass2[cond],mean)
 
 cond<-which(OUT$highScores>0)
 
+
+
+qqplot(unlist(lapply(scor2[1:600],function(x)return(mean(x>scor2[601:1500])))),runif(100000),cex=0.5,xlab="Expected quantiles",ylab="Observed quantiles")
+abline(0,1)
+
+length(pval2)
+dim(OUT)
+library(vioplot)
+set.seed(12);qqplot(runif(500),runif(500),pch=1,cex=0.5,xlab="Expected quantiles",ylab="Observed quantiles")
+abline(0,1,lty=2)
+?qqplot
+?vioplot
 ## fixed parameters
 subs <- OUT[which(OUT$highScores==2),]
 hist(subs$FPR)
@@ -239,15 +268,6 @@ plot(OUT$FP[subs],pval2[subs],main="mu=2")
 
 subs <- which(OUT$netSize == 100 & OUT$subnetSize == 10 & OUT$highScores == 5)
 plot(OUT$FP[subs],pval2[subs],main="mu=5")
-
-
-
-
-#@plot a run
-par(mfrow=c(1,1))
-matplot(signetObject$simulated_annealing[,-2],cex=0.1,type="l",lty=1)
-
-
 
 
 

@@ -1,4 +1,5 @@
 #' Compute a subnetwork score
+#' @export
 
 computeScore <- function(signetObject, score = "ideker")
 {
