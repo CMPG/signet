@@ -4,8 +4,8 @@
 \alias{backgroundDist}
 \title{Background distribution}
 \usage{
-backgroundDist(pathwaysList, scores, kmin = 1, kmax, iterations = 1000,
-  subnetScore = "sum", distribution = FALSE)
+backgroundDist(pathwaysList, scores, kmin = 1, kmax = 100,
+  iterations = 1000)
 }
 \arguments{
 \item{pathwaysList}{A graphNEL object, or a list of graphNEL objects.}

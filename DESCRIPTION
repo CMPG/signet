@@ -1,8 +1,8 @@
 Package: signet
 Type: Package
 Title: signet: Selection Inference in Gene Networks
-Version: 0.2
-Date: 2015-10-09
+Version: 0.5
+Date: 2017-02-07
 Authors@R: c(person("Alexandre", "Gouy",
   email = "alexandre.gouy@iee.unibe.ch", role = c("aut", "cre")),
   person("Laurent", "Excoffier",role = c("aut")))
@@ -15,7 +15,6 @@ Depends:
 Imports:
     graph
 Suggests:
-    animation,
     graphite,
     RCytoscape
 License: GPL-2

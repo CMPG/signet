@@ -202,16 +202,16 @@ correctOverlap<-function(overlapMatrix,
 
 #' @export
 createSignetObject <- function(pathway, scores, iterations, minimumSize) {
-
   threshold <- minimumSize
   if (length(graph::nodes(pathway))==0) X<-NULL
-  else  X<-unlist(graph::connComp(pathway)[!lapply(graph::connComp(pathway),
-                                                         length)<threshold])
+  else {
+    TA<-unlist(lapply(graph::connComp(pathway),length))
+    maxi<-which(TA==max(TA))
+    CC<-unlist(graph::connComp(pathway)[maxi])
+  }
   if (is.null(X)) {
-    stop("\r  No connected component of size greater than the specified threshold")
-  } else {
-    connected_comp<-graph::subGraph(X,pathway)
-    connected_comp<-graph::ugraph(connected_comp)
+    stop("\r  No connected component of size greater than 5.")
+
   }
 
   names(scores)[[1]]<-"gene";names(scores)[[2]]<-"score"
@@ -223,45 +223,73 @@ createSignetObject <- function(pathway, scores, iterations, minimumSize) {
   scores<-rbind(X2,scores[is.na(scores$score) & !scores$gene %in% X2$gene,])
 
   connected_comp<-graph::subGraph(as.character(scores[!is.na(scores$score),]$gene),pathway)
+  connected_comp<-graph::subGraph(CC[CC%in%as.character(scores[!is.na(scores$score),]$gene)],connected_comp)
+  connected_comp<-graph::ugraph(connected_comp)
 
   nnodes<-dim(scores)[1]
   subnet_score <- NA
   subnet_size <- NA
-  subnet_genes <- rep(NA,nnodes)
+  subnet_genes <- NA
   network<-data.frame(
     gene=scores$gene,
     score=scores$score,
     active=rep(FALSE,nnodes)
   )
-  simulated_annealing<-data.frame(
-    temperature=temperatureFunction(iterations),
-    size_evolution=rep(NA,iterations),
-    score_evolution=rep(NA,iterations)
-  )
 
-  object<-list(pathway=pathway,
-               connected_comp=connected_comp,
-               network=network,
-               subnet_score=subnet_score,
-               subnet_size=subnet_size,
-               subnet_genes=subnet_genes,
-               simulated_annealing=simulated_annealing)
-  class(object)<-"signet"
-  return(object)
+  if(max(TA) < minimumSize){
+    object<-list(pathway=pathway,
+                 connected_comp=connected_comp,
+                 network=network,
+                 subnet_score=subnet_score,
+                 subnet_size=subnet_size,
+                 subnet_genes=subnet_genes,
+                 p.value=NA)
+    class(object)<-"signet"
+    return(object)
+  } else {
+    simulated_annealing<-data.frame(
+      temperature=temperatureFunction(iterations),
+      size_evolution=rep(NA,iterations),
+      score_evolution=rep(NA,iterations)
+    )
+
+    object<-list(pathway=pathway,
+                 connected_comp=connected_comp,
+                 network=network,
+                 subnet_score=subnet_score,
+                 subnet_size=subnet_size,
+                 subnet_genes=subnet_genes,
+                 p.value=NA,
+                 simulated_annealing=simulated_annealing)
+    class(object)<-"signet"
+    return(object)
+  }
 }
 #' @export
 print.signet <- summary.signet <- function(object) {
   cat("High-scoring subnetwork found with simulated annealing\n\n")
-  cat(paste("  Subnetwork score: ",object$subnet_score,"\n",sep=""))
-  cat(paste("  Subnetwork size: ",object$subnet_size,"\n",sep=""))
-  cat(paste("  Genes in subnetwork: ",object$subnet_genes,"\n",sep=""))
+  cat(paste("Subnetwork score: ",round(object$subnet_score,digits=4),"\n",sep=""))
+  cat(paste("Subnetwork size: ",object$subnet_size,"\n",sep=""))
+  cat(paste("Genes in subnetwork: ",paste(object$subnet_genes,collapse=" "),"\n",sep=""))
 }
+
+#' @export
+summary.signetList <- function(object) {
+  signet_table <- data.frame(pathway=names(object),
+                             net.size=unlist(lapply(object,function(x)dim(x$network)[1])),
+                             subnet.size=unlist(lapply(object,function(x)x$subnet_size)),
+                             subnet.score=unlist(lapply(object,function(x)x$subnet_score)),
+                             p.value=unlist(lapply(object,function(x)x$p.value)),
+                             subnet.genes=unlist(lapply(object,function(x)paste(x$subnet_genes,collapse=" "))))
+  return(signet_table)
+}
+
 #' @export
 plot.signet <- function(object) {
-  m <- rbind(c(0,1,1,0),c(2,2,3,3))
+  m <- rbind(c(0,1,1,1,1,0),c(2,2,2,3,3,3))
   layout(m)
 
-  glist<-object$network[object$network$active,]$genes
+  glist<-object$network[object$network$active,]$gene
 
   subs<-as.character(glist)
   subg<-graph::subGraph(subs,object$connected_comp)
@@ -269,11 +297,19 @@ plot.signet <- function(object) {
   col<-c(rep("red",length(subs)))
   nAttrs<-list()
   nAttrs$fillcolor <- col
-  nAttrs$height <- nAttrs$width <- rep("0.4", length(graph::nodes(object$connected_comp)))
-  names(nAttrs$width)<-names(nAttrs$height)<-graph::nodes(object$connected_comp)
+  nAttrs$height <- rep("0.6", length(graph::nodes(object$connected_comp)))
+  nAttrs$width <- rep("0.6", length(graph::nodes(object$connected_comp)))
+  nAttrs$color <- rep("darkgrey", length(graph::nodes(object$connected_comp)))
+
+  names(nAttrs$color)<-names(nAttrs$width)<-names(nAttrs$height)<-graph::nodes(object$connected_comp)
   names(nAttrs$fillcolor)<-c(subs)
 
-  graph::plot(object$connected_comp, y="neato", nodeAttrs = nAttrs,graph=list(overlap="scale"))
+  eAttrs<-list()
+  eAttrs$color <- rep("grey",length(graph::edgeNames(object$connected_comp)))
+  names(eAttrs$color)<-graph::edgeNames(object$connected_comp)
+
+  graph::plot(object$connected_comp, y="neato", nodeAttrs = nAttrs,
+              edgeAttrs = eAttrs)
 
   x <- 1:length(object$simulated_annealing$temperature)
   y <- object$simulated_annealing$size_evolution
@@ -289,7 +325,7 @@ plot.signet <- function(object) {
        xlab = "", ylab = "", axes=F, lty=2,
        col = "grey")
   axis(side = 4, at = pretty(range(object$simulated_annealing$temperature)))
-  mtext("Temperature", side = 4, line = 3)
+  mtext("Temperature", side = 4, line = 3, cex=0.7)
 
   plot(x, y, type = "l", cex = 0.5,
        xlab = "Iterations", ylab = "Subnetwork size",
@@ -300,7 +336,7 @@ plot.signet <- function(object) {
        xlab="", ylab="",axes=F,lty=2,
        col="grey")
   axis(side=4, at = pretty(range(object$simulated_annealing$temperature)))
-  mtext("Temperature", side=4, line=3)
+  mtext("Temperature", side=4, line=3, cex=0.7)
 
   par(mfrow = c(1,1))
 
@@ -539,4 +575,22 @@ plot.single.Cytoscape<-function(object,pnumber,graphlist,results){
 
 }
 
+#' @export
+lapply_pb <- function(X, FUN, ...)
+{
+  env <- environment()
+  pb_Total <- length(X)
+  counter <- 0
+  pb <- txtProgressBar(min = 0, max = pb_Total, style = 3)
 
+  # wrapper around FUN
+  wrapper <- function(...){
+    curVal <- get("counter", envir = env)
+    assign("counter", curVal +1 ,envir=env)
+    setTxtProgressBar(get("pb", envir=env), curVal +1)
+    FUN(...)
+  }
+  res <- lapply(X, wrapper, ...)
+  close(pb)
+  res
+}

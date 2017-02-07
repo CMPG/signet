@@ -5,8 +5,7 @@
 \title{Search for a high scoring subnetwork}
 \usage{
 searchSubnet(pathway, scores, nullDist, replicates = 1, iterations = 5000,
-  subnetScore = "ideker", kmin = 2, verbose = TRUE, animPlot = 0,
-  diagnostic = FALSE)
+  subnetScore = "ideker", kmin = 2, verbose = TRUE)
 }
 \arguments{
 \item{pathway}{A gene network, or a list of networks,
@@ -25,18 +24,14 @@ Can be obtained thanks to the \verb{nulldistribution()} function.}
 \item{kmin}{The minimal size of a subnetwork.}
 
 \item{verbose}{If \verb{TRUE}, displays text in the R console.}
-
-\item{animPlot}{For development purposes.}
-
-\item{diagnostic}{If TRUE, plots the evolution of different stats along the run.}
 }
 \value{
 A list containing a table with genes, their state, their score;
 the subnetwortk score and size and the p-value
 }
 \description{
-A simulated annealing algorithm is used to research a high scoring
-subnetwork.Implements also a test id a null distribution is provided.
+A simulated annealing algorithm to find the highest scoring
+subnetwork in a graph.
 }
 \examples{
 require(signet)

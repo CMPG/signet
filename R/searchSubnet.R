@@ -1,7 +1,7 @@
 #' Search for a high scoring subnetwork
 #'
-#' A simulated annealing algorithm is used to research a high scoring
-#' subnetwork.Implements also a test id a null distribution is provided.
+#' A simulated annealing algorithm to find the highest scoring
+#' subnetwork in a graph.
 #'
 #' @param pathway A gene network, or a list of networks,
 #'  in the \verb{graphNEL} format.
@@ -13,8 +13,6 @@
 #' @param iterations Number of iterations.
 #' @param kmin The minimal size of a subnetwork.
 #' @param verbose If \verb{TRUE}, displays text in the R console.
-#' @param animPlot For development purposes.
-#' @param diagnostic If TRUE, plots the evolution of different stats along the run.
 #'
 #' @keywords subnetwork, simulated annealing, heuristics, search algorithm
 #'
@@ -36,10 +34,8 @@ searchSubnet<-function(pathway,
                        iterations = 5000,
                        subnetScore="ideker",
                        kmin = 2,
-                       verbose = TRUE,
-                       animPlot = 0,
-                       diagnostic = FALSE)
-{
+                       verbose = TRUE) {
+
   # check for packages =========================================================
   if (sum(installed.packages()[, 1]=="graph")==0) {
     stop("Package graph is required.")
@@ -57,13 +53,13 @@ searchSubnet<-function(pathway,
   if (class(pathway) == "list") {
     all<-list()
     for (i in 1:length(pathway)) {
+      print(names(pathway[i]))
       res<-try(
         searchSubnet(pathway[[i]],
                      scores=scores,
                      nullDist = nullDist,
                      iterations = iterations,
                      replicates = replicates,
-                     diagnostic=diagnostic,
                      verbose=verbose,
                      subnetScore=subnetScore,
                      kmin = kmin)
@@ -74,12 +70,21 @@ searchSubnet<-function(pathway,
       all[[i]]<-res
       cat("\r  ", i, "/", length(pathway), " pathways analyzed.", sep="")
     }
+    names(all)<-names(pathway)
+    class(all)<-"signetList"
     invisible(all)
+
   } else if (class(pathway)!="graphNEL") {
+
     stop("Pathway is not a graphNEL object")
+
   } else {
+
     if (replicates>1) {
-      if (verbose) cat("  Replicating: ")
+
+      if (verbose) {
+        cat("Replicating: ")
+      }
       allReturn<-replicate(replicates, {out<-searchSubnet(pathway=pathway,
                                                           scores = scores,
                                                           nullDist = nullDist,
@@ -87,12 +92,8 @@ searchSubnet<-function(pathway,
                                                           iterations = iterations,
                                                           kmin = kmin,
                                                           verbose = FALSE,
-                                                          animPlot = 0,
-                                                          subnetScore = subnetScore,
-                                                          diagnostic=diagnostic);if (verbose) cat("+");return(out)},
+                                                          subnetScore = subnetScore);if (verbose) cat("+");return(out)},simplify=FALSE)
 
-                           simplify=FALSE)
-      if (verbose) cat("\n  ... Done !")
       sz <- unlist(lapply(allReturn, function(x) return(x$subnet_size)))
 
       condS <- which(sz > 1) #plusieurs maxima possibles,
@@ -102,7 +103,7 @@ searchSubnet<-function(pathway,
 
       if (length(vec)==0) {
         if (verbose) {
-          cat("\n  No high-scoring subnetwork found\n\n")
+          cat("\nNo high-scoring subnetwork found\n\n")
         }
       } else {
         condV<-which(vec==max(vec))
@@ -111,9 +112,13 @@ searchSubnet<-function(pathway,
     } else {
 
       # INITIALIZATION ==================================================
-      signetObject<-createSignetObject(pathway,scores,iterations, kmin)
-      adjMatrix <- getAdjacencyMatrix(pathway=signetObject$connected_comp)
+      signetObject<-createSignetObject(pathway,scores,iterations,5)
 
+      if(length(nodes(signetObject$connected_comp))<5) {
+        return(signetObject)
+      }
+
+      adjMatrix <- getAdjacencyMatrix(pathway=signetObject$connected_comp)
       boundaries <- NULL
       geneSampled <- sample(colnames(adjMatrix), 1)
       geneSampled <- c(geneSampled, sample(names(which(adjMatrix[, geneSampled]>0)))[1])
@@ -122,10 +127,10 @@ searchSubnet<-function(pathway,
       signetObject$network[which(signetObject$network$gene%in%geneSampled), ]$active <- TRUE
       sumStat <- computeScore(signetObject, score = subnetScore)
 
-      # SCORE COMPUTATION ==================================================
+      # SCORE COMPUTATION ===============================================
       s <- (sumStat-nullDist[nullDist$k == kmin, ]$mu)/nullDist[nullDist$k==kmin,]$sigma
 
-      # OPTIMISATION ==================================================
+      # OPTIMISATION ====================================================
       for (i in 1:iterations) {
 
         activeNet <- as.character(signetObject$network[signetObject$network$active,]$gene)
@@ -159,9 +164,9 @@ searchSubnet<-function(pathway,
         }
 
         if (verbose) {
-          if (length(activeNet) >= max(nullDist$k)) stop(paste("No null distribution
-                                 for subnetwork
-                                 of size > ",max(nullDist$k)))
+          if (length(activeNet) >= max(nullDist$k)) {
+            stop(paste("No null distribution for subnetwork of size > ",max(nullDist$k)))
+          }
         }
 
         if (length(activeNet) > 1 & length(unique(c(neighbours,boundaries))) > 0) {

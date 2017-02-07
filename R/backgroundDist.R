@@ -25,39 +25,31 @@
 backgroundDist<-function(pathwaysList,
                          scores,
                          kmin = 1,
-                         kmax,
-                         iterations = 1000,
-                         subnetScore="sum",
-                         distribution = FALSE)
-{
+                         kmax = 100,
+                         iterations = 1000) {
   requireNamespace("graph",quietly=TRUE)
-  if(missing(pathwaysList))
-  {
-    pathwaysList<-NULL
-    gList<-scores
+  if(missing(pathwaysList)) {
+    pathwaysList <- NULL
+    gList <- scores
   }
-  colnames(scores)<-c("gene","score")
 
-  if(missing(kmax)) # kmax not specified: max k in the graph list
-  {
+  colnames(scores) <- c("gene","score")
+
+  if(kmax=="max") { # kmax not specified: max k in the graph list
     kmax <- max(unlist(lapply(pathwaysList,function(x)length(nodes(x)))))
   }
 
-  cat("  Generating null distribution...\n")
-  distrib<-NULL
-  nullD<-NULL
-  for(k in kmin:kmax)
-  {
-    cat("\r  ... for k =",k)
+  cat("  Generating background distribution...\n")
 
+  bk<-lapply_pb(kmin:kmax,function(x){
     ba<-NULL
 
-    for(i in 1:iterations)
-    {
-      if(length(pathwaysList)>0)
-      {
+    ba<-unlist(lapply(1:iterations,function(y){
+
+      if(length(pathwaysList)>0) {
+
         glis<-NULL
-        while(length(glis)<k+5)
+        while(length(glis)<x+5)
         {
           path<-pathwaysList[[sample(length(pathwaysList),1)]]
           glis<-graph::nodes(path)
@@ -65,26 +57,16 @@ backgroundDist<-function(pathwaysList,
         gList<-scores[scores$gene %in% glis,]
       }
 
-      if(subnetScore=="mean"){
-        sumStat<-c(mean(gList[sample(length(gList$gene),k,replace=TRUE),]$score,na.rm=TRUE))
-      }
-      if(subnetScore=="sum") {
-        sumStat<-c(sum(gList[sample(length(gList$gene),k,replace=TRUE),]$score,na.rm=TRUE))
-      }
-      if(subnetScore == "ideker") {
-        gList2<-gList[sample(length(gList$gene),k,replace=TRUE),]
-        sumStat <- (1/sqrt(k))*sum(gList2$score)
-      }
-      ba<-rbind(ba,sumStat)
-    }
+      gList2<-gList[sample(length(gList$gene),x,replace=TRUE),]
+      sumStat <- (1/sqrt(x))*sum(gList2$score)
 
-    nullD<-rbind(nullD,c(k,mean(ba,na.rm=TRUE),sd(ba,na.rm=TRUE)))
-    distrib<-c(distrib,ba)
-  }
-  cat("\n  Done !\n\n")
-  nullD<-as.data.frame(nullD)
-  colnames(nullD)<-c("k","mu","sigma")
+      return(sumStat)
+    }))
 
-  if(distribution) nullD<-list(parameters=nullD,distributions=distrib)
+    return(c(k=x,mu=mean(ba,na.rm=TRUE),sigma=sd(ba,na.rm=TRUE)))
+  })
+
+  nullD<-as.data.frame(do.call("rbind",bk))
+  cat("\n  Done!\n\n")
   return(nullD)
 }
