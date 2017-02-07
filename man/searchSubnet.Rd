@@ -5,8 +5,8 @@
 \title{Search for a high scoring subnetwork}
 \usage{
 searchSubnet(pathway, scores, nullDist, replicates = 1, iterations = 5000,
-  subnetScore = "ideker", kmin = 2, directed = FALSE, verbose = TRUE,
-  burnin = 100, animPlot = 0, diagnostic = FALSE)
+  subnetScore = "ideker", kmin = 2, verbose = TRUE, animPlot = 0,
+  diagnostic = FALSE)
 }
 \arguments{
 \item{pathway}{A gene network, or a list of networks,
@@ -24,11 +24,7 @@ Can be obtained thanks to the \verb{nulldistribution()} function.}
 
 \item{kmin}{The minimal size of a subnetwork.}
 
-\item{directed}{If \verb{TRUE}, considers the edges direction, i.e. cannot go back.}
-
 \item{verbose}{If \verb{TRUE}, displays text in the R console.}
-
-\item{burnin}{Number of iterations before the temperature begins to decrease.}
 
 \item{animPlot}{For development purposes.}
 
