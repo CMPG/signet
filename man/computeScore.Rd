@@ -9,4 +9,3 @@ computeScore(signetObject, score = "ideker")
 \description{
 Compute a subnetwork score
 }
-

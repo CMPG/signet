@@ -4,7 +4,7 @@
 \alias{searchSubnet}
 \title{Search for a high scoring subnetwork}
 \usage{
-searchSubnet(pathway, scores, nullDist, replicates = 1, iterations = 5000,
+searchSubnet(pathway, scores, background, replicates = 1, iterations = 5000,
   subnetScore = "ideker", kmin = 2, verbose = TRUE)
 }
 \arguments{
@@ -14,8 +14,7 @@ in the \verb{graphNEL} format.}
 \item{scores}{A data frame with two columns: gene identifiers list
 and associated scores.}
 
-\item{nullDist}{A data frame with three columns : k, mu, sigma.
-Can be obtained thanks to the \verb{nulldistribution()} function.}
+\item{background}{A data frame with three columns : k, mu, sigma.}
 
 \item{replicates}{Number of replicates per network.}
 
@@ -46,4 +45,3 @@ example1 <- searchSubnet(keggPathways[[1]], zScores)
 \keyword{search}
 \keyword{simulated}
 \keyword{subnetwork,}
-

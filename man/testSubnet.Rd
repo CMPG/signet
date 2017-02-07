@@ -24,4 +24,3 @@ After a burnin period, the temperature decreases geometrically.
 \keyword{annealing}
 \keyword{simulated}
 \keyword{subnetwork,}
-

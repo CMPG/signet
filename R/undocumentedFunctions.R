@@ -45,6 +45,59 @@ graphSummary<-function(allgraphs){
   return(output)
 }
 
+
+#' @export
+computeScore <- function(signetObject, score = "ideker")
+{
+  activeNet <- signetObject$network[signetObject$network$active, ]
+
+  if (score == "mean") {
+    subnetStat <- mean(activeNet$score)
+  }
+  if (score == "sum") {
+    subnetStat <- sum(activeNet$score)
+  }
+  if (score == "ideker") {
+    k <- length(activeNet$score)
+    subnetStat <- (1/sqrt(k))*sum(activeNet$score)
+  }
+  if (score == "delta") {
+    subnetStat <- mean(activeNet$score)-mean(tail(sort(activeNet$score),5))
+  }
+  return(subnetStat)
+}
+
+
+
+#' @export
+getAdjacencyMatrix<-function(pathway,
+                             directed = FALSE,
+                             selfLoops=FALSE)
+{
+  requireNamespace("graph",quietly=TRUE)
+  x<-graph::edges(pathway)
+  GList <- names(x)
+  adjMatrix <- matrix(0,length(GList),length(GList),dimnames=list(GList,GList))
+
+  if(!directed) {
+    sapply(GList,function(y){
+      adjMatrix[y,x[[y]]]<<-1
+      adjMatrix[x[[y]],y]<<-1
+    })
+  } else {
+    sapply(GList,function(y){
+      adjMatrix[y,x[[y]]]<<-1
+    })
+  }
+
+  if(!selfLoops) diag(adjMatrix)<-0
+
+  rownames(adjMatrix)<-colnames(adjMatrix)<-GList
+
+  return(adjMatrix)
+}
+
+
 #' @export
 #returns graphs
 filterGraphs<-function(allgraphs,gsummary,nodes_min = 0,density_max = 1){
@@ -53,7 +106,7 @@ filterGraphs<-function(allgraphs,gsummary,nodes_min = 0,density_max = 1){
 }
 
 #' @export
-#O
+#Output
 returnTable<-function(outputSignet,
                       pDatabase,
                       nullDistribution,
@@ -172,16 +225,12 @@ correctOverlap<-function(overlapMatrix,
   qvalmax<-qvalue(pvalmax)
   signetTable$qvalues<-rep(NA,length(signetTable$pvalues))
 
-
-
-  for(i in 1:length(signetTable$pvalues)){
-
+  for(i in 1:length(signetTable$pvalues)) {
 
     if(!is.na(signetTable[i,]$pvalues)) {
       print(signetTable[which(signetTable$group==signetTable[i,]$group),1])
       minp<-min(signetTable[which(signetTable$group==signetTable[i,]$group),]$pvalues)
       print(minp)
-
 
       if(minp==signetTable[i,]$pvalues) {
         print(qvalmax$q[which(abs(qvalmax$pvalues-minp) == min(abs(qvalmax$pvalues-minp)))])
@@ -190,13 +239,6 @@ correctOverlap<-function(overlapMatrix,
     }
   }
 
-  #need ids of remaining subnetworks
-
-  #compute qvalue using FDR method
-
-  #add qvalues to table
-
-  #plot histogram
   return(signetTable)
 }
 
@@ -265,9 +307,10 @@ createSignetObject <- function(pathway, scores, iterations, minimumSize) {
     return(object)
   }
 }
+
 #' @export
 print.signet <- summary.signet <- function(object) {
-  cat("High-scoring subnetwork found with simulated annealing\n\n")
+  cat("High-scoring subnetwork found with simulated annealing\n")
   cat(paste("Subnetwork score: ",round(object$subnet_score,digits=4),"\n",sep=""))
   cat(paste("Subnetwork size: ",object$subnet_size,"\n",sep=""))
   cat(paste("Genes in subnetwork: ",paste(object$subnet_genes,collapse=" "),"\n",sep=""))
@@ -281,6 +324,7 @@ summary.signetList <- function(object) {
                              subnet.score=unlist(lapply(object,function(x)x$subnet_score)),
                              p.value=unlist(lapply(object,function(x)x$p.value)),
                              subnet.genes=unlist(lapply(object,function(x)paste(x$subnet_genes,collapse=" "))))
+  rownames(signet_table)<-NULL
   return(signet_table)
 }
 
@@ -346,67 +390,7 @@ adjacencyMatrixToList <- function(adjMatrix) {
   adjList <- apply(adjMatrix, 1, function(x) return(names(x[x==1])))
   return(adjList)
 }
-#' @export
-bfs <- function(graph, seeds) {
 
-  # graph<-remove_loops(graph)
-  V <- names(graph)
-  N <- length(V)
-  reachable <- seeds
-  marks <- structure(rep(FALSE, N), names = V)
-
-  while (length(seeds)) {
-
-    s <- seeds[1]
-    seeds <- seeds[-1]
-
-    for (n in graph[[s]]) {
-      if (!marks[[n]]) {
-        seeds <- c(seeds, n)
-        reachable <- c(reachable, n)
-        marks[[n]] <- TRUE
-      }
-    }
-  }
-
-  reachable
-}
-#' @export
-remove_loops <- function(graph) {
-  structure(
-    lapply(names(graph), function(n) setdiff(graph[[n]], n)),
-    names = names(graph)
-  )
-}
-#' @export
-isArticulationPoint <- function(node, adjMatrix) {
-
-  adjNodes <- names(which(adjMatrix[node, ] == 1))
-
-  if(length(adjNodes) == 1) {
-    isTrue <- FALSE
-  } else {
-    cond <- !(colnames(adjMatrix) %in% node)
-    newMatrix <- adjMatrix[cond, cond]
-    newList <- adjacencyMatrixToList(newMatrix)
-
-    reachable <- list()
-    for(i in adjNodes) {
-      reachable[[i]] <- bfs(newList,adjNodes[adjNodes==i])
-    }
-
-    isTrue <- unlist(lapply(adjNodes,
-                            function(x) {
-                              sum(reachable[[x]] %in% adjNodes[adjNodes != x])
-                              }))
-    if(any(isTrue == 0)) {
-      isTrue <- TRUE
-    } else {
-      isTrue <- FALSE
-    }
-  }
-  return(isTrue)
-}
 #' @export
 plot.Cytoscape<-function(object,graphlist,results,threshold){
   clust<-object[which(object$pvalue<threshold),]

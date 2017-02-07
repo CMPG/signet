@@ -37,4 +37,3 @@ require(signet)
 \keyword{annealing}
 \keyword{simulated}
 \keyword{subnetwork,}
-

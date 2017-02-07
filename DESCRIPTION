@@ -1,22 +1,22 @@
 Package: signet
 Type: Package
-Title: signet: Selection Inference in Gene Networks
+Title: signet: Selection Inference in Gene NETworks
 Version: 0.5
 Date: 2017-02-07
 Authors@R: c(person("Alexandre", "Gouy",
   email = "alexandre.gouy@iee.unibe.ch", role = c("aut", "cre")),
   person("Laurent", "Excoffier",role = c("aut")))
-Description: An R package to detect and test for selection in biological
-    pathways. From a gene list with associated scores, and biological pathways
-    data, one can search for a high-scoring subnetwork and test for its
-    significance against the score's null distribution.
+Description: An R package to detect selection in biological pathways. 
+    From a gene list with associated scores, and biological pathways
+    data, one can search for a high-scoring subnetworks and test for their
+    significance.
 Depends:
     R (>= 3.2.1)
 Imports:
-    graph
+    graph,
+    graphite
 Suggests:
-    graphite,
     RCytoscape
 License: GPL-2
 LazyData: true
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

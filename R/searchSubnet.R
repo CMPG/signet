@@ -7,8 +7,7 @@
 #'  in the \verb{graphNEL} format.
 #' @param scores A data frame with two columns: gene identifiers list
 #'  and associated scores.
-#' @param nullDist A data frame with three columns : k, mu, sigma.
-#' Can be obtained thanks to the \verb{nulldistribution()} function.
+#' @param background A data frame with three columns : k, mu, sigma.
 #' @param replicates Number of replicates per network.
 #' @param iterations Number of iterations.
 #' @param kmin The minimal size of a subnetwork.
@@ -29,7 +28,7 @@
 
 searchSubnet<-function(pathway,
                        scores,
-                       nullDist,
+                       background,
                        replicates = 1,
                        iterations = 5000,
                        subnetScore="ideker",
@@ -46,7 +45,7 @@ searchSubnet<-function(pathway,
   #check for arguments =========================================================
   if (missing(pathway)) stop("Pathway data are missing.")
   if (missing(scores)) stop("Gene scores are missing.")
-  if (missing(nullDist)) stop("Background distribution is missing.")
+  if (missing(background)) stop("Background distribution is missing.")
   colnames(scores) <- c("gene", "score")
 
   #check if list or unique pathway =============================================
@@ -57,7 +56,7 @@ searchSubnet<-function(pathway,
       res<-try(
         searchSubnet(pathway[[i]],
                      scores=scores,
-                     nullDist = nullDist,
+                     background = background,
                      iterations = iterations,
                      replicates = replicates,
                      verbose=verbose,
@@ -87,7 +86,7 @@ searchSubnet<-function(pathway,
       }
       allReturn<-replicate(replicates, {out<-searchSubnet(pathway=pathway,
                                                           scores = scores,
-                                                          nullDist = nullDist,
+                                                          background = background,
                                                           replicates = -1,
                                                           iterations = iterations,
                                                           kmin = kmin,
@@ -128,7 +127,7 @@ searchSubnet<-function(pathway,
       sumStat <- computeScore(signetObject, score = subnetScore)
 
       # SCORE COMPUTATION ===============================================
-      s <- (sumStat-nullDist[nullDist$k == kmin, ]$mu)/nullDist[nullDist$k==kmin,]$sigma
+      s <- (sumStat-background[background$k == kmin, ]$mu)/background[background$k==kmin,]$sigma
 
       # OPTIMISATION ====================================================
       for (i in 1:iterations) {
@@ -164,8 +163,8 @@ searchSubnet<-function(pathway,
         }
 
         if (verbose) {
-          if (length(activeNet) >= max(nullDist$k)) {
-            stop(paste("No null distribution for subnetwork of size > ",max(nullDist$k)))
+          if (length(activeNet) >= max(background$k)) {
+            stop(paste("No null distribution for subnetwork of size > ",max(background$k)))
           }
         }
 
@@ -181,7 +180,7 @@ searchSubnet<-function(pathway,
           sumStat <- computeScore(signetObject, score = subnetScore)
 
           # Scale the subnet score
-          s2 <- (sumStat-nullDist[nullDist$k == length(activeNet),]$mu)/nullDist[nullDist$k==length(activeNet),]$sigma
+          s2 <- (sumStat-background[background$k == length(activeNet),]$mu)/background[background$k==length(activeNet),]$sigma
 
           # Keep or not the toggled gene, acceptance probability
           if (s2 < s) {

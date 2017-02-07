@@ -11,16 +11,10 @@
 #' @param kmax Maximal value of k for which a background distribution is
 #' generated. Default value is the size of the biggest graph in the
 #' provided list.
-#' @param iterations Number of iterations to make the bachground distribution.
-#' @param distribution If TRUE, returns the whole simulated data.
-#' Else, returns the mean and standard deviation of the distribution for each k.
+#' @param iterations Number of iterations to make the background distribution.
 #'
-#' @keywords subnetwork, simulated annealing
+#' @keywords simulated annealing, background distribution
 #' @export
-#' @examples
-#' require(signet)
-#' #get data
-#' #backgroundDist()
 
 backgroundDist<-function(pathwaysList,
                          scores,

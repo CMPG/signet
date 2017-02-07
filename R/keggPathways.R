@@ -5,4 +5,4 @@
 #' @format A list with 244 graphNEL objects
 #' @source graphite
 #' @name keggPathways
-NULL
+"kegg"

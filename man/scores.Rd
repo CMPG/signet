@@ -20,4 +20,3 @@ scores
 A dataset of gene scores
 }
 \keyword{datasets}
-

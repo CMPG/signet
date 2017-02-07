@@ -21,4 +21,3 @@ require(signet)
 }
 \keyword{adjacency}
 \keyword{matrix}
-

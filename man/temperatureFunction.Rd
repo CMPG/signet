@@ -24,4 +24,3 @@ plot(t, ylab = "Temperature", xlab = "Iterations")
 \keyword{simulated}
 \keyword{subnetwork,}
 \keyword{temperature}
-
