@@ -44,79 +44,17 @@ package (`Rtools` must also be installed and properly configured):
 #install.packages('devtools')
 devtools::install_github('CMPG/signet')
 library(signet)
+
+data(scores);data(kegg)
+
+#Generate background distribution:
+bkgd_dist <- backgroundDist(kegg_clean,scores)
+
+#Run simulated annealing on the first 10 pathways
+HSS <- searchSubnet(kegg_clean[1:10],scores,bkgd_dist)
+
+#Generate the null distribution
+
+#Results
+
 ```
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-
-### Input
-
-We will use gene scores obtained from Daub et al. (2013) and run the search
-in KEGG pathways.
-
-```{r}
-library(graphite)
-
-kegg <- pathways("hsapiens", "kegg") # KEGG pathways
-kegg <- lapply(kegg,pathwaysGraph) # pathways objects need to be converted as graphs
-data(daub2013) # gene scores
-```
-
-### Analysis
-
-NB: This procedure is still a bit slow (but doable in a few hours on
-a single computer); a C++ implementation will be soon considered.
-
-First, we need to generate the background distribution of the subnetworks scores 
-for all possible subnetwork sizes.
-You can skip this step and run `data(backgroundDist)` instead.
-
-```{r}
-bkgd <- backgroundDist(kegg,scores)
-```
-
-Then, we apply the simulated annealing algorithm on a list of pathways
-(here, the first 10 KEGG pathways). Pathways must be in the `graphNEL` format.
-
-```{r}
-analysis <- searchSubnet(pathways = kegg[1:10],
-                             score = scores,
-                             background = bkgd)
-```
-
-This function returns a list of N signet objects (corresponding to N pathways),
-including a table with the whole list of genes, their scores, 
-and a boolean indicating if they are found in the high-scoring subnetwork.
-
-To assess the significance of the subnetwork scores, we need to generate an 
-empirical null distribution.
-
-```{r}
-null <- nullDist(kegg, 1000)
-# and compute p-values:
-### 
-```
-
-### Extracting the results
-
-You can generate a table using the `summary()` function and then write the 
-results in your working directory.
-
-```{r}
-tab <- summary(analysis)
-write.table(tab, sep="\t", file="results.tsv")
-```
-
-Plot the results in R
-
-To get a better representation of the networks, we advise to use the Cytoscape software.
-The package RCytoscape
-Works only with Cytoscape v.X.X.X
-
-Plotting the results with Cytoscape.
-Single pathway.
-
-Merged significant pathways.
-=======
->>>>>>> b488d6d1fb3c0e223e815a75e3374621decb452f
->>>>>>> 6901074f9e2d9e453dc937b9474634192e77ab58

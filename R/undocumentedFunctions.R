@@ -245,15 +245,16 @@ correctOverlap<-function(overlapMatrix,
 #' @export
 createSignetObject <- function(pathway, scores, iterations, minimumSize) {
   threshold <- minimumSize
-  if (length(graph::nodes(pathway))==0) X<-NULL
-  else {
+  if (length(graph::nodes(pathway))==0) {
+    X<-NULL
+  } else {
     TA<-unlist(lapply(graph::connComp(pathway),length))
     maxi<-which(TA==max(TA))
     CC<-unlist(graph::connComp(pathway)[maxi])
   }
+
   if (is.null(X)) {
     stop("\r  No connected component of size greater than 5.")
-
   }
 
   names(scores)[[1]]<-"gene";names(scores)[[2]]<-"score"
