@@ -40,6 +40,7 @@ searchSubnet<-function(pathway,
     stop("Package graph is required.")
   } else {
     requireNamespace("graph", quietly=TRUE)
+    requireNamespace("RBGL", quietly=TRUE)
   }
 
   #check for arguments =========================================================
@@ -59,7 +60,7 @@ searchSubnet<-function(pathway,
                      background = background,
                      iterations = iterations,
                      replicates = replicates,
-                     verbose=verbose,
+                     verbose=FALSE,
                      subnetScore=subnetScore,
                      kmin = kmin)
       )
@@ -113,7 +114,7 @@ searchSubnet<-function(pathway,
       # INITIALIZATION ==================================================
       signetObject<-createSignetObject(pathway,scores,iterations,5)
 
-      if(length(nodes(signetObject$connected_comp))<5) {
+      if(length(graph::nodes(signetObject$connected_comp))<5) {
         return(signetObject)
       }
 
@@ -127,10 +128,17 @@ searchSubnet<-function(pathway,
       sumStat <- computeScore(signetObject, score = subnetScore)
 
       # SCORE COMPUTATION ===============================================
+
       s <- (sumStat-background[background$k == kmin, ]$mu)/background[background$k==kmin,]$sigma
+
+
+      if(verbose) cat("  Running simulated annealing...\n")
+      rn <- runif(iterations)
 
       # OPTIMISATION ====================================================
       for (i in 1:iterations) {
+
+        if(verbose & i %% 100 == 0) cat(paste("\r  Iteration ",i))
 
         activeNet <- as.character(signetObject$network[signetObject$network$active,]$gene)
         adjSubgraph <- adjMatrix[activeNet,]
@@ -144,28 +152,32 @@ searchSubnet<-function(pathway,
           boundaries <- NULL
         }
 
-        bla <- 0
-        while (bla != 1) {
-          ge <- sample(activeNet,1)
-          test <- graph::subGraph(as.character(activeNet[activeNet != ge]),signetObject$connected_comp)
-
-          bla <- length(graph::connComp(test))
-          if (bla == 1) neighbours<-c(ge)
-        }
-
+        neighbours<-NULL
         probneighbour <- 0
         sampNeighbour <- FALSE
+
         if (length(activeNet) > kmin) {
-          probneighbour <- length(activeNet)/(length(boundaries)+length(activeNet))
+
+          probneighbour <-length(activeNet)/(length(boundaries)+length(activeNet))
           if (probneighbour > runif(1)) {
             sampNeighbour <- TRUE
+
+            bla <- 0
+            while (bla != 1) { #bottleneck
+              ge <- sample(activeNet,1)
+              test <- graph::subGraph(as.character(activeNet[activeNet != ge]),
+                                      signetObject$connected_comp)
+              bla <- length(RBGL::connectedComp(test))
+
+              # bla <- length(graph::connComp(test))
+              if (bla == 1) neighbours<-c(ge)
+            }
           }
+
         }
 
-        if (verbose) {
-          if (length(activeNet) >= max(background$k)) {
-            stop(paste("No null distribution for subnetwork of size > ",max(background$k)))
-          }
+        if (verbose & length(activeNet) >= max(background$k)) {
+            stop(paste("No background distribution for size > ",max(background$k)))
         }
 
         if (length(activeNet) > 1 & length(unique(c(neighbours,boundaries))) > 0) {
@@ -184,8 +196,11 @@ searchSubnet<-function(pathway,
 
           # Keep or not the toggled gene, acceptance probability
           if (s2 < s) {
+
+            #acceptance probability
             prob <- exp((s2-s)/signetObject$simulated_annealing$temperature[i])
-            if (prob > runif(1)) {
+
+            if (prob > rn[i]) {
               s <- s2
               signetObject$simulated_annealing$score_evolution[i] <- s
               signetObject$simulated_annealing$size_evolution[i] <- sum(

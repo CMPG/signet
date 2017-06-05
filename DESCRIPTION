@@ -13,7 +13,8 @@ Depends:
     R (>= 3.2.1)
 Imports:
     graph,
-    graphite
+    graphite,
+    RBGL
 Suggests:
     RCytoscape
 License: GPL-2

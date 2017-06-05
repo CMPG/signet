@@ -1,5 +1,6 @@
 #' Undocumented functions
 #' @export
+#' @keywords internal
 
 #returns summary statistics for all graphs in a database
 graphSummary<-function(allgraphs){
@@ -47,6 +48,7 @@ graphSummary<-function(allgraphs){
 
 
 #' @export
+#' @keywords internal
 computeScore <- function(signetObject, score = "ideker")
 {
   activeNet <- signetObject$network[signetObject$network$active, ]
@@ -70,6 +72,7 @@ computeScore <- function(signetObject, score = "ideker")
 
 
 #' @export
+#' @keywords internal
 getAdjacencyMatrix<-function(pathway,
                              directed = FALSE,
                              selfLoops=FALSE)
@@ -99,6 +102,7 @@ getAdjacencyMatrix<-function(pathway,
 
 
 #' @export
+#' @keywords internal
 #returns graphs
 filterGraphs<-function(allgraphs,gsummary,nodes_min = 0,density_max = 1){
   filter<-which(gsummary$nodes >= nodes_min & gsummary$density <= density_max)
@@ -106,6 +110,7 @@ filterGraphs<-function(allgraphs,gsummary,nodes_min = 0,density_max = 1){
 }
 
 #' @export
+#' @keywords internal
 #Output
 returnTable<-function(outputSignet,
                       pDatabase,
@@ -166,6 +171,7 @@ returnTable<-function(outputSignet,
 }
 
 #' @export
+#' @keywords internal
 overlapMatrix<-function(signetObject){
   overlap<-matrix(0,nrow=length(signetObject),ncol=length(signetObject))
   for(i in 1:length(signetObject))
@@ -185,6 +191,7 @@ overlapMatrix<-function(signetObject){
 }
 
 #' @export
+#' @keywords internal
 correctOverlap<-function(overlapMatrix,
                          signetTable,
                          threshold,
@@ -243,6 +250,7 @@ correctOverlap<-function(overlapMatrix,
 }
 
 #' @export
+#' @keywords internal
 createSignetObject <- function(pathway, scores, iterations, minimumSize) {
   threshold <- minimumSize
   if (length(graph::nodes(pathway))==0) {
@@ -311,6 +319,7 @@ createSignetObject <- function(pathway, scores, iterations, minimumSize) {
 }
 
 #' @export
+#' @keywords internal
 print.signet <- summary.signet <- function(object) {
   cat("High-scoring subnetwork found with simulated annealing\n")
   cat(paste("Subnetwork score: ",round(object$subnet_score,digits=4),"\n",sep=""))
@@ -319,6 +328,7 @@ print.signet <- summary.signet <- function(object) {
 }
 
 #' @export
+#' @keywords internal
 summary.signetList <- function(object) {
   signet_table <- data.frame(pathway=names(object),
                              net.size=unlist(lapply(object,function(x)dim(x$network)[1])),
@@ -331,6 +341,7 @@ summary.signetList <- function(object) {
 }
 
 #' @export
+#' @keywords internal
 plot.signet <- function(object) {
   m <- rbind(c(0,1,1,1,1,0),c(2,2,2,3,3,3))
   layout(m)
@@ -387,13 +398,16 @@ plot.signet <- function(object) {
   par(mfrow = c(1,1))
 
 }
+
 #' @export
+#' @keywords internal
 adjacencyMatrixToList <- function(adjMatrix) {
   adjList <- apply(adjMatrix, 1, function(x) return(names(x[x==1])))
   return(adjList)
 }
 
 #' @export
+#' @keywords internal
 plot.Cytoscape<-function(object,graphlist,results,threshold){
   clust<-object[which(object$pvalue<threshold),]
   #get number of occurences of a gene (color)
@@ -478,7 +492,7 @@ plot.Cytoscape<-function(object,graphlist,results,threshold){
   for(gene in glistz) nodeData(graph,gene,"occurence")<-TABLE[TABLE$gene==gene,]$occurence
 
 
-  cw <- new.CytoscapeWindow("Coverage", graph=graph,overwriteWindow=TRUE)
+  cw <- new.CytoscapeWindow("signet", graph=graph,overwriteWindow=TRUE)
 
   displayGraph(cw)
 
@@ -491,8 +505,9 @@ plot.Cytoscape<-function(object,graphlist,results,threshold){
   layoutNetwork(cw,"jgraph-spring")
 
 }
-# displayGraph(cw)
+
 #' @export
+#' @keywords internal
 plot.single.Cytoscape<-function(object,pnumber,graphlist,results){
   clust<-object[pnumber,]
   #get number of occurences of a gene (color)
@@ -562,6 +577,7 @@ plot.single.Cytoscape<-function(object,pnumber,graphlist,results){
 }
 
 #' @export
+#' @keywords internal
 lapply_pb <- function(X, FUN, ...)
 {
   env <- environment()

@@ -9,3 +9,4 @@ graphSummary(allgraphs)
 \description{
 Undocumented functions
 }
+\keyword{internal}

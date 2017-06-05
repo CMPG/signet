@@ -20,7 +20,4 @@ of iterations.
 t <- temperatureFunction(iterations = 5000)
 plot(t, ylab = "Temperature", xlab = "Iterations")
 }
-\keyword{annealing,}
-\keyword{simulated}
-\keyword{subnetwork,}
-\keyword{temperature}
+\keyword{internal}

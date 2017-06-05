@@ -6,8 +6,7 @@
 #'
 #' @param iterations Number of iterations.
 #' @param threshold Temperature desired at the last iteration.
-#' @keywords subnetwork, simulated annealing, temperature
-#' @export
+#' @keywords internal
 #' @examples
 #' t <- temperatureFunction(iterations = 5000)
 #' plot(t, ylab = "Temperature", xlab = "Iterations")
