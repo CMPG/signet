@@ -6,7 +6,7 @@
 #' @param pathwaysList A list of graphNEL objects.
 #' @param scores A data frame in which the first column if the gene list
 #' and the second column contains the gene scores.
-#' @param iterations Number of iterations to make the null distribution.
+#' @param iterations Number of null high-scores to compute.
 #'
 #' @keywords simulated annealing, null distribution
 #' @export
@@ -18,20 +18,25 @@ nullDist<-function(pathwaysList,
   requireNamespace("graph",quietly=TRUE)
   colnames(scores) <- c("gene","score")
 
+  genesDB <- unique(unlist(sapply(pathwaysList,graph::nodes)))
+  scores <- scores[scores$gene %in% genesDB,]
+
   cat("  Generating null distribution...\n")
   bk<-lapply_pb(1:iterations,function(x){
 
       newscores<-data.frame(gene=scores$gene,score=sample(scores$score))
-      grap<-sample(1:length(pathwaysList),1)
-
-      HSS<-try(searchSubnet(pathwaysList[[grap]],
-                            scores=newscores,
-                            bkgd))
-      if(class(HSS)!="try-error") return(HSS$subnet_score)
-      else return(NA)
+      cond<-TRUE
+      while(cond){
+        grap<-sample(1:length(pathwaysList),1)
+        HSS<-try(searchSubnet(pathwaysList[[grap]],
+                              scores=newscores,
+                              bkgd,iterations=1000),silent=TRUE)
+        if(class(HSS)!="try-error") cond<-FALSE
+      }
+      return(HSS$subnet_score)
 
   })
 
   cat("\n  Done!\n\n")
-  return(bk)
+  return(unlist(bk))
 }

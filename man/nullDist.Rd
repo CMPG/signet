@@ -4,7 +4,7 @@
 \alias{nullDist}
 \title{Null distribution}
 \usage{
-nullDist(pathwaysList, scores, iterations = 100, bkgd)
+nullDist(pathwaysList, scores, iterations = 1000, bkgd)
 }
 \arguments{
 \item{pathwaysList}{A list of graphNEL objects.}
@@ -12,7 +12,7 @@ nullDist(pathwaysList, scores, iterations = 100, bkgd)
 \item{scores}{A data frame in which the first column if the gene list
 and the second column contains the gene scores.}
 
-\item{iterations}{Number of iterations to make the null distribution.}
+\item{iterations}{Number of null high-scores to compute.}
 }
 \description{
 Generate the high-scores null distribution to compute empirical p-values

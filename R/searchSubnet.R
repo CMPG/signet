@@ -52,7 +52,7 @@ searchSubnet<-function(pathway,
   if (class(pathway) == "list") {
     all<-list()
     for (i in 1:length(pathway)) {
-      print(names(pathway[i]))
+      cat(paste("\n  Analyzing pathway: ",names(pathway[i])))
       res<-try(
         searchSubnet(pathway[[i]],
                      scores=scores,
@@ -67,7 +67,7 @@ searchSubnet<-function(pathway,
         res<-NA
       }
       all[[i]]<-res
-      cat("\r  ", i, "/", length(pathway), " pathways analyzed.", sep="")
+      cat("\n  ", i, "/", length(pathway), " pathways analyzed.", sep="")
     }
     names(all)<-names(pathway)
     class(all)<-"signetList"
