@@ -42,6 +42,7 @@ package (`Rtools` must also be installed and properly configured):
 devtools::install_github('CMPG/signet')
 library(signet)
 ```
+
 ### Input
 
 `signet` takes as input a data frame of gene scores. the first column
@@ -54,6 +55,7 @@ pathwayDatabases() #check pathways and species available
 paths <- pathways("hsapiens", "kegg") #get the pathway list
 graphs <- lapply(paths, pathwayGraph) #convert pathways to graphs
 ```
+
 Note that gene identifiers must be the same between the gene scores data frame
 and the pathway list (e.g. entrez). `graphite` provides a function to convert
 gene identifiers.
@@ -64,12 +66,22 @@ provided:
 ```{r}
 data(daub13)
 ```
+
 ### Workflow
+
+We first have to generate a "background distribution" of subnetworks scores
+to be able to compare subnetworks of different sizes with simulated annealing.
+To do so, we sample random subnetworks and compute the distribution of 
+their scores for different possible sizes:
 
 ```{r}
 #Generate background distribution:
 bkgd_dist <- backgroundDist(kegg_human,scores)
 ```
+
+This distribution is then used to search for high-scoring subnetworks within the
+provided biological pathways:
+
 ```{r}
 #Run simulated annealing on the first 10 pathways:
 HSS <- searchSubnet(kegg_human[1:10],
@@ -77,27 +89,60 @@ HSS <- searchSubnet(kegg_human[1:10],
                     bkgd_dist,
                     iterations = 5000)
 ```
+
+This function returns, for each pathway, the highest-scoring subnetwork found,
+its score and other information about the simulated annealing run. You can have
+a look at the network and the optimization process as follow:
+
+```{r}
+#Inspect a pathway:
+plot(HSS[[1]])
+```
+
+Then, to test the significance of the high-scoring subnetworks, you have to 
+generate a null distribution of high-scores:
+
 ```{r}
 #Generate the null distribution
 null <- nullDist(kegg_human,scores,1000,bkgd_dist)
+```
 
+Note that the `null` object is a simple vector of null high-scores. Therefore,
+you can run other iterations afterwards and concatenate the output with the
+previous vector to compute more precise p-values.
+
+This distribution is finally used to compute p-values and update the 
+`signet` object:
+
+```{r}
 #Compute p-values
 HSS <- testSubnet(HSS,null)
 ```
-### Interpretation fo the results
+
+### Interpretation of the results
+
+When p-values have been computed, you can generate a summary table
+(one row per pathway):
 
 ```{r}
 #Results: generate a summary table
 tab <- summary(HSS)
 
-#Inspect a single pathway:
-plot(HSS[[1]])
-
+#write the table
 ```
+
 Note that searching for high-scoring subnetworks and generating the null 
 distribution usually takes a few hours. However, these steps are easy
 to parallelize on a cluster as different iterations are independent from each 
 other. Depending on the number of processors available, the computation time
 can be reduced to a few minutes.
+
+### Plot the results using Cytoscape (coming soon)
+
+Cytoscape and RCytoscape
+
+1. Plot a single pathway and its highest-scoring subnetwork
+
+2. Merge all the sugnificant subnetworks and plot the resulting graph
 
 
