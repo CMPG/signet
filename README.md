@@ -44,20 +44,35 @@ package (`Rtools` must also be installed and properly configured):
 #install.packages('devtools')
 devtools::install_github('CMPG/signet')
 library(signet)
-<<<<<<< HEAD
-
-data(scores);data(kegg)
-
-#Generate background distribution:
-bkgd_dist <- backgroundDist(kegg_clean,scores)
-
-#Run simulated annealing on the first 10 pathways
-HSS <- searchSubnet(kegg_clean[1:10],scores,bkgd_dist)
-
-#Generate the null distribution
-
-#Results
-
-=======
->>>>>>> 2cd560f40a476c0551af96785889d39bca6429f1
 ```
+```{r}
+#load gene scores from Daub et al. 2013 + human KEGG pathways:
+data(daub13)
+```
+```{r}
+#Generate background distribution:
+bkgd_dist <- backgroundDist(kegg_human,scores)
+```
+```{r}
+#Run simulated annealing on the first 10 pathways:
+HSS <- searchSubnet(kegg_human[1:10],scores,bkgd_dist)
+```
+```{r}
+#Generate the null distribution
+null <- nullDist(kegg_human,scores,100,bkgd_dist)
+```
+```{r}
+#Results: generate a summary table
+tab <- signetTable(HSS,null)
+
+#Inspect a single pathway:
+plot(HSS[[1]])
+
+```
+Note that searching for high-scoring subnetworks and generating the null 
+distribution might take a while (a few hours). However, these steps are easy
+to parallelize on a cluster as different iterations are independent from each 
+other. Depending on the number of processors available, the computation time
+can be reduced to a few minutes.
+
+
