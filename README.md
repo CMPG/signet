@@ -127,8 +127,6 @@ When p-values have been computed, you can generate a summary table
 ```{r}
 #Results: generate a summary table
 tab <- summary(HSS)
-
-#write the table
 ```
 
 Note that searching for high-scoring subnetworks and generating the null 
