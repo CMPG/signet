@@ -44,6 +44,7 @@ package (`Rtools` must also be installed and properly configured):
 #install.packages('devtools')
 devtools::install_github('CMPG/signet')
 library(signet)
+<<<<<<< HEAD
 
 data(scores);data(kegg)
 
@@ -57,4 +58,6 @@ HSS <- searchSubnet(kegg_clean[1:10],scores,bkgd_dist)
 
 #Results
 
+=======
+>>>>>>> 2cd560f40a476c0551af96785889d39bca6429f1
 ```
