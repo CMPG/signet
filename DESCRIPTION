@@ -10,7 +10,7 @@ Description: An R package to detect selection in biological pathways.
     data, one can search for a high-scoring subnetworks and test for their
     significance.
 Depends:
-    R (>= 3.2.1)
+    R (>= 3.0.0)
 Imports:
     graph,
     graphite,
