@@ -13,9 +13,9 @@ Depends:
     R (>= 3.0.0)
 Imports:
     graph,
-    graphite,
     RBGL
 Suggests:
+    graphite,
     RCytoscape
 License: GPL-2
 LazyData: true
