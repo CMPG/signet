@@ -38,7 +38,13 @@ But you can install the development version on GitHub using the `devtools`
 package (`Rtools` must also be installed and properly configured):
 
 ```{r}
-#install.packages('devtools')
+## install devtools and signet dependencies
+# install.packages('devtools')
+# source("http://bioconductor.org/biocLite.R")
+# biocLite(graph)
+# biocLite(RBGL)
+# biocLite(Rgraphviz)
+
 devtools::install_github('CMPG/signet')
 library(signet)
 ```
