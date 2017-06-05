@@ -20,20 +20,13 @@ generated. Default value is 1.}
 generated. Default value is the size of the biggest graph in the
 provided list.}
 
-\item{iterations}{Number of iterations to make the bachground distribution.}
-
-\item{distribution}{If TRUE, returns the whole simulated data.
-Else, returns the mean and standard deviation of the distribution for each k.}
+\item{iterations}{Number of iterations to make the background distribution.}
 }
 \description{
 Generate the background distribution necessary to compute subnetwork scores
 during a simulated annealing run.
 }
-\examples{
-require(signet)
-#get data
-#backgroundDist()
-}
-\keyword{annealing}
+\keyword{annealing,}
+\keyword{background}
+\keyword{distribution}
 \keyword{simulated}
-\keyword{subnetwork,}

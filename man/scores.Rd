@@ -17,6 +17,6 @@ Daub et al., 2013, MBE.
 scores
 }
 \description{
-A dataset of gene scores
+A dataset of gene scores + KEGG pathways.
 }
 \keyword{datasets}

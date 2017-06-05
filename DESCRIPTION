@@ -4,8 +4,7 @@ Title: signet: Selection Inference in Gene NETworks
 Version: 0.5
 Date: 2017-02-07
 Authors@R: c(person("Alexandre", "Gouy",
-  email = "alexandre.gouy@iee.unibe.ch", role = c("aut", "cre")),
-  person("Laurent", "Excoffier",role = c("aut")))
+  email = "alexandre.gouy@iee.unibe.ch", role = c("aut", "cre")))
 Description: An R package to detect selection in biological pathways. 
     From a gene list with associated scores, and biological pathways
     data, one can search for a high-scoring subnetworks and test for their

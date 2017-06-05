@@ -1,6 +1,6 @@
 #' Datasetscores.
 #'
-#' A dataset of gene scores
+#' A dataset of gene scores + KEGG pathways.
 #'
 #' @format A data frame with 17918 rows and 2 variables:
 #' \describe{
@@ -10,3 +10,4 @@
 #' }
 #' @source Daub et al., 2013, MBE.
 "scores"
+"kegg_human"
