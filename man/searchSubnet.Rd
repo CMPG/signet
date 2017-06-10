@@ -5,7 +5,7 @@
 \title{Search for a high scoring subnetwork}
 \usage{
 searchSubnet(pathway, scores, background, replicates = 1, iterations = 5000,
-  subnetScore = "ideker", kmin = 2, verbose = TRUE)
+  subnetScore = "ideker", verbose = TRUE)
 }
 \arguments{
 \item{pathway}{A gene network, or a list of networks,
@@ -20,9 +20,9 @@ and associated scores.}
 
 \item{iterations}{Number of iterations.}
 
-\item{kmin}{The minimal size of a subnetwork.}
-
 \item{verbose}{If \verb{TRUE}, displays text in the R console.}
+
+\item{kmin}{The minimal size of a subnetwork.}
 }
 \value{
 A list containing a table with genes, their state, their score;

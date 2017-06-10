@@ -327,15 +327,42 @@ print.signet <- summary.signet <- function(object) {
   cat(paste("Genes in subnetwork: ",paste(object$subnet_genes,collapse=" "),"\n",sep=""))
 }
 
+
 #' @export
 #' @keywords internal
 summary.signetList <- function(object) {
-  signet_table <- data.frame(pathway=names(object),
-                             net.size=unlist(lapply(object,function(x)dim(x$network)[1])),
-                             subnet.size=unlist(lapply(object,function(x)x$subnet_size)),
-                             subnet.score=unlist(lapply(object,function(x)x$subnet_score)),
-                             p.value=unlist(lapply(object,function(x)x$p.value)),
-                             subnet.genes=unlist(lapply(object,function(x)paste(x$subnet_genes,collapse=" "))))
+
+  if(class(object) != "signetList") stop("Object must be a signetList")
+
+  pathway <- names(object)
+  net.size <- unlist(lapply(object,function(x){
+    if(length(x)>1) return(dim(x$network)[1])
+    else return(NA)
+  }))
+  subnet.size <- unlist(lapply(object,function(x){
+    if(length(x)>1) return(x$subnet_size)
+    else return(NA)
+  }))
+  subnet.score <- unlist(lapply(object,function(x){
+    if(length(x)>1) return(x$subnet_score)
+    else return(NA)
+  }))
+  p.value <- unlist(lapply(object,function(x){
+    if(length(x)>1) return(x$p.value)
+    else return(NA)
+  }))
+  subnet.genes <- unlist(lapply(object,function(x){
+    if(length(x)>1) return(paste(x$subnet_genes,collapse=" "))
+    else return(NA)
+  }))
+
+  signet_table <- data.frame(pathway,
+                             net.size,
+                             subnet.size,
+                             subnet.score,
+                             p.value,
+                             subnet.genes)
+
   rownames(signet_table)<-NULL
   return(signet_table)
 }

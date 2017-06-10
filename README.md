@@ -75,24 +75,13 @@ data(daub13)
 
 ### Workflow
 
-We first have to generate a "background distribution" of subnetworks scores
-to be able to compare subnetworks of different sizes with simulated annealing.
-To do so, we sample random subnetworks and compute the distribution of 
-their scores for different possible sizes:
-
-```{r}
-#Generate background distribution:
-bkgd_dist <- backgroundDist(kegg_human,scores)
-```
-
-This distribution is then used to search for high-scoring subnetworks within the
-provided biological pathways:
+We first have to search for high-scoring subnetworks within the
+provided biological pathways, using simulated annealing:
 
 ```{r}
 #Run simulated annealing on the first 10 pathways:
 HSS <- searchSubnet(kegg_human[1:10],
                     scores,
-                    bkgd_dist,
                     iterations = 5000)
 ```
 
@@ -105,17 +94,19 @@ a look at the network and the optimization process as follow:
 plot(HSS[[1]])
 ```
 
-Then, to test the significance of the high-scoring subnetworks, you have to 
+Then, to test the significance of the high-scoring subnetworks, we 
 generate a null distribution of high-scores:
 
 ```{r}
 #Generate the null distribution
-null <- nullDist(kegg_human,scores,1000,bkgd_dist)
+null <- nullDist(kegg_human,
+                 scores,
+                 iterations = 1000)
 ```
 
-Note that the `null` object is a simple vector of null high-scores. Therefore,
-you can run other iterations afterwards and concatenate the output with the
-previous vector to compute more precise p-values.
+Note that the `null` object is a simple vector of null high-scores (here, 1000).
+Therefore, you can run other iterations afterwards and concatenate the output 
+with the previous vector if you want to compute more precise p-values.
 
 This distribution is finally used to compute p-values and update the 
 `signet` object:
@@ -133,13 +124,20 @@ When p-values have been computed, you can generate a summary table
 ```{r}
 #Results: generate a summary table
 tab <- summary(HSS)
+
+#write the summary table
+write.table(tab,
+            file = "signet_output.tsv",
+            sep = "\t",
+            quote = FALSE,
+            row.names = FALSE)
+
 ```
 
 Note that searching for high-scoring subnetworks and generating the null 
-distribution usually takes a few hours. However, these steps are easy
+distribution can take a few hours. However, these steps are easy
 to parallelize on a cluster as different iterations are independent from each 
-other. Depending on the number of processors available, the computation time
-can be reduced to a few minutes.
+other.
 
 ### Plot the results using Cytoscape (coming soon)
 

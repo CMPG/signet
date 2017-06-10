@@ -1,34 +1,22 @@
 #' Test the significance of a subnetwork
 #'
-#' A function to generate the temperature function used in simulated annealing.
-#' After a burnin period, the temperature decreases geometrically.
-#'
-#' @param outputSA Output of the algorithm.
-#' @param pathwaysList List of pathways to generate null distribution.
-#' @param scores Again, the scores.
-#'
-#' @keywords subnetwork, simulated annealing
+#' @keywords null distribution, simulated annealing
 #' @export
-#' @examples
-#' #t<-temperatureFunction(iterations=1500,param=0.995,burnin=100)
-#' #plot(t)
 
-testSubnet<-function(outputSA,pathwaysList,scores)
-{
 
-  klist<-unlist(lapply(outputSA,function(x) return(x$size)))
+testSubnet<-function(sigObj,nullD) {
 
-  nul<-nullDistribution(pathwaysList,scores,kmin=min(klist),kmax=max(klist),
-                   iterations=100)
+  if(class(sigObj) != "signetList") stop("Input is not a list of signet objects")
+  if(class(tt) != "numeric") stop("Null distribution must be a numeric vector")
 
-  pvals<-lapply(outputSA,
-  function(x)
-  {
-    normScore<-(x$score-nul[which(nul$k==x$size),]$mu)/nul[which(nul$k==x$size),]$sigma
-    pval<-1-pnorm(normScore)
-    outputSA$pvalue<-pval
-    print(pval)
+  lapply(names(sigObj),function(x) {
+
+    if(length(sigObj[[x]])>1) {
+      sigObj[[x]]$p.value <<- mean(tt > sigObj[[x]]$subnet_score, na.rm=TRUE)
+    }
+
   })
 
-  invisible(outputSA)
+  return(sigObj)
+
 }

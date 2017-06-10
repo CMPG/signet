@@ -21,6 +21,13 @@ nullDist<-function(pathwaysList,
   genesDB <- unique(unlist(sapply(pathwaysList,graph::nodes)))
   scores <- scores[scores$gene %in% genesDB,]
 
+  if (missing(bkgd)) {
+    bkgd <- data.frame(k=1:200,
+                             mu=sqrt(1:200)*mean(scores$score,na.rm=TRUE),
+                             sigma=rep(sd(scores$score,na.rm=TRUE),200))
+  }
+
+
   cat("  Generating null distribution...\n")
   bk<-lapply_pb(1:iterations,function(x){
 
@@ -30,7 +37,7 @@ nullDist<-function(pathwaysList,
         grap<-sample(1:length(pathwaysList),1)
         HSS<-try(searchSubnet(pathwaysList[[grap]],
                               scores=newscores,
-                              bkgd,iterations=1000),silent=TRUE)
+                              bkgd,iterations=1000,verbose=FALSE),silent=TRUE)
         if(class(HSS)!="try-error") cond<-FALSE
       }
       return(HSS$subnet_score)

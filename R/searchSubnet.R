@@ -8,9 +8,7 @@
 #' @param scores A data frame with two columns: gene identifiers list
 #'  and associated scores.
 #' @param background A data frame with three columns : k, mu, sigma.
-#' @param replicates Number of replicates per network.
 #' @param iterations Number of iterations.
-#' @param kmin The minimal size of a subnetwork.
 #' @param verbose If \verb{TRUE}, displays text in the R console.
 #'
 #' @keywords subnetwork, simulated annealing, heuristics, search algorithm
@@ -26,14 +24,12 @@
 #'
 #' example1 <- searchSubnet(keggPathways[[1]], zScores)
 
-searchSubnet<-function(pathway,
-                       scores,
-                       background,
-                       replicates = 1,
-                       iterations = 5000,
-                       subnetScore="ideker",
-                       kmin = 2,
-                       verbose = TRUE) {
+searchSubnet <- function(pathway,
+                         scores,
+                         background,
+                         iterations = 5000,
+                         subnetScore="ideker",
+                         verbose = TRUE) {
 
   # check for packages =========================================================
   if (sum(installed.packages()[, 1]=="graph")==0) {
@@ -46,8 +42,25 @@ searchSubnet<-function(pathway,
   #check for arguments =========================================================
   if (missing(pathway)) stop("Pathway data are missing.")
   if (missing(scores)) stop("Gene scores are missing.")
-  if (missing(background)) stop("Background distribution is missing.")
   colnames(scores) <- c("gene", "score")
+
+  if (class(pathway) == "list") {
+
+    uniqGenes<-unique(unlist(sapply(pathway,function(x) unique(nodes(x)))))
+    scores<-scores[scores$gene %in% uniqGenes,]
+
+  } else if (class(pathway)!="graphNEL") {
+
+    uniqGenes<-unique(unlist(nodes(pathway)))
+    scores<-scores[scores$gene %in% uniqGenes,]
+
+  }
+
+  if (missing(background)) {
+    background <- data.frame(k=1:100,
+                             mu=sqrt(1:100)*mean(scores$score,na.rm=TRUE),
+                             sigma=rep(sd(scores$score,na.rm=TRUE),100))
+  }
 
   #check if list or unique pathway =============================================
   if (class(pathway) == "list") {
@@ -59,10 +72,8 @@ searchSubnet<-function(pathway,
                      scores=scores,
                      background = background,
                      iterations = iterations,
-                     replicates = replicates,
                      verbose=FALSE,
-                     subnetScore=subnetScore,
-                     kmin = kmin)
+                     subnetScore=subnetScore)
       )
       if (class(res)=="try-error") {
         res<-NA
@@ -80,158 +91,192 @@ searchSubnet<-function(pathway,
 
   } else {
 
-    if (replicates>1) {
+    # INITIALIZATION ==================================================
+    sigObj<-createSignetObject(pathway,scores,iterations,5)
 
-      if (verbose) {
-        cat("Replicating: ")
-      }
-      allReturn<-replicate(replicates, {out<-searchSubnet(pathway=pathway,
-                                                          scores = scores,
-                                                          background = background,
-                                                          replicates = -1,
-                                                          iterations = iterations,
-                                                          kmin = kmin,
-                                                          verbose = FALSE,
-                                                          subnetScore = subnetScore);if (verbose) cat("+");return(out)},simplify=FALSE)
+    if(length(graph::nodes(sigObj$connected_comp))<5) {
+      return(sigObj)
+    }
 
-      sz <- unlist(lapply(allReturn, function(x) return(x$subnet_size)))
+    adjMatrix <- getAdjacencyMatrix(pathway=sigObj$connected_comp)
 
-      condS <- which(sz > 1) #plusieurs maxima possibles,
-      allReturn <- allReturn[condS]
+    # sample two connected genes
+    geneSampled <- sample(colnames(adjMatrix), 1)
+    geneSampled <- c(geneSampled, sample(names(which(adjMatrix[, geneSampled]>0)))[1])
 
-      vec <- unlist(lapply(allReturn, function(x) return(x$subnet_score)))
+    # toggle state of the two starting genes
+    sigObj$network[which(sigObj$network$gene%in%geneSampled), ]$active <- TRUE
 
-      if (length(vec)==0) {
-        if (verbose) {
-          cat("\nNo high-scoring subnetwork found\n\n")
-        }
+    # SCORE COMPUTATION ===============================================
+    sumStat <- computeScore(sigObj, score = subnetScore)
+    s <- (sumStat-background[background$k == 2, ]$mu)/background[background$k==2,]$sigma
+
+    if(verbose) cat("  Running simulated annealing...\n")
+    rn <- runif(iterations)
+    rn2 <- runif(iterations)
+
+    boundaries <- NULL
+
+    # OPTIMISATION ====================================================
+    for (i in 1:iterations) {
+
+      if(verbose & i %% 100 == 0) cat(paste("\r  Iteration ",i))
+
+      activeNet <- sigObj$network[sigObj$network$active,]$gene
+      activeNet <- as.character(activeNet)
+      adjSubgraph <- adjMatrix[activeNet,]
+
+      if (length(dim(adjSubgraph))>0) {
+
+        boundaries <- adjSubgraph[apply(adjSubgraph,1,sum)>0,]
+        boundaries <- colnames(boundaries[,apply(boundaries,2,sum)>0])
+        # remove boundaries already active
+        boundaries <- boundaries[!boundaries %in% activeNet]
+
       } else {
-        condV<-which(vec==max(vec))
-        signetObject<-allReturn[condV][[1]]#on prend le premier si plusieurs
-      }
-    } else {
 
-      # INITIALIZATION ==================================================
-      signetObject<-createSignetObject(pathway,scores,iterations,5)
+        boundaries <- NULL
 
-      if(length(graph::nodes(signetObject$connected_comp))<5) {
-        return(signetObject)
       }
 
-      adjMatrix <- getAdjacencyMatrix(pathway=signetObject$connected_comp)
-      boundaries <- NULL
-      geneSampled <- sample(colnames(adjMatrix), 1)
-      geneSampled <- c(geneSampled, sample(names(which(adjMatrix[, geneSampled]>0)))[1])
+      neighbours <- NULL
+      probneighbour <- 0
+      sampNeighbour <- FALSE
 
-      # toggle state in final list
-      signetObject$network[which(signetObject$network$gene%in%geneSampled), ]$active <- TRUE
-      sumStat <- computeScore(signetObject, score = subnetScore)
+      if (length(activeNet) > 2) {
 
-      # SCORE COMPUTATION ===============================================
+        probneighbour <- 0.5
 
-      s <- (sumStat-background[background$k == kmin, ]$mu)/background[background$k==kmin,]$sigma
+        if (probneighbour > rn2[i]) {
 
+          sampNeighbour <- TRUE
 
-      if(verbose) cat("  Running simulated annealing...\n")
-      rn <- runif(iterations)
+          if (length(activeNet) <= 10) {
 
-      # OPTIMISATION ====================================================
-      for (i in 1:iterations) {
+            CComp <- list(1,2)
 
-        if(verbose & i %% 100 == 0) cat(paste("\r  Iteration ",i))
+            while (length(CComp) != 1) { #bottleneck
 
-        activeNet <- as.character(signetObject$network[signetObject$network$active,]$gene)
-        adjSubgraph <- adjMatrix[activeNet,]
-
-        if (length(dim(adjSubgraph))>0) {
-          boundaries <- adjSubgraph[apply(adjSubgraph,1,sum)>0,]
-          boundaries <- colnames(boundaries[,apply(boundaries,2,sum)>0])
-          #remove boundaries already active
-          boundaries <- boundaries[!boundaries %in% signetObject$network[signetObject$network$active,]$gene]
-        } else {
-          boundaries <- NULL
-        }
-
-        neighbours<-NULL
-        probneighbour <- 0
-        sampNeighbour <- FALSE
-
-        if (length(activeNet) > kmin) {
-
-          probneighbour <-length(activeNet)/(length(boundaries)+length(activeNet))
-          if (probneighbour > runif(1)) {
-            sampNeighbour <- TRUE
-
-            bla <- 0
-            while (bla != 1) { #bottleneck
               ge <- sample(activeNet,1)
               test <- graph::subGraph(as.character(activeNet[activeNet != ge]),
-                                      signetObject$connected_comp)
-              bla <- length(RBGL::connectedComp(test))
+                                      sigObj$connected_comp)
+              CComp <- RBGL::connectedComp(test)
 
-              # bla <- length(graph::connComp(test))
-              if (bla == 1) neighbours<-c(ge)
+              if (length(CComp) == 1) {
+                neighbours<-c(ge)
+              }
+
             }
-          }
 
-        }
+          } else {
 
-        if (verbose & length(activeNet) >= max(background$k)) {
-            stop(paste("No background distribution for size > ",max(background$k)))
-        }
+            ge <- sample(activeNet,1)
+            test <- graph::subGraph(as.character(activeNet[activeNet != ge]),
+                                    sigObj$connected_comp)
+            CComp <- RBGL::connectedComp(test)
 
-        if (length(activeNet) > 1 & length(unique(c(neighbours,boundaries))) > 0) {
-
-          # Sample a new gene to toggle its state
-          if (!sampNeighbour) newG <- as.character(sample(unique(c(boundaries)),1))
-          else newG <- neighbours
-          signetObject$network[which(signetObject$network$gene==newG),]$active <-
-            !signetObject$network[which(signetObject$network$gene==newG),]$active
-
-          # Compute the subnet score
-          sumStat <- computeScore(signetObject, score = subnetScore)
-
-          # Scale the subnet score
-          s2 <- (sumStat-background[background$k == length(activeNet),]$mu)/background[background$k==length(activeNet),]$sigma
-
-          # Keep or not the toggled gene, acceptance probability
-          if (s2 < s) {
-
-            #acceptance probability
-            prob <- exp((s2-s)/signetObject$simulated_annealing$temperature[i])
-
-            if (prob > rn[i]) {
-              s <- s2
-              signetObject$simulated_annealing$score_evolution[i] <- s
-              signetObject$simulated_annealing$size_evolution[i] <- sum(
-                signetObject$network$active
-              )
-            } else {
-              signetObject$network[which(signetObject$network$gene==newG),]$active <-
-                !signetObject$network[which(signetObject$network$gene==newG),]$active
-              signetObject$simulated_annealing$score_evolution[i] <- s
-              signetObject$simulated_annealing$size_evolution[i] <- sum(
-                signetObject$network$active
-              )
+            if(max(sapply(CComp,length)) <= 10) {
+              sampNeighbour <- FALSE
             }
-          } else if (s2 > s) {
-            s <- s2
-            signetObject$simulated_annealing$score_evolution[i] <- s
-            signetObject$simulated_annealing$size_evolution[i] <- sum(
-              signetObject$network$active
-            )
+
+            neighbours<-c(ge)#added
+
           }
         }
       }
 
-      ### Return the results (subnetwork, size, score)
-      signetObject$subnet_size<-signetObject$simulated_annealing$size_evolution[iterations]
-      signetObject$subnet_score<-signetObject$simulated_annealing$score_evolution[iterations]
-      signetObject$aggregate_score<-sum(signetObject$network$score[signetObject$network$active])/sqrt(signetObject$subnet_size)
-      signetObject$mean_score<-sum(signetObject$network$score[signetObject$network$active])/(signetObject$subnet_size)
-      signetObject$subnet_genes<-signetObject$network$gene[signetObject$network$active]
+      if (verbose & length(activeNet) >= max(background$k)) {
+        stop(paste("No background distribution for size > ",max(background$k)))
+      }
+
+      if (length(activeNet) > 1 & length(unique(c(neighbours,boundaries))) > 0) {
+
+        # Sample a new gene to toggle its state
+        if (!sampNeighbour) newG <- as.character(sample(unique(c(boundaries)),1))
+        else newG <- neighbours
+
+        sigObj$network[which(sigObj$network$gene%in%newG),]$active <-
+          !sigObj$network[which(sigObj$network$gene%in%newG),]$active
+
+
+        # Compute the subnet score
+        if (!sampNeighbour){
+
+          sumStat <- computeScore(sigObj, score = subnetScore)
+
+          # Scale the subnet score
+          s2 <- (sumStat-background[background$k == length(activeNet),]$mu)/
+            background[background$k==length(activeNet),]$sigma
+
+        } else {
+
+          if(length(CComp)==1){
+
+            sc2<-computeScore(sigObj, score = subnetScore)
+            cK<-sum(sigObj$network$active)
+            s2<-(sc2-background[background$k==cK,]$mu)/
+              (background[background$k==cK,]$sigma)
+
+          } else {
+
+            scs<-lapply(CComp,function(x){
+              cK<-length(x)
+
+              if(cK >= 5) {
+                scn<-(1/(sqrt(cK)))*sum(sigObj$network$score[
+                  as.character(sigObj$network$gene)%in%x]
+                  )
+                scn<-(scn-background[background$k==cK,]$mu)/
+                  (background[background$k==cK,]$sigma)
+              } else {
+                scn <- NA
+              }
+
+            }) #compute score for each CC
+
+            s2<-max(unlist(scs),na.rm=TRUE)
+            GL<-CComp[[which(unlist(scs)==s2)[1]]]
+            sigObj$network[!(as.character(sigObj$network$gene) %in% GL),]$active <- FALSE
+
+          }
+        }
+
+        # Keep or not the toggled gene, acceptance probability
+        if (s2 < s) {
+
+          #acceptance probability
+          prob <- exp((s2-s)/sigObj$simulated_annealing$temperature[i])
+
+          if (prob > rn[i]) {
+            s <- s2
+            sigObj$simulated_annealing$score_evolution[i] <- s
+            sigObj$simulated_annealing$size_evolution[i] <- sum(
+              sigObj$network$active
+            )
+          } else {
+            sigObj$network[which(sigObj$network$gene%in%newG),]$active <-
+              !sigObj$network[which(sigObj$network$gene%in%newG),]$active
+            sigObj$simulated_annealing$score_evolution[i] <- s
+            sigObj$simulated_annealing$size_evolution[i] <- sum(
+              sigObj$network$active
+            )
+          }
+        } else if (s2 >= s) {
+          s <- s2
+          sigObj$simulated_annealing$score_evolution[i] <- s
+          sigObj$simulated_annealing$size_evolution[i] <- sum(
+            sigObj$network$active
+          )
+        }
+      }
     }
-    invisible(signetObject)
+
+    ### Return the results (subnetwork, size, score)
+    sigObj$subnet_size<-sigObj$simulated_annealing$size_evolution[iterations]
+    sigObj$subnet_score<-sigObj$simulated_annealing$score_evolution[iterations]
+    sigObj$aggregate_score<-sum(sigObj$network$score[sigObj$network$active])/sqrt(sigObj$subnet_size)
+    sigObj$mean_score<-sum(sigObj$network$score[sigObj$network$active])/(sigObj$subnet_size)
+    sigObj$subnet_genes<-sigObj$network$gene[sigObj$network$active]
+    invisible(sigObj)
   }
 }
-
