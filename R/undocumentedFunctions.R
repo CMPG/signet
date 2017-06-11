@@ -251,20 +251,7 @@ correctOverlap<-function(overlapMatrix,
 
 #' @export
 #' @keywords internal
-createSignetObject <- function(pathway, scores, iterations, minimumSize) {
-  threshold <- minimumSize
-  if (length(graph::nodes(pathway))==0) {
-    X<-NA
-  } else {
-    TA<-unlist(lapply(graph::connComp(pathway),length))
-    maxi<-which(TA==max(TA))
-    CC<-unlist(graph::connComp(pathway)[maxi])
-    X<-0
-  }
-
-  if (is.na(X)) {
-    stop("\r  No connected component of size greater than 5.")
-  }
+createSignetObject <- function(pathway, scores, iterations) {
 
   names(scores)[[1]]<-"gene";names(scores)[[2]]<-"score"
   scores<-scores[scores$gene %in% graph::nodes(pathway),]
@@ -275,6 +262,11 @@ createSignetObject <- function(pathway, scores, iterations, minimumSize) {
   scores<-rbind(X2,scores[is.na(scores$score) & !scores$gene %in% X2$gene,])
 
   connected_comp<-graph::subGraph(as.character(scores[!is.na(scores$score),]$gene),pathway)
+
+  TA<-unlist(lapply(RBGL::connectedComp(connected_comp),length))
+  maxi<-which(TA==max(TA))
+  CC<-unlist(RBGL::connectedComp(connected_comp)[maxi])
+
   connected_comp<-graph::subGraph(CC[CC%in%as.character(scores[!is.na(scores$score),]$gene)],connected_comp)
   connected_comp<-graph::ugraph(connected_comp)
 
@@ -288,7 +280,7 @@ createSignetObject <- function(pathway, scores, iterations, minimumSize) {
     active=rep(FALSE,nnodes)
   )
 
-  if(max(TA) < minimumSize){
+  if(max(TA) < 5){
     object<-list(pathway=pathway,
                  connected_comp=connected_comp,
                  network=network,
@@ -370,6 +362,9 @@ summary.signetList <- function(object) {
 #' @export
 #' @keywords internal
 plot.signet <- function(object) {
+  if(class(object) != "signet") stop("Object must be a signet object.")
+  if(is.na(object$subnet_score)) stop("Pathway is too small/disconnected to be tested.")
+
   m <- rbind(c(0,1,1,1,1,0),c(2,2,2,3,3,3))
   layout(m)
 
@@ -436,19 +431,26 @@ adjacencyMatrixToList <- function(adjMatrix) {
 #' @export
 #' @keywords internal
 plot.Cytoscape<-function(object,graphlist,results,threshold){
-  clust<-object[which(object$pvalue<threshold),]
-  #get number of occurences of a gene (color)
-  glist<-strsplit(as.character(clust[1,]$geneListEntrez), ";")[[1]]
-  ID<-which(names(graphlist)==clust$pathwaysNames[1])
-  GRAPH<-subGraph(glist,graphlist[ID][[1]])
-  GRAPH<-graph_from_graphnel(GRAPH)
-  for(i in 2:dim(clust)[1]){
-    glist2<-strsplit(as.character(clust[i,]$geneListEntrez), ";")[[1]]
-    glistInGraph<-glist2[glist2%in%nodes(graphlist[[as.character(clust$pathwaysNames[i])]])]
-    subG2<-subGraph(glistInGraph,graphlist[[as.character(clust$pathwaysNames[i])]])
-    subG2<-graph_from_graphnel(subG2)
 
-    GRAPH<-graph.union(GRAPH,subG2)
+  require(igraph)
+  object<-object[!is.nan(object$p.value),]
+  object<-object[!is.na(object$p.value),]
+  clust<-object[which(object$p.value<threshold),]
+  #get number of occurences of a gene (color)
+  glist<-strsplit(as.character(clust[1,]$subnet.genes), " ")[[1]]
+  ID<-which(names(graphlist)==clust$pathway[1])
+  GRAPH<-graph::subGraph(glist,graphlist[ID][[1]])
+  GRAPH<-igraph::graph_from_graphnel(GRAPH)
+
+  for(i in 2:dim(clust)[1]){
+
+    glist2<-strsplit(as.character(clust[i,]$subnet.genes), " ")[[1]]
+    glistInGraph<-glist2[glist2%in%nodes(graphlist[[as.character(clust$pathway[i])]])]
+
+    subG2<-subGraph(glistInGraph,graphlist[[as.character(clust$pathway[i])]])
+    subG2<-igraph::graph_from_graphnel(subG2)
+
+    GRAPH<-igraph::graph.union(GRAPH,subG2)
     E(GRAPH)$weight_1[is.na(E(GRAPH)$weight_1)]<-0
     E(GRAPH)$weight_2[is.na(E(GRAPH)$weight_2)]<-0
 
@@ -459,7 +461,7 @@ plot.Cytoscape<-function(object,graphlist,results,threshold){
   #create TABLE with gene and score and occurences
   TABLE<-data.frame(gene=Glist,score=rep(NA,length(Glist)),occurence=rep(0,length(Glist)))
   for(i in 1:dim(clust)[1]){ #scores
-    ID<-which(names(graphlist)==clust$pathwaysNames[i])
+    ID<-which(names(graphlist)==clust$pathway[i])
     Gscor<-results[ID][[1]]$network[results[ID][[1]]$network$active,]$score
     Gnam<-results[ID][[1]]$network[results[ID][[1]]$network$active,]$gene
     for(ii in 1:length(Gscor)){
@@ -471,7 +473,7 @@ plot.Cytoscape<-function(object,graphlist,results,threshold){
 
   #nodes occurences
   for(i in 1:dim(clust)[1]){ #scores
-    ID<-which(names(graphlist)==clust$pathwaysNames[i])
+    ID<-which(names(graphlist)==clust$pathway[i])
     Gnam<-results[ID][[1]]$network[results[ID][[1]]$network$active,]$gene
     for(ii in 1:length(Gnam)){
       if(sum(TABLE$gene==as.character(Gnam[ii]))>0){

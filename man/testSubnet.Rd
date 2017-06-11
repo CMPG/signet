@@ -4,23 +4,12 @@
 \alias{testSubnet}
 \title{Test the significance of a subnetwork}
 \usage{
-testSubnet(outputSA, pathwaysList, scores)
-}
-\arguments{
-\item{outputSA}{Output of the algorithm.}
-
-\item{pathwaysList}{List of pathways to generate null distribution.}
-
-\item{scores}{Again, the scores.}
+testSubnet(sigObj, nullD)
 }
 \description{
-A function to generate the temperature function used in simulated annealing.
-After a burnin period, the temperature decreases geometrically.
-}
-\examples{
-#t<-temperatureFunction(iterations=1500,param=0.995,burnin=100)
-#plot(t)
+Test the significance of a subnetwork
 }
 \keyword{annealing}
+\keyword{distribution,}
+\keyword{null}
 \keyword{simulated}
-\keyword{subnetwork,}

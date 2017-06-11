@@ -44,29 +44,26 @@ searchSubnet <- function(pathway,
   if (missing(scores)) stop("Gene scores are missing.")
   colnames(scores) <- c("gene", "score")
 
-  if (class(pathway) == "list") {
+  if (missing(background) & class(pathway) == "list") {
+    background <- data.frame(k=1:100,
+                             mu=sqrt(1:100)*mean(scores$score,na.rm=TRUE),
+                             sigma=rep(sd(scores$score,na.rm=TRUE),100))
+  } else if (missing(background) & class(pathway) == "graphNEL") {
+    stop("Background distribution is required to run SA within a single pathway.")
+  }
+
+  if (class(pathway) == "list" & length(pathway) > 100) {
 
     uniqGenes<-unique(unlist(sapply(pathway,function(x) unique(nodes(x)))))
     scores<-scores[scores$gene %in% uniqGenes,]
 
-  } else if (class(pathway)!="graphNEL") {
-
-    uniqGenes<-unique(unlist(nodes(pathway)))
-    scores<-scores[scores$gene %in% uniqGenes,]
-
-  }
-
-  if (missing(background)) {
-    background <- data.frame(k=1:100,
-                             mu=sqrt(1:100)*mean(scores$score,na.rm=TRUE),
-                             sigma=rep(sd(scores$score,na.rm=TRUE),100))
   }
 
   #check if list or unique pathway =============================================
   if (class(pathway) == "list") {
     all<-list()
     for (i in 1:length(pathway)) {
-      cat(paste("\n  Analyzing pathway: ",names(pathway[i])))
+      cat(paste("\r  Analyzing pathway ", i, "/", length(pathway),sep=""))
       res<-try(
         searchSubnet(pathway[[i]],
                      scores=scores,
@@ -79,7 +76,6 @@ searchSubnet <- function(pathway,
         res<-NA
       }
       all[[i]]<-res
-      cat("\n  ", i, "/", length(pathway), " pathways analyzed.", sep="")
     }
     names(all)<-names(pathway)
     class(all)<-"signetList"
@@ -92,7 +88,11 @@ searchSubnet <- function(pathway,
   } else {
 
     # INITIALIZATION ==================================================
-    sigObj<-createSignetObject(pathway,scores,iterations,5)
+
+    sigObj<-createSignetObject(pathway,scores,iterations)
+
+    uniqGenes<-unique(unlist(nodes(pathway)))
+    scores<-scores[scores$gene %in% uniqGenes,]
 
     if(length(graph::nodes(sigObj$connected_comp))<5) {
       return(sigObj)
@@ -142,8 +142,9 @@ searchSubnet <- function(pathway,
       neighbours <- NULL
       probneighbour <- 0
       sampNeighbour <- FALSE
+      lenActive <- length(activeNet)
 
-      if (length(activeNet) > 2) {
+      if (lenActive > 2) {
 
         probneighbour <- 0.5
 
@@ -151,7 +152,7 @@ searchSubnet <- function(pathway,
 
           sampNeighbour <- TRUE
 
-          if (length(activeNet) <= 10) {
+          if (lenActive <= 10) {
 
             CComp <- list(1,2)
 
@@ -175,7 +176,7 @@ searchSubnet <- function(pathway,
                                     sigObj$connected_comp)
             CComp <- RBGL::connectedComp(test)
 
-            if(max(sapply(CComp,length)) <= 10) {
+            if(max(sapply(CComp,length)) < 5) {
               sampNeighbour <- FALSE
             }
 
@@ -185,11 +186,11 @@ searchSubnet <- function(pathway,
         }
       }
 
-      if (verbose & length(activeNet) >= max(background$k)) {
+      if (verbose & lenActive >= max(background$k)) {
         stop(paste("No background distribution for size > ",max(background$k)))
       }
 
-      if (length(activeNet) > 1 & length(unique(c(neighbours,boundaries))) > 0) {
+      if (lenActive > 1 & length(unique(c(neighbours,boundaries))) > 0) {
 
         # Sample a new gene to toggle its state
         if (!sampNeighbour) newG <- as.character(sample(unique(c(boundaries)),1))
@@ -205,8 +206,9 @@ searchSubnet <- function(pathway,
           sumStat <- computeScore(sigObj, score = subnetScore)
 
           # Scale the subnet score
-          s2 <- (sumStat-background[background$k == length(activeNet),]$mu)/
-            background[background$k==length(activeNet),]$sigma
+          lenActive <- sum(sigObj$network$active)
+          s2 <- (sumStat-background[background$k == lenActive,]$mu)/
+            background[background$k==lenActive,]$sigma
 
         } else {
 
@@ -246,6 +248,7 @@ searchSubnet <- function(pathway,
 
           #acceptance probability
           prob <- exp((s2-s)/sigObj$simulated_annealing$temperature[i])
+          if(i > iterations-iterations/10) prob <- 0
 
           if (prob > rn[i]) {
             s <- s2

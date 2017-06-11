@@ -4,7 +4,7 @@
 \alias{searchSubnet}
 \title{Search for a high scoring subnetwork}
 \usage{
-searchSubnet(pathway, scores, background, replicates = 1, iterations = 5000,
+searchSubnet(pathway, scores, background, iterations = 5000,
   subnetScore = "ideker", verbose = TRUE)
 }
 \arguments{
@@ -16,13 +16,9 @@ and associated scores.}
 
 \item{background}{A data frame with three columns : k, mu, sigma.}
 
-\item{replicates}{Number of replicates per network.}
-
 \item{iterations}{Number of iterations.}
 
 \item{verbose}{If \verb{TRUE}, displays text in the R console.}
-
-\item{kmin}{The minimal size of a subnetwork.}
 }
 \value{
 A list containing a table with genes, their state, their score;
