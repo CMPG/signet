@@ -4,8 +4,7 @@
 \alias{searchSubnet}
 \title{Search for a high scoring subnetwork}
 \usage{
-searchSubnet(pathway, scores, background, iterations = 5000,
-  subnetScore = "ideker", verbose = TRUE)
+searchSubnet(pathway, scores, background, iterations = 5000, verbose = TRUE)
 }
 \arguments{
 \item{pathway}{A gene network, or a list of networks,
@@ -16,7 +15,7 @@ and associated scores.}
 
 \item{background}{A data frame with three columns : k, mu, sigma.}
 
-\item{iterations}{Number of iterations.}
+\item{iterations}{Number of iterations ofr simulated annealing.}
 
 \item{verbose}{If \verb{TRUE}, displays text in the R console.}
 }
@@ -29,11 +28,11 @@ A simulated annealing algorithm to find the highest scoring
 subnetwork in a graph.
 }
 \examples{
-require(signet)
-data(keggPathways)
-data(zScores)
+\dontrun{
+data(daub2013)
 
-example1 <- searchSubnet(keggPathways[[1]], zScores)
+example <- searchSubnet(kegg_human[1:5], scores, iterations = 1000)
+}
 }
 \keyword{algorithm}
 \keyword{annealing,}

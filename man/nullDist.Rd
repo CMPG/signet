@@ -4,19 +4,28 @@
 \alias{nullDist}
 \title{Null distribution}
 \usage{
-nullDist(pathwaysList, scores, iterations = 1000, bkgd)
+nullDist(pathways, scores, n = 1000, background)
 }
 \arguments{
-\item{pathwaysList}{A list of graphNEL objects.}
+\item{pathways}{A list of graphNEL objects.}
 
-\item{scores}{A data frame in which the first column if the gene list
+\item{scores}{A data frame in which the first column is the gene list
 and the second column contains the gene scores.}
 
-\item{iterations}{Number of null high-scores to compute.}
+\item{n}{Number of null high-scores to compute.}
+
+\item{background}{Background distribution.}
 }
 \description{
 Generate the high-scores null distribution to compute empirical p-values
 for each pathway tested.
+}
+\examples{
+\dontrun{
+data(daub13)
+
+nullDistrib <- nullDist(kegg_human, scores, n = 1000)
+}
 }
 \keyword{annealing,}
 \keyword{distribution}

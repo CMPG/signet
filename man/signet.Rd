@@ -14,32 +14,28 @@
 
 
 \examples{
-## The following example illustrates the workflow.
+  ## The following example illustrates the workflow.
 
-\dontrun{
- ## (1) The user must provide pathways and score data
+  \dontrun{
+   ## (1) The user must provide pathways and score data in the same format as
+   ## this example dataset:
 
- data(keggPathways);data(zScores)
+   data(daub13)
 
- ## (2) Generate the background distribution of the subnetwork scores
- ## for different possible sizes (kmin to kmax).
- ## This may be a little long, so you can use data(nullDistExample) here.
+   ## (3) Apply the simulated annealing algorithm on pathways of your choice.
+   ## You can provide the searchSubnet() function a graph list, or a single graph.
 
- bkgd_dist <- backgroundDist(keggPathways,zScores)
+   HSS <- searchSubnet(kegg_human, scores)
 
- ## (3) Apply the simulated annealing algorithm on pathways of your choice.
- ## You can provide the searchSubnet() function a graph list, or a single graph.
+   ## (4) Generate the high-scores null distribution.
 
- HSS <- searchSubnet(keggPathways,zScores,bkgd_dist)
+   null <- nullDist(kegg_human, scores)
 
- ## (4) Generate the high-scores null distribution.
+   ## (5) Compute p-values and generate a summary table:
 
- null <- searchSubnet(keggPathways,zScores,bkgd_dist)
+   HSS <- testSubnet(HSS, null)
+   results <- summary(HSS)
 
- ## (5) Compute p-values.
-
- results <- summary(HSS, null)
-}
-
+  }
 }
 \keyword{ package }

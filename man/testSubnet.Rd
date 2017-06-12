@@ -2,12 +2,18 @@
 % Please edit documentation in R/testSubnet.R
 \name{testSubnet}
 \alias{testSubnet}
-\title{Test the significance of a subnetwork}
+\title{Test the significance of high-scoring subnetworks}
 \usage{
 testSubnet(sigObj, nullD)
 }
+\arguments{
+\item{sigObj}{A list of signet objects.}
+
+\item{nullD}{Vector of null highscores generated using the
+\code{nullDist} function}
+}
 \description{
-Test the significance of a subnetwork
+Test the significance of high-scoring subnetworks
 }
 \keyword{annealing}
 \keyword{distribution,}

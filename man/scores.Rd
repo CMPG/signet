@@ -3,7 +3,7 @@
 \docType{data}
 \name{scores}
 \alias{scores}
-\title{Datasetscores.}
+\title{Gene scores example.}
 \format{A data frame with 17918 rows and 2 variables:
 \describe{
   \item{gene}{gene identifier}
@@ -17,6 +17,6 @@ Daub et al., 2013, MBE.
 scores
 }
 \description{
-A dataset of gene scores + KEGG pathways.
+A dataset of gene scores.
 }
 \keyword{datasets}

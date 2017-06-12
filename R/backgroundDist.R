@@ -21,7 +21,10 @@ backgroundDist<-function(pathwaysList,
                          kmin = 1,
                          kmax = 100,
                          iterations = 1000) {
+
   requireNamespace("graph",quietly=TRUE)
+  requireNamespace("stats",quietly=TRUE)
+
   if(missing(pathwaysList)) {
     pathwaysList <- NULL
     gList <- scores
@@ -30,10 +33,12 @@ backgroundDist<-function(pathwaysList,
   colnames(scores) <- c("gene","score")
 
   if(kmax=="max") { # kmax not specified: max k in the graph list
-    kmax <- max(unlist(lapply(pathwaysList,function(x)length(nodes(x)))))
+    kmax <- max(unlist(lapply(pathwaysList,function(x){
+      length(graph::nodes(x))
+      })))
   }
 
-  cat("  Generating background distribution...\n")
+  message("  Generating background distribution...\n", appendLF = FALSE)
 
   bk<-lapply_pb(kmin:kmax,function(x){
     ba<-NULL
@@ -43,10 +48,11 @@ backgroundDist<-function(pathwaysList,
       if(length(pathwaysList)>0) {
 
         glis<-NULL
-        while(length(glis)<x+5)
-        {
+        while(length(glis)<x+5) {
+
           path<-pathwaysList[[sample(length(pathwaysList),1)]]
           glis<-graph::nodes(path)
+
         }
         gList<-scores[scores$gene %in% glis,]
       }
@@ -57,10 +63,10 @@ backgroundDist<-function(pathwaysList,
       return(sumStat)
     }))
 
-    return(c(k=x,mu=mean(ba,na.rm=TRUE),sigma=sd(ba,na.rm=TRUE)))
+    return(c(k=x,mu=mean(ba,na.rm=TRUE),sigma=stats::sd(ba,na.rm=TRUE)))
   })
 
   nullD<-as.data.frame(do.call("rbind",bk))
-  cat("\n  Done!\n\n")
+  message("  Done!\n", appendLF = FALSE)
   return(nullD)
 }
