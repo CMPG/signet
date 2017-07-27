@@ -63,7 +63,7 @@ createSignetObject <- function(pathway, scores, iterations) {
   X<-tapply(scores[!is.na(scores$score),]$score,
             scores[!is.na(scores$score),]$gene,max,na.rm=TRUE)
 
-  X2<-data.frame(gene=as.numeric(names(X)),score=X)
+  X2<-data.frame(gene=as.character(names(X)),score=X) ##num for entrez?
 
   scores<-rbind(X2,scores[is.na(scores$score) & !scores$gene %in% X2$gene,])
 
@@ -123,7 +123,7 @@ createSignetObject <- function(pathway, scores, iterations) {
   }
 }
 
-#' @keywords internal
+#' @export
 print.signet <- summary.signet <- function(object) {
 
   cat("High-scoring subnetwork found with simulated annealing\n")
@@ -139,7 +139,7 @@ print.signet <- summary.signet <- function(object) {
 
 }
 
-#' @keywords internal
+#' @export
 summary.signetList <- function(object) {
 
   if(class(object) != "signetList") stop("Object must be a signetList")
@@ -182,7 +182,7 @@ summary.signetList <- function(object) {
   return(signet_table)
 }
 
-#' @keywords internal
+#' @export
 plot.signet <- function(object) {
 
   if(class(object) != "signet") {
