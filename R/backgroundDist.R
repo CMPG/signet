@@ -13,8 +13,16 @@
 #' provided list.
 #' @param iterations Number of iterations to make the background distribution.
 #'
+#' @return A data frame containing, for each possible subnetwork size k,
+#' the mean and standard deviation of randomly sampled subnetwork scores.
+#'
 #' @keywords simulated annealing, background distribution
 #' @export
+#' @examples
+#' data(daub2013) #pathways and gene scores from Daub et al. (2013).
+#' \dontrun{
+#' example <- backgroundDist(kegg_human, scores)
+#' }
 
 backgroundDist<-function(pathwaysList,
                          scores,
@@ -22,51 +30,51 @@ backgroundDist<-function(pathwaysList,
                          kmax = 100,
                          iterations = 1000) {
 
-  requireNamespace("graph",quietly=TRUE)
-  requireNamespace("stats",quietly=TRUE)
+    requireNamespace("graph",quietly=TRUE)
+    requireNamespace("stats",quietly=TRUE)
 
-  if(missing(pathwaysList)) {
-    pathwaysList <- NULL
-    gList <- scores
-  }
+    if(missing(pathwaysList)) {
+        pathwaysList <- NULL
+        gList <- scores
+    }
 
-  colnames(scores) <- c("gene","score")
+    colnames(scores) <- c("gene","score")
 
-  if(kmax=="max") { # kmax not specified: max k in the graph list
-    kmax <- max(unlist(lapply(pathwaysList,function(x){
-      length(graph::nodes(x))
-      })))
-  }
+    if(kmax=="max") { # kmax not specified: max k in the graph list
+        kmax <- max(unlist(lapply(pathwaysList,function(x){
+            length(graph::nodes(x))
+        })))
+    }
 
-  message("  Generating background distribution...\n", appendLF = FALSE)
+    message("  Generating background distribution...\n", appendLF = FALSE)
 
-  bk<-lapply_pb(kmin:kmax,function(x){
-    ba<-NULL
+    bk<-lapply_pb(kmin:kmax,function(x){
+        ba<-NULL
 
-    ba<-unlist(lapply(1:iterations,function(y){
+        ba<-unlist(lapply(1:iterations,function(y){
 
-      if(length(pathwaysList)>0) {
+            if(length(pathwaysList)>0) {
 
-        glis<-NULL
-        while(length(glis)<x+5) {
+                glis<-NULL
+                while(length(glis)<x+5) {
 
-          path<-pathwaysList[[sample(length(pathwaysList),1)]]
-          glis<-graph::nodes(path)
+                    path<-pathwaysList[[sample(length(pathwaysList),1)]]
+                    glis<-graph::nodes(path)
 
-        }
-        gList<-scores[scores$gene %in% glis,]
-      }
+                }
+                gList<-scores[scores$gene %in% glis,]
+            }
 
-      gList2<-gList[sample(length(gList$gene),x,replace=TRUE),]
-      sumStat <- (1/sqrt(x))*sum(gList2$score)
+            gList2<-gList[sample(length(gList$gene),x,replace=TRUE),]
+            sumStat <- (1/sqrt(x))*sum(gList2$score)
 
-      return(sumStat)
-    }))
+            return(sumStat)
+        }))
 
-    return(c(k=x,mu=mean(ba,na.rm=TRUE),sigma=stats::sd(ba,na.rm=TRUE)))
-  })
+        return(c(k=x,mu=mean(ba,na.rm=TRUE),sigma=stats::sd(ba,na.rm=TRUE)))
+    })
 
-  nullD<-as.data.frame(do.call("rbind",bk))
-  message("  Done!\n", appendLF = FALSE)
-  return(nullD)
+    nullD<-as.data.frame(do.call("rbind",bk))
+    message("  Done!\n", appendLF = FALSE)
+    return(nullD)
 }

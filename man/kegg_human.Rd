@@ -3,12 +3,12 @@
 \docType{data}
 \name{kegg_human}
 \alias{kegg_human}
-\title{Pathways ecample.}
-\format{A list of graphNEL objects}
+\title{Example set of human biological pathways.}
+\format{A list of graphNEL objects.}
 \usage{
 kegg_human
 }
 \description{
-Human KEGG pathways in the graphNEL format (entrez gene identifiers).
+Human KEGG pathways in the graphNEL format (Entrez gene IDs).
 }
 \keyword{datasets}

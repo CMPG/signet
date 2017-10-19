@@ -1,0 +1,150 @@
+---
+title: "signet: Selection Inference in Gene NETworks"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{signet tutorial}
+  %\VignetteEncoding{UTF-8}
+---
+
+## General principle
+
+The `signet` R package implements a method to detect selection in biological 
+pathways. The general idea is to search for gene subnetworks within biological 
+pathways that present unusual features, using a heuristic approach 
+(simulated annealing).
+
+The general idea is simple: we consider a gene list with prealably defined
+scores (e.g. a differentiation measure like the Fst) and we want to find
+gene networks presenting a score higher than expected under the null hypothesis.
+
+To do so, we will use biological pathways databases converted as gene networks
+and search in these graphs for high-scoring subnetworks.
+
+Details about the algorithm can be found in
+<a href="https://doi.org/10.1093/nar/gkx626">Gouy et al. (2017)</a>.
+
+## Walkthrough example
+
+### Input
+
+`signet` takes as input a data frame of gene scores. The first column must
+correspond to the gene ID (e.g. Entrez) and the second columns is the gene 
+score (a single value per gene).
+
+The other input is a list of biological pathways (gene networks) in the
+`graphNEL` format. We advise to use the package `graphite` to get the
+pathway data:
+
+```{r, eval=TRUE, message=FALSE}
+library(signet)
+library(graphite)
+
+# pathwayDatabases() #to have a look at pathways and species available
+paths <- pathways("hsapiens", "kegg") #get the pathway list
+graphs <- lapply(paths, pathwayGraph) #convert pathways to graphs
+```
+
+Note that gene identifiers must be the same between the gene scores data frame
+and the pathway list (e.g. entrez). `graphite` provides a function to convert
+gene identifiers.
+
+A example dataset from Daub et al. (2013, MBE) as well as human KEGG 
+pathways are provided:
+
+```{r, eval=TRUE}
+data(daub13)
+head(scores) #gene scores
+head(kegg_human) #pathways
+```
+
+### Workflow
+
+We first have to search for high-scoring subnetworks within the
+provided biological pathways, using simulated annealing:
+
+```{r, echo=FALSE, eval=TRUE, message=FALSE}
+#Run simulated annealing on the first 10 pathways:
+HSS <- searchSubnet(kegg_human[1:2],
+                    scores,
+                    iterations = 500)
+```
+```{r, eval=FALSE}
+#Run simulated annealing on the first 10 pathways:
+HSS <- searchSubnet(kegg_human[1:10],
+                    scores,
+                    iterations = 5000)
+```
+
+This function returns, for each pathway, the highest-scoring subnetwork found,
+its score and other information about the simulated annealing run.
+
+Then, to test the significance of the high-scoring subnetworks, we
+generate a null distribution of high-scores:
+
+```{r, echo=FALSE, eval=TRUE, message=FALSE}
+#Generate the null distribution
+null <- nullDist(kegg_human,
+                 scores,
+                 n = 10)
+```
+```{r, eval=FALSE}
+#Generate the null distribution
+null <- nullDist(kegg_human,
+                 scores,
+                 n = 1000)
+```
+
+Note that the `null` object is a simple vector of null high-scores (here, 1000).
+Therefore, you can run other iterations afterwards and concatenate the output
+with the previous vector if you want to compute more precise p-values.
+
+This distribution is finally used to compute p-values and update the
+`signet` object:
+
+```{r, eval=TRUE}
+#Compute p-values
+HSS <- testSubnet(HSS,null)
+```
+
+### Interpretation of the results
+
+When p-values have been computed, you can generate a summary table
+(one row per pathway):
+
+```{r, eval=TRUE}
+#Results: generate a summary table
+tab <- summary(HSS)
+
+#write the summary table
+write.table(tab,
+            file = "signet_output.tsv",
+            sep = "\t",
+            quote = FALSE,
+            row.names = FALSE)
+
+```
+
+Note that searching for high-scoring subnetworks and generating the null
+distribution can take a few hours. However, these steps are easy
+to parallelize on a cluster as different iterations are independent from each
+other.
+
+### Plot the results using Cytoscape
+
+Cytoscape is an external software dedicated to network visualization.
+`signet` allows to generate an XGMML file to be loaded in Cytoscape. The file
+is written thanks to the function `writeXGMML` in your working directory.
+
+1. Plot a single pathway and its highest-scoring subnetwork
+
+If the input of
+```{r, eval=FALSE}
+writeXGMML(HSS[[1]], file="cytoscape_input.xgmml")
+```
+
+2. Merge all the sugnificant subnetworks and plot the resulting graph
+
+```{r, eval=FALSE}
+writeXGMML(HSS, threshold=0.01, file="cytoscape_input.xgmml")
+```

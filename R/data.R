@@ -1,19 +1,18 @@
-#' Gene scores example.
+#' Example of gene selection scores.
 #'
-#' A dataset of gene scores.
+#' A dataset of gene selection scores.
 #'
 #' @format A data frame with 17918 rows and 2 variables:
 #' \describe{
-#'   \item{gene}{gene identifier}
-#'   \item{score}{gene score}
+#'   \item{gene}{Gene identifier (Entrez gene ID)}
+#'   \item{score}{Gene selection score}
 #'   ...
 #' }
 #' @source Daub et al., 2013, MBE.
 "scores"
 
-#' Pathways ecample.
+#' Example set of human biological pathways.
 #'
-#' Human KEGG pathways in the graphNEL format (entrez gene identifiers).
-#'
-#' @format A list of graphNEL objects
+#' Human KEGG pathways in the graphNEL format (Entrez gene IDs).
+#' @format A list of graphNEL objects.
 "kegg_human"

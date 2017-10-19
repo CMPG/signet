@@ -22,9 +22,19 @@ provided list.}
 
 \item{iterations}{Number of iterations to make the background distribution.}
 }
+\value{
+A data frame containing, for each possible subnetwork size k,
+the mean and standard deviation of randomly sampled subnetwork scores.
+}
 \description{
 Generate the background distribution necessary to compute subnetwork scores
 during a simulated annealing run.
+}
+\examples{
+data(daub2013) #pathways and gene scores from Daub et al. (2013).
+\dontrun{
+example <- backgroundDist(kegg_human, scores)
+}
 }
 \keyword{annealing,}
 \keyword{background}

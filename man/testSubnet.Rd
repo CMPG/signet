@@ -2,18 +2,33 @@
 % Please edit documentation in R/testSubnet.R
 \name{testSubnet}
 \alias{testSubnet}
-\title{Test the significance of high-scoring subnetworks}
+\title{Test the significance of high-scoring subnetworks found using simulated
+annealing.}
 \usage{
 testSubnet(sigObj, nullD)
 }
 \arguments{
-\item{sigObj}{A list of signet objects.}
+\item{sigObj}{A list of signet objects obtained using the
+\verb{searchSubnet} function.}
 
-\item{nullD}{Vector of null highscores generated using the
-\code{nullDist} function}
+\item{nullD}{Vector of null subnetwork scores generated using the
+\code{nullDist} function.}
+}
+\value{
+For each \verb{signet} object, a p-value is computed given the
+provided emnpirical null distribution.
 }
 \description{
-Test the significance of high-scoring subnetworks
+Test the significance of high-scoring subnetworks found using simulated
+annealing.
+}
+\examples{
+data(daub13)
+\dontrun{
+HSS <- searchSubnet(kegg_human[1:10], scores, iterations = 5000)
+null <- nullDist(kegg_human, scores, n = 1000)
+HSS <- testSubnet(HSS,null)
+}
 }
 \keyword{annealing}
 \keyword{distribution,}

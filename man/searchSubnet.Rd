@@ -7,31 +7,38 @@
 searchSubnet(pathway, scores, background, iterations = 5000, verbose = TRUE)
 }
 \arguments{
-\item{pathway}{A gene network, or a list of networks,
+\item{pathway}{A gene network, or a list of gene networks,
 in the \verb{graphNEL} format.}
 
-\item{scores}{A data frame with two columns: gene identifiers list
-and associated scores.}
+\item{scores}{A data frame with two columns: gene identifiers list (IDs have
+to be the same as for the pathways, e.g. Entrez) and associated scores.}
 
-\item{background}{A data frame with three columns : k, mu, sigma.}
+\item{background}{Optional. A data frame generated using the
+\verb{backgroundDist} function. Is missing, the
+theoretical expectation is computed (see Gouy et al., 2017).}
 
-\item{iterations}{Number of iterations ofr simulated annealing.}
+\item{iterations}{Number of iterations.}
 
 \item{verbose}{If \verb{TRUE}, displays text in the R console.}
 }
 \value{
-A list containing a table with genes, their state, their score;
-the subnetwortk score and size and the p-value
+A \verb{signet} object or a list of \verb{signet} objects. Each
+\verb{signet} object consists in a table with gene IDs, their state,
+their score; the subnetwork score and size and the p-value.
 }
 \description{
 A simulated annealing algorithm to find the highest scoring
-subnetwork in a graph.
+subnetwork within a graph.
 }
 \examples{
-\dontrun{
-data(daub2013)
+data(daub2013) #pathways and gene scores from Daub et al. (2013).
 
-example <- searchSubnet(kegg_human[1:5], scores, iterations = 1000)
+#run the search in the first two pathways with 1000 iterations
+example <- searchSubnet(kegg_human[1:2], scores, iterations = 1000)
+\dontrun{
+
+#run the search in all the pathways with 5000 iterations (default)
+example <- searchSubnet(kegg_human, scores)
 }
 }
 \keyword{algorithm}

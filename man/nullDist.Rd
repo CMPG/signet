@@ -9,22 +9,28 @@ nullDist(pathways, scores, n = 1000, background)
 \arguments{
 \item{pathways}{A list of graphNEL objects.}
 
-\item{scores}{A data frame in which the first column is the gene list
-and the second column contains the gene scores.}
+\item{scores}{A data frame in which the first column corresponds to the gene
+ID and the second column contains the gene scores.}
 
-\item{n}{Number of null high-scores to compute.}
+\item{n}{Number of null high-scores to compute (default = 1000).}
 
-\item{background}{Background distribution.}
+\item{background}{Optional. Background distribution computed using the
+\verb{backgroundDist} function.}
+}
+\value{
+A vector of subnetworks scores obtained under the null hypothesis.
+Must be used as input of the \verb{testSubnet} function.
 }
 \description{
 Generate the high-scores null distribution to compute empirical p-values
-for each pathway tested.
+for each biological pathway.
 }
 \examples{
-\dontrun{
 data(daub13)
-
-nullDistrib <- nullDist(kegg_human, scores, n = 1000)
+\dontrun{
+HSS <- searchSubnet(kegg_human[1:10], scores, iterations = 5000)
+null <- nullDist(kegg_human, scores, n = 1000)
+HSS <- testSubnet(HSS,null)
 }
 }
 \keyword{annealing,}

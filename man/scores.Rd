@@ -3,11 +3,11 @@
 \docType{data}
 \name{scores}
 \alias{scores}
-\title{Gene scores example.}
+\title{Example of gene selection scores.}
 \format{A data frame with 17918 rows and 2 variables:
 \describe{
-  \item{gene}{gene identifier}
-  \item{score}{gene score}
+  \item{gene}{Gene identifier (Entrez gene ID)}
+  \item{score}{Gene selection score}
   ...
 }}
 \source{
@@ -17,6 +17,6 @@ Daub et al., 2013, MBE.
 scores
 }
 \description{
-A dataset of gene scores.
+A dataset of gene selection scores.
 }
 \keyword{datasets}
