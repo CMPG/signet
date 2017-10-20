@@ -89,9 +89,10 @@ writeXGMML <- function(results,
     } else {
 
         selec <- unlist(lapply(results, function(x) {
-            if (is.na(x$p.value)) return(FALSE)
+
             if (length(x) > 1)
-                return(x$p.value < threshold)
+                if (is.na(x$p.value)) return(FALSE)
+                else return(x$p.value < threshold)
             else
                 return(FALSE)
         }))
