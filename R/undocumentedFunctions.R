@@ -126,7 +126,7 @@ createSignetObject <- function(pathway, scores, iterations) {
     }
 }
 
-#' @method print signet
+#' @export
 print.signet <- function(object, ...) {
 
     cat("High-scoring subnetwork found with simulated annealing\n")
@@ -142,7 +142,7 @@ print.signet <- function(object, ...) {
 
 }
 
-#' @method summary signet
+#' @export
 summary.signet <- function(object, ...) {
 
     cat("High-scoring subnetwork found with simulated annealing\n")
@@ -158,7 +158,7 @@ summary.signet <- function(object, ...) {
 
 }
 
-#' @method summary signetList
+#' @export
 summary.signetList <- function(object, ...) {
 
     if(class(object) != "signetList") stop("Object must be a signetList")
@@ -201,7 +201,7 @@ summary.signetList <- function(object, ...) {
     return(signet_table)
 }
 
-#' @method plot signet
+#' @export
 plot.signet <- function(object, ...) {
 
     if(class(object) != "signet") {
