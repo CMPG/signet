@@ -127,18 +127,18 @@ createSignetObject <- function(pathway, scores, iterations) {
 }
 
 #' @export
-print.signet <- function(object, ...) {
+print.signet <- function(x, ...) {
 
     cat("High-scoring subnetwork found with simulated annealing\n")
 
     cat(paste("Subnetwork score: ",
-              round(object$subnet_score,digits=4),"\n",sep=""))
+              round(x$subnet_score,digits=4),"\n",sep=""))
 
     cat(paste("Subnetwork size: ",
-              object$subnet_size,"\n",sep=""))
+              x$subnet_size,"\n",sep=""))
 
     cat(paste("Genes in subnetwork: ",
-              paste(object$subnet_genes,collapse=" "),"\n",sep=""))
+              paste(x$subnet_genes,collapse=" "),"\n",sep=""))
 
 }
 
@@ -165,28 +165,28 @@ summary.signetList <- function(object, ...) {
 
     pathway <- names(object)
 
-    net.size <- unlist(lapply(object,function(x){
-        if(length(x)>1) return(dim(x$network)[1])
+    net.size <- unlist(lapply(object, function(xl){
+        if(length(xl)>1) return(dim(xl$network)[1])
         else return(NA)
     }))
 
-    subnet.size <- unlist(lapply(object,function(x){
-        if(length(x)>1) return(x$subnet_size)
+    subnet.size <- unlist(lapply(object, function(xl){
+        if(length(xl)>1) return(xl$subnet_size)
         else return(NA)
     }))
 
-    subnet.score <- unlist(lapply(object,function(x){
-        if(length(x)>1) return(x$subnet_score)
+    subnet.score <- unlist(lapply(object, function(xl){
+        if(length(xl)>1) return(xl$subnet_score)
         else return(NA)
     }))
 
-    p.value <- unlist(lapply(object,function(x){
-        if(length(x)>1) return(x$p.value)
+    p.value <- unlist(lapply(object, function(xl){
+        if(length(xl)>1) return(xl$p.value)
         else return(NA)
     }))
 
-    subnet.genes <- unlist(lapply(object,function(x){
-        if(length(x)>1) return(paste(x$subnet_genes,collapse=" "))
+    subnet.genes <- unlist(lapply(object,function(xl){
+        if(length(xl)>1) return(paste(xl$subnet_genes,collapse=" "))
         else return(NA)
     }))
 
@@ -202,13 +202,13 @@ summary.signetList <- function(object, ...) {
 }
 
 #' @export
-plot.signet <- function(object, ...) {
+plot.signet <- function(x, ...) {
 
-    if(class(object) != "signet") {
-        stop("Object must be a signet object.")
+    if(class(x) != "signet") {
+        stop("Input must be a signet object.")
     }
 
-    if(is.na(object$subnet_score)) {
+    if(is.na(x$subnet_score)) {
         stop("Pathway is too small/disconnected to be tested.")
     }
 
@@ -217,55 +217,55 @@ plot.signet <- function(object, ...) {
     m <- rbind(c(0,1,1,1,1,0),c(2,2,2,3,3,3))
     layout(m)
 
-    glist <- object$network[object$network$active,]$gene
+    glist <- x$network[x$network$active,]$gene
 
     subs <- as.character(glist)
-    subg <- graph::subGraph(subs,object$connected_comp)
+    subg <- graph::subGraph(subs,x$connected_comp)
 
     col <- c(rep("red",length(subs)))
     nAttrs <- list()
     nAttrs$fillcolor <- col
-    nAttrs$height <- rep("0.6", length(graph::nodes(object$connected_comp)))
-    nAttrs$width <- rep("0.6", length(graph::nodes(object$connected_comp)))
-    nAttrs$color <- rep("darkgrey", length(graph::nodes(object$connected_comp)))
+    nAttrs$height <- rep("0.6", length(graph::nodes(x$connected_comp)))
+    nAttrs$width <- rep("0.6", length(graph::nodes(x$connected_comp)))
+    nAttrs$color <- rep("darkgrey", length(graph::nodes(x$connected_comp)))
 
     names(nAttrs$color) <- names(nAttrs$width) <- names(nAttrs$height) <-
-        graph::nodes(object$connected_comp)
+        graph::nodes(x$connected_comp)
 
     names(nAttrs$fillcolor) <- c(subs)
 
     eAttrs <- list()
-    eAttrs$color <- rep("grey",length(graph::edgeNames(object$connected_comp)))
-    names(eAttrs$color) <- graph::edgeNames(object$connected_comp)
+    eAttrs$color <- rep("grey",length(graph::edgeNames(x$connected_comp)))
+    names(eAttrs$color) <- graph::edgeNames(x$connected_comp)
 
-    graph::plot(object$connected_comp, y = "neato", nodeAttrs = nAttrs,
+    graph::plot(x$connected_comp, y = "neato", nodeAttrs = nAttrs,
                 edgeAttrs = eAttrs)
 
-    x <- 1:length(object$simulated_annealing$temperature)
-    y <- object$simulated_annealing$size_evolution
-    z <- object$simulated_annealing$score_evolution
+    x.ax <- 1:length(x$simulated_annealing$temperature)
+    y <- x$simulated_annealing$size_evolution
+    z <- x$simulated_annealing$score_evolution
     par(mar = c(5, 5, 5, 5))  # Leave space for z axis
 
-    plot(x, z, type = "l",lwd = 1,cex = 0.2,pch = 16,
+    plot(x.ax, z, type = "l",lwd = 1,cex = 0.2,pch = 16,
          col = "firebrick",ylab = "Subnetwork score",
          xlab = "Iterations") # first plot
 
     par(new = TRUE)
-    plot(x, object$simulated_annealing$temperature, type = "l", lwd=1,
+    plot(x.ax, x$simulated_annealing$temperature, type = "l", lwd=1,
          xlab = "", ylab = "", axes=FALSE, lty=2,
          col = "grey")
-    axis(side = 4, at = pretty(range(object$simulated_annealing$temperature)))
+    axis(side = 4, at = pretty(range(x$simulated_annealing$temperature)))
     mtext("Temperature", side = 4, line = 3, cex=0.7)
 
-    plot(x, y, type = "l", cex = 0.5,
+    plot(x.ax, y, type = "l", cex = 0.5,
          xlab = "Iterations", ylab = "Subnetwork size",
          pch=16,lwd=1,col="dodgerblue")
 
     par(new=TRUE)
-    plot(x,object$simulated_annealing$temperature, type="l",lwd=1,
+    plot(x.ax, x$simulated_annealing$temperature, type="l",lwd=1,
          xlab="", ylab="",axes=FALSE,lty=2,
          col="grey")
-    axis(side=4, at = pretty(range(object$simulated_annealing$temperature)))
+    axis(side=4, at = pretty(range(x$simulated_annealing$temperature)))
     mtext("Temperature", side=4, line=3, cex=0.7)
 
     par(mfrow = c(1,1))
