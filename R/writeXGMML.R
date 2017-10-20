@@ -23,7 +23,8 @@
 #' data(daub2013) #pathways and gene scores from Daub et al. (2013).
 #' \dontrun{
 #' #run the search in all the pathways with 5000 iterations (default)
-#' example <- searchSubnet(kegg_human, scores)
+#' example <- searchSubnet(kegg_human[[1]], scores)
+#' writeXGMML(example)
 #' }
 
 writeXGMML <- function(results,

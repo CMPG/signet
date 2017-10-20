@@ -24,6 +24,13 @@ and search in these graphs for high-scoring subnetworks.
 Details about the algorithm can be found in
 <a href="https://doi.org/10.1093/nar/gkx626">Gouy et al. (2017)</a>.
 
+## Citation
+
+Please cite this paper if you use `signet` for your project:
+
+* Gouy A, Daub JT & Excoffier L (2017) Detecting gene subnetworks under 
+selection in biological pathways. Nucleic Acids Research 45(16): e149
+
 ## Walkthrough example
 
 ### Input
@@ -103,7 +110,6 @@ This distribution is finally used to compute p-values and update the
 `signet` object:
 
 ```{r, eval=TRUE}
-#Compute p-values
 HSS <- testSubnet(HSS,null)
 ```
 
@@ -113,15 +119,16 @@ When p-values have been computed, you can generate a summary table
 (one row per pathway):
 
 ```{r, eval=TRUE}
-#Results: generate a summary table
+# Results: generate a summary table
 tab <- summary(HSS)
+head(tab)
 
-#write the summary table
-write.table(tab,
-            file = "signet_output.tsv",
-            sep = "\t",
-            quote = FALSE,
-            row.names = FALSE)
+# you can write the summary table as follow:
+# write.table(tab,
+#             file = "signet_output.tsv",
+#             sep = "\t",
+#             quote = FALSE,
+#             row.names = FALSE)
 
 ```
 
@@ -132,19 +139,30 @@ other.
 
 ### Plot the results using Cytoscape
 
-Cytoscape is an external software dedicated to network visualization.
-`signet` allows to generate an XGMML file to be loaded in Cytoscape. The file
-is written thanks to the function `writeXGMML` in your working directory.
+Cytoscape (www.cytoscape.org) is an external software dedicated to network 
+visualization. `signet` allows to generate an XGMML file to be loaded in 
+Cytoscape (File > Import > Network > File...). 
+This file can be written in your working directory thanks to the 
+function `writeXGMML`.
 
 1. Plot a single pathway and its highest-scoring subnetwork
 
-If the input of
-```{r, eval=FALSE}
-writeXGMML(HSS[[1]], file="cytoscape_input.xgmml")
-```
-
-2. Merge all the sugnificant subnetworks and plot the resulting graph
+If the input of the function is a single `signet` object, the whole pathway will
+be represented and nodes belonging to the highest-scoring subnetwork (HSS) 
+will be highlighted in red.
 
 ```{r, eval=FALSE}
-writeXGMML(HSS, threshold=0.01, file="cytoscape_input.xgmml")
+writeXGMML(HSS[[1]], filename = "cytoscape_input.xgmml")
 ```
+
+2. Merge all the significant subnetworks and plot the resulting graph
+
+If a list of pathways (signetList) is provided, all subnetworks with a p-value 
+below a given threshold (default: 0.01) are merged and represented. Note that 
+in this case, only the nodes belonging to HSS are kept for representation.
+
+```{r, eval=FALSE}
+writeXGMML(HSS, filename = "cytoscape_input.xgmml", threshold = 0.01)
+```
+
+The representation can then be finely customised in Cytoscape.

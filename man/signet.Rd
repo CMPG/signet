@@ -12,31 +12,35 @@
     for their significance.
 }
 
-
 \examples{
     ## The following example illustrates the workflow.
 
-  \dontrun{
-   ## (1) The user must provide pathways and score data in the same format as
-   ## this example dataset:
+    ## (1) The user must provide pathways and score data in the same format as
+    ## this example dataset:
 
-   data(daub13)
+    data(daub13)
 
-   ## (3) Apply the simulated annealing algorithm on pathways of your choice.
-   ## You can provide the searchSubnet() function a graph list,
-   ## or a single graph.
+    \dontrun {
 
-   HSS <- searchSubnet(kegg_human, scores)
+    ## (2) Apply the simulated annealing algorithm on pathways of your choice.
+    ## You can provide the searchSubnet() function a graph list,
+    ## or a single graph:
 
-   ## (4) Generate the high-scores null distribution.
+    HSS <- searchSubnet(kegg_human, scores)
 
-   null <- nullDist(kegg_human, scores)
+    ## (3) Generate the high-scores null distribution:
 
-   ## (5) Compute p-values and generate a summary table:
+    null <- nullDist(kegg_human, scores)
 
-   HSS <- testSubnet(HSS, null)
-   results <- summary(HSS)
+    ## (4) Compute p-values and generate a summary table:
 
-  }
+    HSS <- testSubnet(HSS, null)
+    results <- summary(HSS)
+
+    ## (5) Write a Cytoscape input file for visualisation:
+
+    writeXGMML(HSS, threshold=0.01)
+
+    }
 }
 \keyword{ package }
