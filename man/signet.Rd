@@ -20,7 +20,7 @@
 
     data(daub13)
 
-    \dontrun {
+    \dontrun{
 
     ## (2) Apply the simulated annealing algorithm on pathways of your choice.
     ## You can provide the searchSubnet() function a graph list,
