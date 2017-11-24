@@ -23,8 +23,10 @@ scores
 A dataset of gene selection scores.
 }
 \details{
-These gene scores are the one used in Daub et al. (2013). Each score
-corresponds to the maximal value among SNPs located within each gene.
+These gene scores are the one used in Daub et al. (2013). For a set of SNPs,
+a z-score has been computed to represent an overall genetic differentiation
+among several human populations. A gene score corresponds to the maximal
+value among SNPs located within a given gene.
 
 The table has been generated using the pipeline described here
 ("Human populations project"): https://github.com/CMPG/polysel

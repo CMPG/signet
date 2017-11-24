@@ -3,7 +3,7 @@ title: "signet: Selection Inference in Gene NETworks"
 output: rmarkdown::html_vignette
 vignette: >
     %\VignetteEngine{knitr::rmarkdown}
-    %\VignetteIndexEntry{signet tutorial}
+    %\VignetteIndexEntry{signet}
     %\VignetteEncoding{UTF-8}
 ---
 
@@ -141,7 +141,8 @@ be represented and nodes belonging to the highest-scoring subnetwork (HSS)
 will be highlighted in red.
 
 ```{r, eval=TRUE, echo=FALSE}
-writeXGMML(HSS[[1]], filename = tempfile())
+fname <- tempfile()
+writeXGMML(HSS[[1]], filename = fname)
 ```
 ```{r, eval=FALSE}
 writeXGMML(HSS[[1]], filename = "cytoscape_input.xgmml")
