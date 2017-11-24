@@ -3,7 +3,7 @@
 #'
 #' @param sigObj A list of signet objects obtained using the
 #' \verb{searchSubnet} function.
-#' @param nullD Vector of null subnetwork scores generated using the
+#' @param null Vector of null subnetwork scores generated using the
 #' \code{nullDist} function.
 #'
 #' @return For each \verb{signet} object, a p-value is computed given the
@@ -12,36 +12,36 @@
 #' @keywords null distribution, simulated annealing
 #' @export
 #' @examples
-#' data(daub13)
-#' \dontrun{
-#' HSS <- searchSubnet(kegg_human[1:10], scores, iterations = 5000)
-#' null <- nullDist(kegg_human, scores, n = 1000)
-#' HSS <- testSubnet(HSS,null)
-#' }
+#'
+#' # Get KEGG pathways from the package graphite:
+#' library(graphite)
+#' kegg <- pathways("hsapiens", "kegg")
+#' kegg_human <- lapply(kegg[1:5], pathwayGraph)
+#'
+#' data(daub2013) # load the gene scores from Daub et al. (2013)
+#'
+#' #run the search in all the pathways with 2500 iterations (default)
+#' example <- searchSubnet(kegg_human, scores)
+#'
+#' # generate the null distribution (here, only 10 values, but
+#' # at least 1000 are advised)
+#' null <- nullDist(kegg_human, scores, n = 10)
+#' example <- testSubnet(example, null) #now, 'example' includes p-values
+#' summary(example)
 
-testSubnet<-function(sigObj, nullD) {
+testSubnet <- function(sigObj, null) {
 
-    if(class(sigObj) != "signetList") {
-
+    if(class(sigObj) != "SignetList") {
         stop("Input is not a list of signet objects")
-
     }
 
-    if(class(nullD) != "numeric") {
-
+    if(class(null) != "numeric") {
         stop("Null distribution must be a numeric vector")
-
     }
 
-    lapply(names(sigObj),function(x) {
-
-        if(length(sigObj[[x]])>1) {
-
-            sigObj[[x]]$p.value <<- mean(nullD > sigObj[[x]]$subnet_score,
-                                         na.rm=TRUE)
-
-        }
-
+    sigObj@results <- lapply(sigObj@results, function(x) {
+        x@p.value <- mean(null > x@subnet_score, na.rm = TRUE)
+        x
     })
 
     return(sigObj)

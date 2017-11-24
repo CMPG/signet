@@ -2,9 +2,9 @@
 title: "signet: Selection Inference in Gene NETworks"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{signet tutorial}
-  %\VignetteEncoding{UTF-8}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteIndexEntry{signet tutorial}
+    %\VignetteEncoding{UTF-8}
 ---
 
 ## General principle
@@ -48,8 +48,12 @@ library(signet)
 library(graphite)
 
 # pathwayDatabases() #to have a look at pathways and species available
-paths <- pathways("hsapiens", "kegg") #get the pathway list
-graphs <- lapply(paths, pathwayGraph) #convert pathways to graphs
+# get the pathway list:
+paths <- pathways("hsapiens", "kegg")
+
+# convert the first 3 pathways to graphs:
+kegg_human <- lapply(paths[1:3], pathwayGraph)
+head(kegg_human)
 ```
 
 Note that gene identifiers must be the same between the gene scores data frame
@@ -61,8 +65,7 @@ pathways are provided:
 
 ```{r, eval=TRUE}
 data(daub13)
-head(scores) #gene scores
-head(kegg_human) #pathways
+head(scores) # gene scores
 ```
 
 ### Workflow
@@ -70,17 +73,9 @@ head(kegg_human) #pathways
 We first have to search for high-scoring subnetworks within the
 provided biological pathways, using simulated annealing:
 
-```{r, echo=FALSE, eval=TRUE, message=FALSE}
-#Run simulated annealing on the first 10 pathways:
-HSS <- searchSubnet(kegg_human[1:2],
-                    scores,
-                    iterations = 500)
-```
-```{r, eval=FALSE}
-#Run simulated annealing on the first 10 pathways:
-HSS <- searchSubnet(kegg_human[1:10],
-                    scores,
-                    iterations = 5000)
+```{r, eval=TRUE, message=FALSE, results="hide"}
+# Run simulated annealing on the first 3 KEGG pathways:
+HSS <- searchSubnet(kegg_human, scores)
 ```
 
 This function returns, for each pathway, the highest-scoring subnetwork found,
@@ -89,17 +84,12 @@ its score and other information about the simulated annealing run.
 Then, to test the significance of the high-scoring subnetworks, we
 generate a null distribution of high-scores:
 
-```{r, echo=FALSE, eval=TRUE, message=FALSE}
-#Generate the null distribution
-null <- nullDist(kegg_human,
-                 scores,
-                 n = 10)
+```{r, echo=FALSE, eval=TRUE, message=FALSE, results="hide"}
+null <- rnorm(1000, mean = 1.2, sd = 1)
 ```
-```{r, eval=FALSE}
-#Generate the null distribution
-null <- nullDist(kegg_human,
-                 scores,
-                 n = 1000)
+```{r, eval=FALSE, message=FALSE}
+#Generate the empirical null distribution
+null <- nullDist(kegg_human, scores, n = 1000)
 ```
 
 Note that the `null` object is a simple vector of null high-scores (here, 1000).
@@ -110,7 +100,7 @@ This distribution is finally used to compute p-values and update the
 `signet` object:
 
 ```{r, eval=TRUE}
-HSS <- testSubnet(HSS,null)
+HSS <- testSubnet(HSS, null)
 ```
 
 ### Interpretation of the results
@@ -129,7 +119,6 @@ head(tab)
 #             sep = "\t",
 #             quote = FALSE,
 #             row.names = FALSE)
-
 ```
 
 Note that searching for high-scoring subnetworks and generating the null
@@ -151,6 +140,9 @@ If the input of the function is a single `signet` object, the whole pathway will
 be represented and nodes belonging to the highest-scoring subnetwork (HSS) 
 will be highlighted in red.
 
+```{r, eval=TRUE, echo=FALSE}
+writeXGMML(HSS[[1]], filename = tempfile())
+```
 ```{r, eval=FALSE}
 writeXGMML(HSS[[1]], filename = "cytoscape_input.xgmml")
 ```

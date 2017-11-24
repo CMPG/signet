@@ -17,9 +17,6 @@ and search in these graphs for high-scoring subnetworks.
 Details about the algorithm can be found in
 <a href="https://doi.org/10.1093/nar/gkx626">Gouy et al. (2017)</a>.
 
-<p align="center"><img src="misc/anim_50fps.gif"></p>
-<p align="center">Simulated annealing run in a gene network.</p>
-
 ## Citation
 
 Please cite this paper if you use `signet` for your project:

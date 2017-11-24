@@ -2,17 +2,22 @@
 #'
 #' A dataset of gene selection scores.
 #'
+#' These gene scores are the one used in Daub et al. (2013). For a set of SNPs,
+#' a z-score has been computed to represent an overall genetic differentiation
+#' among several human populations. A gene score corresponds to the maximal
+#' value among SNPs located within a given gene.
+#'
+#' The table has been generated using the pipeline described here
+#' ("Human populations project"): https://github.com/CMPG/polysel
+#'
 #' @format A data frame with 17918 rows and 2 variables:
 #' \describe{
-#'   \item{gene}{Gene identifier (Entrez gene ID)}
-#'   \item{score}{Gene selection score}
-#'   ...
+#'     \item{gene}{Gene identifier (Entrez gene ID)}
+#'     \item{score}{Gene selection score}
+#'     ...
 #' }
-#' @source Daub et al., 2013, MBE.
+#' @source Daub, J. T., Hofer, T., Cutivet, E., Dupanloup, I.,
+#' Quintana-Murci, L., Robinson-Rechavi, M., & Excoffier, L. (2013). Evidence
+#' for polygenic adaptation to pathogens in the human genome. Molecular biology
+#' and evolution, 30(7), 1544-1558.
 "scores"
-
-#' Example set of human biological pathways.
-#'
-#' Human KEGG pathways in the graphNEL format (Entrez gene IDs).
-#' @format A list of graphNEL objects.
-"kegg_human"

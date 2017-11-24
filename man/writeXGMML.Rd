@@ -4,10 +4,10 @@
 \alias{writeXGMML}
 \title{Write Cytoscape input file}
 \usage{
-writeXGMML(results, filename = "signet_output.xgmml", threshold = 0.01)
+writeXGMML(sigObj, filename = "signet_output.xgmml", threshold = 0.01)
 }
 \arguments{
-\item{results}{A signet or signetList object.}
+\item{sigObj}{A signet or signetList object.}
 
 \item{filename}{The desired file name. Default is "signet_output.xgmml".}
 
@@ -28,12 +28,18 @@ This function allows to write an XGMML file to represent the results in
 Cytoscape.
 }
 \examples{
-data(daub2013) #pathways and gene scores from Daub et al. (2013).
-\dontrun{
-#run the search in all the pathways with 5000 iterations (default)
-example <- searchSubnet(kegg_human[[1]], scores)
-writeXGMML(example)
-}
+# Get KEGG pathways from the package graphite:
+library(graphite)
+kegg <- pathways("hsapiens", "kegg")
+kegg_human <- lapply(kegg[1:5], pathwayGraph)
+
+data(daub2013) # load the gene scores from Daub et al. (2013)
+
+#run the search in all the pathways with 2500 iterations (default)
+example <- searchSubnet(kegg_human, scores)
+
+#write Cytoscape input file for the first pathway:
+writeXGMML(example[[1]], filename = tempfile())
 }
 \keyword{Cytoscape,}
 \keyword{network,}

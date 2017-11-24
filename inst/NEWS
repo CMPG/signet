@@ -1,0 +1,5 @@
+signet v0.99.3 (2017-11-21)
+------------------------
+
+Bug fixes:
+* Fixed the error returning a wrong pathway size when calling summary() for a signetList object.

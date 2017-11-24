@@ -26,12 +26,16 @@ Generate the high-scores null distribution to compute empirical p-values
 for each biological pathway.
 }
 \examples{
-data(daub13)
-\dontrun{
-HSS <- searchSubnet(kegg_human[1:10], scores, iterations = 5000)
-null <- nullDist(kegg_human, scores, n = 1000)
-HSS <- testSubnet(HSS,null)
-}
+# Get KEGG pathways from the package graphite:
+library(graphite)
+kegg <- pathways("hsapiens", "kegg")
+kegg_human <- lapply(kegg[1:5], pathwayGraph)
+
+data(daub2013) # load the gene scores from Daub et al. (2013)
+
+# generate the null distribution (here, only 10 values, but
+# at least 1000 are advised)
+null <- nullDist(kegg_human, scores, n = 10)
 }
 \keyword{annealing,}
 \keyword{distribution}

@@ -6,17 +6,27 @@
 \title{Example of gene selection scores.}
 \format{A data frame with 17918 rows and 2 variables:
 \describe{
-  \item{gene}{Gene identifier (Entrez gene ID)}
-  \item{score}{Gene selection score}
-  ...
+    \item{gene}{Gene identifier (Entrez gene ID)}
+    \item{score}{Gene selection score}
+    ...
 }}
 \source{
-Daub et al., 2013, MBE.
+Daub, J. T., Hofer, T., Cutivet, E., Dupanloup, I.,
+Quintana-Murci, L., Robinson-Rechavi, M., & Excoffier, L. (2013). Evidence
+for polygenic adaptation to pathogens in the human genome. Molecular biology
+and evolution, 30(7), 1544-1558.
 }
 \usage{
 scores
 }
 \description{
 A dataset of gene selection scores.
+}
+\details{
+These gene scores are the one used in Daub et al. (2013). Each score
+corresponds to the maximal value among SNPs located within each gene.
+
+The table has been generated using the pipeline described here
+("Human populations project"): https://github.com/CMPG/polysel
 }
 \keyword{datasets}
