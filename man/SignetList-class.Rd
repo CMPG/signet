@@ -17,7 +17,7 @@
 
 \S4method{[}{SignetList,ANY,missing}(x, i, j, ..., drop = TRUE)
 
-\S4method{summary}{SignetList}(object)
+\S4method{summary}{SignetList}(object, ...)
 }
 \arguments{
 \item{.Object}{A SignetList object.}

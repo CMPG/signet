@@ -108,7 +108,7 @@ HSS <- testSubnet(HSS, null)
 When p-values have been computed, you can generate a summary table
 (one row per pathway):
 
-```{r, eval=TRUE}
+```{r, eval=FALSE}
 # Results: generate a summary table
 tab <- summary(HSS)
 head(tab)
@@ -140,6 +140,10 @@ If the input of the function is a single `signet` object, the whole pathway will
 be represented and nodes belonging to the highest-scoring subnetwork (HSS) 
 will be highlighted in red.
 
+```{r, eval=TRUE, echo=FALSE}
+fname <- tempfile()
+writeXGMML(HSS[[1]], filename = fname)
+```
 ```{r, eval=FALSE}
 writeXGMML(HSS[[1]], filename = "cytoscape_input.xgmml")
 ```

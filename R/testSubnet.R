@@ -18,7 +18,7 @@
 #' kegg <- pathways("hsapiens", "kegg")
 #' kegg_human <- lapply(kegg[1:5], pathwayGraph)
 #'
-#' data(daub2013) # load the gene scores from Daub et al. (2013)
+#' data(daub13) # load the gene scores from Daub et al. (2013)
 #'
 #' #run the search in all the pathways with 2500 iterations (default)
 #' example <- searchSubnet(kegg_human, scores)

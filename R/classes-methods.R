@@ -231,7 +231,7 @@ setMethod("[", c("SignetList", "ANY", "missing"),
 #' summary statistics for each element (network and subnetwork sizes,
 #' subnetwork score, p-value, significant genes list)
 #' @export
-setMethod("summary", "SignetList", function(object) {
+setMethod("summary", "SignetList", function(object, ...) {
 
     re <- data.frame(pathway = names(object@results))
 
