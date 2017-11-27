@@ -7,10 +7,10 @@ library(graphite)
 
 # pathwayDatabases() #to have a look at pathways and species available
 # get the pathway list:
-paths <- pathways("hsapiens", "kegg")
+paths <- graphite::pathways("hsapiens", "kegg")
 
 # convert the first 3 pathways to graphs:
-kegg_human <- lapply(paths[1:3], pathwayGraph)
+kegg_human <- lapply(paths[1:3], graphite::pathwayGraph)
 head(kegg_human)
 
 ## ---- eval=TRUE----------------------------------------------------------
@@ -22,7 +22,7 @@ head(scores) # gene scores
 HSS <- searchSubnet(kegg_human, scores)
 
 ## ---- echo=FALSE, eval=TRUE, message=FALSE, results="hide"---------------
-null <- rnorm(1000, mean = 1.2, sd = 1)
+null <- nullDist(kegg_human, scores, n = 10)
 
 ## ---- eval=FALSE, message=FALSE------------------------------------------
 #  #Generate the empirical null distribution

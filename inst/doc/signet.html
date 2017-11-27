@@ -331,10 +331,10 @@ library(graphite)
 
 # pathwayDatabases() #to have a look at pathways and species available
 # get the pathway list:
-paths &lt;- pathways(&quot;hsapiens&quot;, &quot;kegg&quot;)
+paths &lt;- graphite::pathways(&quot;hsapiens&quot;, &quot;kegg&quot;)
 
 # convert the first 3 pathways to graphs:
-kegg_human &lt;- lapply(paths[1:3], pathwayGraph)
+kegg_human &lt;- lapply(paths[1:3], graphite::pathwayGraph)
 head(kegg_human)
 </code></pre>
 
@@ -414,13 +414,13 @@ head(tab)
 </code></pre>
 
 <pre><code>##                           pathway net.size subnet.size     subnet.score
-## 1          Acute myeloid leukemia       53           9 3.45239763922685
-## 2               Adherens junction       66           6  4.7261167815587
+## 1          Acute myeloid leukemia       53           8 3.48302459875205
+## 2               Adherens junction       66           6 3.37209915260395
 ## 3 Adipocytokine signaling pathway       62           5  3.2463628948038
-##   p.val                                   subnet.genes
-## 1 0.016 2322 3815 3845 5291 5292 6776 6777 10000 11040
-## 2     0                   87 1496 1499 7082 7414 29119
-## 3 0.024                    2538 4852 51422 53632 92579
+##   p.val                              subnet.genes
+## 1   0.6 2322 2885 3815 5291 5293 6777 10000 11040
+## 2   0.7            1499 5818 5879 5880 6714 56288
+## 3   0.7               2538 4852 51422 53632 92579
 </code></pre>
 
 <pre><code class="r"># you can write the summary table as follow:
