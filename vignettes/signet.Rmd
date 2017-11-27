@@ -1,13 +1,22 @@
 ---
 title: "signet: Selection Inference in Gene NETworks"
-output: rmarkdown::html_vignette
+author: "Alexandre Gouy"
+package: signet
+output:
+    BiocStyle::html_document2
 vignette: >
-    %\VignetteEngine{knitr::rmarkdown}
-    %\VignetteIndexEntry{signet}
+    %\VignetteIndexEntry{signet tutorial}
     %\VignetteEncoding{UTF-8}
+    <!--
+    %% \VignetteEngine{knitr::knitr}
+    -->
 ---
 
-## General principle
+```{r style, echo = FALSE, results = 'asis'}
+BiocStyle::markdown()
+```
+
+# General principle
 
 The `signet` R package implements a method to detect selection in biological 
 pathways. The general idea is to search for gene subnetworks within biological 
@@ -24,16 +33,16 @@ and search in these graphs for high-scoring subnetworks.
 Details about the algorithm can be found in
 <a href="https://doi.org/10.1093/nar/gkx626">Gouy et al. (2017)</a>.
 
-## Citation
+# Citation
 
 Please cite this paper if you use `signet` for your project:
 
 * Gouy A, Daub JT & Excoffier L (2017) Detecting gene subnetworks under 
 selection in biological pathways. Nucleic Acids Research 45(16): e149
 
-## Walkthrough example
+# Walkthrough example
 
-### Input
+## Input
 
 `signet` takes as input a data frame of gene scores. The first column must
 correspond to the gene ID (e.g. Entrez) and the second columns is the gene 
@@ -103,12 +112,12 @@ This distribution is finally used to compute p-values and update the
 HSS <- testSubnet(HSS, null)
 ```
 
-### Interpretation of the results
+## Interpretation of the results
 
 When p-values have been computed, you can generate a summary table
 (one row per pathway):
 
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 # Results: generate a summary table
 tab <- summary(HSS)
 head(tab)
@@ -126,7 +135,7 @@ distribution can take a few hours. However, these steps are easy
 to parallelize on a cluster as different iterations are independent from each
 other.
 
-### Plot the results using Cytoscape
+## Plot the results using Cytoscape
 
 Cytoscape (www.cytoscape.org) is an external software dedicated to network 
 visualization. `signet` allows to generate an XGMML file to be loaded in 
