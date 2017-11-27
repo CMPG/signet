@@ -77,7 +77,7 @@ data(daub13)
 head(scores) # gene scores
 ```
 
-### Workflow
+## Workflow
 
 We first have to search for high-scoring subnetworks within the
 provided biological pathways, using simulated annealing:
