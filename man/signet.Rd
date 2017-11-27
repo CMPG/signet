@@ -14,6 +14,6 @@
 
 \examples{
     ## A complete workflow is described in signet vignette:
-    vignette("signet")
+    browseVignettes("signet")
 }
 \keyword{ package }
