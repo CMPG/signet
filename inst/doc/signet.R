@@ -1,19 +1,19 @@
 ## ----style, echo = FALSE, results = 'asis'-------------------------------
 BiocStyle::markdown()
 
-## ---- eval=TRUE, message=FALSE-------------------------------------------
-library(signet)
-library(graphite)
-
-# pathwayDatabases() #to have a look at pathways and species available
-# get the pathway list:
-paths <- graphite::pathways("hsapiens", "kegg")
-
-# convert the first 3 pathways to graphs:
-kegg_human <- lapply(paths[1:3], graphite::pathwayGraph)
-head(kegg_human)
+## ---- eval=FALSE, message=FALSE------------------------------------------
+#  library(graphite)
+#  
+#  # pathwayDatabases() #to have a look at pathways and species available
+#  # get the pathway list:
+#  paths <- graphite::pathways("hsapiens", "kegg")
+#  
+#  # convert the first 3 pathways to graphs:
+#  kegg_human <- lapply(paths[1:3], graphite::pathwayGraph)
+#  head(kegg_human)
 
 ## ---- eval=TRUE----------------------------------------------------------
+library(signet)
 data(daub13)
 head(scores) # gene scores
 
@@ -22,7 +22,7 @@ head(scores) # gene scores
 HSS <- searchSubnet(kegg_human, scores)
 
 ## ---- echo=FALSE, eval=TRUE, message=FALSE, results="hide"---------------
-null <- nullDist(kegg_human, scores, n = 10)
+null <- rnorm(1000, mean = 1.5)
 
 ## ---- eval=FALSE, message=FALSE------------------------------------------
 #  #Generate the empirical null distribution

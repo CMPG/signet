@@ -20,9 +20,9 @@
 #' @examples
 #'
 #' # Get KEGG pathways from the package graphite:
-#' library(graphite)
-#' kegg <- pathways("hsapiens", "kegg")
-#' kegg_human <- lapply(kegg[1:5], pathwayGraph)
+#' # library(graphite)
+#' # kegg <- pathways("hsapiens", "kegg")
+#' # kegg_human <- lapply(kegg, pathwayGraph)
 #'
 #' data(daub13) # load the gene scores from Daub et al. (2013)
 #'

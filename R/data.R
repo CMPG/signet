@@ -21,3 +21,7 @@
 #' for polygenic adaptation to pathogens in the human genome. Molecular biology
 #' and evolution, 30(7), 1544-1558.
 "scores"
+#' Pathway examples.
+#' See \code{browseVignettes("signet")} to see how to prepare the pathways for
+#' running simulated annealing.
+"kegg_human"

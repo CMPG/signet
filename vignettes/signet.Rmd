@@ -53,8 +53,7 @@ The other input is a list of biological pathways (gene networks) in the
 `graphNEL` format. We advise to use the package `graphite` to get the
 pathway data:
 
-```{r, eval=TRUE, message=FALSE}
-library(signet)
+```{r, eval=FALSE, message=FALSE}
 library(graphite)
 
 # pathwayDatabases() #to have a look at pathways and species available
@@ -74,6 +73,7 @@ A example dataset from Daub et al. (2013, MBE) as well as human KEGG
 pathways are provided:
 
 ```{r, eval=TRUE}
+library(signet)
 data(daub13)
 head(scores) # gene scores
 ```
@@ -95,7 +95,7 @@ Then, to test the significance of the high-scoring subnetworks, we
 generate a null distribution of high-scores:
 
 ```{r, echo=FALSE, eval=TRUE, message=FALSE, results="hide"}
-null <- nullDist(kegg_human, scores, n = 10)
+null <- rnorm(1000, mean = 1.5)
 ```
 ```{r, eval=FALSE, message=FALSE}
 #Generate the empirical null distribution
