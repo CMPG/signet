@@ -34,7 +34,7 @@ data(daub13) # load the gene scores from Daub et al. (2013)
 #run the search in all the pathways with 2500 iterations (default)
 example <- searchSubnet(kegg_human, scores)
 
-# generate the null distribution (here, only 10 values, but
+# generate the null distribution (here, only 5 values, but
 # at least 1000 are advised)
 null <- nullDist(kegg_human, scores, n = 5)
 example <- testSubnet(example, null) #now, 'example' includes p-values
