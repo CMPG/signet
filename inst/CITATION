@@ -1,0 +1,15 @@
+note <- sprintf("R package version %s", meta$Version)
+bibentry(
+	bibtype = "Article",
+	title = "Detecting gene subnetworks under selection in biological pathways", 
+	author = c(person("Alexandre", "Gouy"), person("Josephine T.", "Daub"), person("Laurent", "Excoffier")), 
+	journal = "Nucleic Acids Research",
+	volume = "45",
+	number = "16",
+	pages = "e149",
+	year = "2017",
+	doi = "10.1093/nar/gkx626",
+	url =  "http://dx.doi.org/10.1093/nar/gkx626",
+	note = note
+)
+	
