@@ -1,11 +1,7 @@
 Package: signet
 Type: Package
 Title: signet: Selection Inference in Gene NETworks
-<<<<<<< HEAD
-Version: 0.99.12
-=======
 Version: 1.1.0
->>>>>>> upstream/master
 Date: 2017-11-27
 Authors@R: c(person("Alexandre", "Gouy",
     email = "alexandre.gouy@iee.unibe.ch",

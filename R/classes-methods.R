@@ -34,7 +34,7 @@ NULL
     )
 )
 
-#' @describeIn Signet Print the summary a Signet object
+#' @describeIn Signet Print the summary a Signet object.
 #' @param object A signet object.
 #' @export
 setMethod("show", "Signet", function(object) {
