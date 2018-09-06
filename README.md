@@ -35,9 +35,10 @@ package (`Rtools` must also be installed and properly configured):
 ```{r}
 ## install devtools and signet dependencies
 # install.packages('devtools')
-# source("http://bioconductor.org/biocLite.R")
-# biocLite("graph")
-# biocLite("RBGL")
+# if (!requireNamespace("BiocManager", quietly=TRUE))
+    # install.packages("BiocManager")
+# BiocManager::install("graph")
+# BiocManager::install("RBGL")
 # install.packages("igraph")
 
 devtools::install_github('CMPG/signet')
