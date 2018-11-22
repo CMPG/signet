@@ -235,7 +235,7 @@ setMethod("summary", "SignetList", function(object, ...) {
 
     re <- data.frame(pathway = names(object@results))
 
-    xu <- sapply(re$pathway, function(xl) {
+    xu <- sapply(as.character(re$pathway), function(xl) {
         pa <- object@results[[xl]]
         return(c(
             net.size = dim(pa@network)[1],
