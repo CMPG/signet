@@ -47,7 +47,7 @@ simulated annealing run.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{show}: Print the summary a Signet object
+\item \code{show}: Print the summary a Signet object.
 
 \item \code{summary}: Print the summary of a Signet object
 
