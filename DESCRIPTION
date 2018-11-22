@@ -29,5 +29,5 @@ biocViews: Software, Pathways, DifferentialExpression, GeneExpression,
     NetworkEnrichment, GraphAndNetwork, KEGG
 License: GPL-2
 LazyData: true
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 VignetteBuilder: knitr
