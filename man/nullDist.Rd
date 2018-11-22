@@ -31,7 +31,7 @@ for each biological pathway.
 # kegg <- pathways("hsapiens", "kegg")
 # kegg_human <- lapply(kegg, pathwayGraph)
 
-data(daub13) # load the gene scores from Daub et al. (2013)
+data(daub13) # load the gene scores
 
 # generate the null distribution (here, only 5 values, but
 # at least 1000 are advised)

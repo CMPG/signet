@@ -71,11 +71,18 @@ searchSubnet <- function(pathway, scores, iterations = 1000, background) {
     if (class(pathway) == "list") {
 
         message("  Running simulated annealing...")
-        all <- lapply_pb(pathway, function(x) {
 
+        all <- list()
+        for(i in 1:length(pathway)) {
+            searchSubnet(
+                pathway[[i]],
+                scores = scores,
+                background = bk,
+                iterations = iterations
+            )
             res <- try(
                 searchSubnet(
-                    x,
+                    pathway[[i]],
                     scores = scores,
                     background = bk,
                     iterations = iterations
@@ -83,9 +90,12 @@ searchSubnet <- function(pathway, scores, iterations = 1000, background) {
                 silent = TRUE
             )
             if (class(res) == "try-error") res <- NA
-            res
+            all[[i]] <- res
 
-        })
+            cat("\r  ", round(100*i/length(pathway),-1), " %")
+        }
+
+        names(all) <- names(pathway)
 
         cond <- lapply(all, function(x) class(x)=="Signet")
         all <- .SignetList(all[unlist(cond)])
