@@ -176,7 +176,7 @@ searchSubnet <- function(pathway, scores, iterations = 1000, background) {
 
                     sampNeighbour <- TRUE
 
-                    if (lenActive <= 10) {
+                    if (lenActive <= 10 | is.null(boundaries)) {
 
                         CComp <- list(1, 2)
 
