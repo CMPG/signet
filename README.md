@@ -11,7 +11,6 @@ pathways that present unusual features, using a heuristic approach
 `signet` is available on Bioconductor.
 
 ```{r}
-<<<<<<< HEAD
 ## try http:// if https:// URLs are not supported
 source("https://bioconductor.org/biocLite.R")
 biocLite("signet")
@@ -26,7 +25,6 @@ biocLite("signet")
 
 devtools::install_github('CMPG/signet')
 library(signet)
->>>>>>> upstream/master
 ```
 
 ### Usage
