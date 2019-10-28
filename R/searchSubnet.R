@@ -74,12 +74,6 @@ searchSubnet <- function(pathway, scores, iterations = 1000, background) {
 
         all <- list()
         for(i in 1:length(pathway)) {
-            searchSubnet(
-                pathway[[i]],
-                scores = scores,
-                background = bk,
-                iterations = iterations
-            )
             res <- try(
                 searchSubnet(
                     pathway[[i]],
