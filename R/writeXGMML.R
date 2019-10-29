@@ -31,7 +31,7 @@
 #' example <- searchSubnet(kegg_human, scores)
 #'
 #' #write Cytoscape input file for the first pathway:
-#' writeXGMML(example[[1]], filename=tempfile())
+#' #writeXGMML(example[[1]], filename=tempfile())
 
 writeXGMML <- function(sigObj,
                         filename = "signet_output.xgmml", threshold = 0.01) {

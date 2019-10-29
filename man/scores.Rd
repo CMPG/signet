@@ -4,12 +4,14 @@
 \name{scores}
 \alias{scores}
 \title{Example of gene selection scores.}
-\format{A data frame with 17918 rows and 2 variables:
+\format{
+A data frame with 17918 rows and 2 variables:
 \describe{
     \item{gene}{Gene identifier (Entrez gene ID)}
     \item{score}{Gene selection score}
     ...
-}}
+}
+}
 \source{
 Daub, J. T., Hofer, T., Cutivet, E., Dupanloup, I.,
 Quintana-Murci, L., Robinson-Rechavi, M., & Excoffier, L. (2013). Evidence

@@ -150,7 +150,7 @@ If the input of the function is a single `signet` object, the whole pathway will
 be represented and nodes belonging to the highest-scoring subnetwork (HSS) 
 will be highlighted in red.
 
-```{r, eval=TRUE, echo=FALSE}
+```{r, eval=FALSE, echo=FALSE}
 fname <- tempfile()
 writeXGMML(HSS[[1]], filename = fname)
 ```

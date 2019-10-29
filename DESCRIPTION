@@ -1,10 +1,10 @@
 Package: signet
 Type: Package
 Title: signet: Selection Inference in Gene NETworks
-Version: 1.5.1
-Date: 2018-11-22
+Version: 1.5.3
+Date: 2020-04-15
 Authors@R: c(person("Alexandre", "Gouy",
-    email = "alexandre.gouy@iee.unibe.ch",
+    email = "contact@agouy.com",
     role = c("aut", "cre")))
 Description: An R package to detect selection in biological pathways. 
     Using gene selection scores and biological pathways data, 
@@ -29,5 +29,5 @@ biocViews: Software, Pathways, DifferentialExpression, GeneExpression,
     NetworkEnrichment, GraphAndNetwork, KEGG
 License: GPL-2
 LazyData: true
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0
 VignetteBuilder: knitr

@@ -84,7 +84,13 @@ searchSubnet <- function(pathway, scores, iterations = 1000, background) {
                 silent = TRUE
             )
             if (class(res) == "try-error") res <- NA
+            else {
+                na.gr <- NA
+                class(na.gr) <- "graphNEL"
+                res@connected_comp <- na.gr
+            }
             all[[i]] <- res
+            gc()
 
             cat("\r  ", round(100*i/length(pathway),-1), " %")
         }

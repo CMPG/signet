@@ -39,7 +39,7 @@ data(daub13) # load the gene scores from Daub et al. (2013)
 example <- searchSubnet(kegg_human, scores)
 
 #write Cytoscape input file for the first pathway:
-writeXGMML(example[[1]], filename=tempfile())
+#writeXGMML(example[[1]], filename=tempfile())
 }
 \keyword{Cytoscape,}
 \keyword{network,}
