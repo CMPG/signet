@@ -11,10 +11,13 @@ pathways that present unusual features, using a heuristic approach
 `signet` is available on Bioconductor.
 
 ```{r}
-## try http:// if https:// URLs are not supported
 source("https://bioconductor.org/biocLite.R")
 biocLite("signet")
-=======
+```
+
+You can also install the development version:
+
+```{r}
 ## install devtools and signet dependencies
 # install.packages('devtools')
 # if (!requireNamespace("BiocManager", quietly=TRUE))

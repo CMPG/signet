@@ -1,13 +1,8 @@
 Package: signet
 Type: Package
 Title: signet: Selection Inference in Gene NETworks
-<<<<<<< HEAD
-Version: 1.5.3
-Date: 2020-04-15
-=======
-Version: 1.5.2
-Date: 2018-11-22
->>>>>>> 94f0574ab1581c291f5b03a0dc6d342c1fdcd5a6
+Version: 1.5.4
+Date: 2020-05-16
 Authors@R: c(person("Alexandre", "Gouy",
     email = "contact@agouy.com",
     role = c("aut", "cre")))
