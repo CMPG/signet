@@ -152,7 +152,7 @@ will be highlighted in red.
 
 ```{r, eval=FALSE, echo=FALSE}
 fname <- tempfile()
-writeXGMML(HSS[[1]], filename = fname)
+# writeXGMML(HSS[[1]], filename = fname)
 ```
 ```{r, eval=FALSE}
 writeXGMML(HSS[[1]], filename = "cytoscape_input.xgmml")
