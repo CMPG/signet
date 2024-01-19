@@ -95,6 +95,7 @@ writeXGMML <- function(sigObj,
             if (is.na(x@p.value)) return(TRUE)
             else return(x@p.value < threshold)
         }))
+
         sigObj <- sigObj@results[selec]
 
         if(length(sigObj) == 0) {
