@@ -52,7 +52,6 @@ writeXGMML <- function(sigObj,
     }
 
     if (class(sigObj) == "Signet") {
-
         el <- c()
         for (i in 1:length(graph::edges(sigObj@connected_comp))) {
             el <- c(el, paste(
@@ -61,6 +60,7 @@ writeXGMML <- function(sigObj,
                 sep = "-"
             ))
         }
+
         xx <- do.call("rbind", strsplit(el, "-"))
 
         for (i in 1:nrow(xx)) {
@@ -89,13 +89,13 @@ writeXGMML <- function(sigObj,
 
         gr <- igraph:::graph_from_graphnel(sigObj@connected_comp)
         ncoords <- igraph::layout.fruchterman.reingold(gr) * 50
-
     } else {
 
         selec <- unlist(lapply(sigObj@results, function(x) {
-            if (is.na(x@p.value)) return(FALSE)
+            if (is.na(x@p.value)) return(TRUE)
             else return(x@p.value < threshold)
         }))
+
         sigObj <- sigObj@results[selec]
 
         if(length(sigObj) == 0) {
