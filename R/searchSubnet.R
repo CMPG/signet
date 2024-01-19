@@ -81,7 +81,7 @@ searchSubnet <- function(pathway, scores, iterations = 1000, background) {
                     background = bk,
                     iterations = iterations
                 ),
-                silent = TRUE
+                silent = FALSE
             )
             if (class(res) == "try-error") res <- NA
             else {
@@ -320,7 +320,7 @@ searchSubnet <- function(pathway, scores, iterations = 1000, background) {
             sum(sigObj@network$score[sigObj@network$active]) /
             (sigObj@subnet_size)
 
-        sigObj@subnet_genes <- sigObj@network$gene[sigObj@network$active]
+        sigObj@subnet_genes <- factor(sigObj@network$gene[sigObj@network$active])
 
         invisible(sigObj)
     }
