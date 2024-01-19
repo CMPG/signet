@@ -83,12 +83,8 @@ searchSubnet <- function(pathway, scores, iterations = 1000, background) {
                 ),
                 silent = FALSE
             )
-            if (class(res) == "try-error") res <- NA
-            else {
-                na.gr <- NA
-                class(na.gr) <- "graphNEL"
-                res@connected_comp <- na.gr
-            }
+
+            if (class(res) != "Signet") res <- NA
             all[[i]] <- res
             gc()
 
@@ -321,7 +317,6 @@ searchSubnet <- function(pathway, scores, iterations = 1000, background) {
             (sigObj@subnet_size)
 
         sigObj@subnet_genes <- factor(sigObj@network$gene[sigObj@network$active])
-
         invisible(sigObj)
     }
 }
