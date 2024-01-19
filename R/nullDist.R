@@ -68,7 +68,7 @@ nullDist <- function(pathways,
                 iterations = 1000
             ), silent=TRUE)
 
-            if(class(HSS)!="try-error") cond <- FALSE
+            if(class(HSS)=="Signet") cond <- FALSE
 
         }
 
